@@ -5,7 +5,7 @@ This repo contains a Delphi FMX test project for **Trimm-Item** and **Trimm-File
 Note that I added the `dproj` and the `res` file of the test project to `.gitignore`.
 You need to recreate private versions of those (use new empty app).
 
-In your dproj file, check that configuration of `output dir` and `output dir for units` in project options for Delphi-Compiler on all targets is set to the default of
+Check that configuration of `output dir` and `output dir for units` in project options for Delphi-Compiler on all targets is set to the default of
 ```
 .\$(Platform)\$(Config)
 ```
@@ -26,7 +26,7 @@ The test project should explain how the real application will
 - past a Trimm-Item or Trimm-File from the clipboard
 - write a Trimm-File to disk
 - read a Trimm-File from disk at application startup time
-- read a Trimm-File from disk at use request
+- read a Trimm-File from disk at user request
 
 To test drive the code I have created a minimal Form with normal Buttons and Memo Controls.
 The UI for this initial version of the test app was done super quick, it is ugly by design,
@@ -52,10 +52,10 @@ Trimm-File-Auto.txt
 Both text files should be UTF-8 encoded, with BOM.
 
 - The application can write to Trimm-File-Auto.txt
-- The application will never write to Trimm-File.txt
-- The application can read from Trimm-File.txt!
+- The application will not auto-write to Trimm-File.txt
+- The application can read from Trimm-File.txt
 
-You should provide a Trimm-File.txt and press the `rtf` read button.
+You should provide a Trimm-File.txt and press the `rtf` read button to try and read it.
 For Trimm-File.txt, start out with a copy of Trimm-File-Auto.txt,
 which can be created with `wtf` button.
 
@@ -65,14 +65,15 @@ You can paste Trimm-Item text or Trimm-File text, the app will detect what it is
 
 ## On Mac
 
-It should work the same on a Mac.
+It should work almost the same on a Mac.
 
 The version of the real app that I have published uses **sandboxing**, it needs to and I want it.
 
 But *sandboxing* is an overloaded term.
 There is a global variable `IsSandboxed` in the application, located in RiggVar.App.Main.
 If the log reports that IsSandboxed is true,
-it means that the application will use a FileOpenDialog and FileSaveDialog whenever it want to access a file for reading or writing.
+it means that the application will use a FileOpenDialog and FileSaveDialog whenever it wants to access a file for reading or writing,
+which is in harmony with the idea of sandboxing an app on the Mac platform.
 
 When IsSandboxed is true, Trimm-File-Auto.txt in the Documents folder is only a suggestion.
 The user is in control and can choose a different name.
@@ -87,15 +88,25 @@ Sandboxing an app on iOS means that every app has its own Documents folder.
 /var/mobile/Containers/Data/Application/.../Documents/
 ```
 
-In terms of IsSandboxed it means that it should be false,
-no dialog should be shown for the filename to be used,
-the app will just read and write to the app specific Documents folder.
+So yes, variable IsSandboxed should be false,
+no dialog window should be shown for the filename to be used,
+the app will read and write to the app specific Documents folder,
+using the automatically chosen filename,
+according to the convention.
+
+Note that you cannot create and maintain a Trimm-File.txt in the sandboxed Documents folder.
+This is why the `rtf` button in the application will try and read Trimm-File-Auto.txt,
+instead of Trimm-File.txt,
+as it would on Windows or Mac.
+This is a subtle platform diff of the concept.
+Take a note!
 
 ## On Android
 
 I don't know.
 Maybe later when the 64Bit compiler is available.
 It will be similar to iOS, except that the location of the Documents folder is different.
+There is an old app in the Playstore, it needs to be updated.
 
 ## Next steps
 
@@ -109,7 +120,7 @@ Of course you could use it as a starting point for rewriting the app from scratc
 - allow the user to select the current parameter
 - allow the user to change the current parameter value
 
-The real application does all that, and it computes new coordinates for the model on the fly,
+The real application does all that, and it updates computed values for some of the coordinates on the fly,
 according to the latest change to the value of the current parameter.
 
 If you, as a developer, come up with a new implementation of the application shell,
