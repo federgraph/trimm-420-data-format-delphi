@@ -28,7 +28,7 @@ The test project should explain how the real application will
 - read a Trimm-File from disk at application startup time
 - read a Trimm-File from disk at user request
 
-To test drive the code I have created a minimal Form with normal Buttons and Memo Controls.
+To test drive the code I have created a minimal Form with normal Buttons and Memo controls.
 The UI for this initial version of the test app was done super quick, it is ugly by design,
 but can be understood easily.
 You click a button and follow the code.
@@ -55,17 +55,26 @@ Both text files should be UTF-8 encoded, with BOM.
 - The application will not auto-write to Trimm-File.txt
 - The application can read from Trimm-File.txt
 
-You should provide a Trimm-File.txt and press the `rtf` read button to try and read it.
+You should provide a Trimm-File.txt and press the `rtf` button to try and read it.
 For Trimm-File.txt, start out with a copy of Trimm-File-Auto.txt,
 which can be created with `wtf` button.
 
-Monitor the clipboard content.
-Put manually changed text into the clipboard and then paste into the application with `pti` button.
+- Should the app try and read Trimm-File automatically at application startup time? 
+- Should the app try and read Trimm-File-Auto at application startup if Trimm-File does not exist?
+- Should reading a file strictly/always be a manual operation?
+- Should the app try and auto-save Trimm-File-Auto.txt at application shutdown time?
+- Should it be configurable?
+
+We need a table detailing correct answer-rows and platform-columns.
+
+Monitor the clipboard content. I use notepad.exe to manually put
+changed text into the clipboard and then paste into the application with `pti` button.
 You can paste Trimm-Item text or Trimm-File text, the app will detect what it is and digest either.
 
 ## On Mac
 
 It should work almost the same on a Mac.
+I use the Notes Mac App to work manage content to put onto the clipboard.
 
 The version of the real app that I have published uses **sandboxing**, it needs to and I want it.
 
@@ -80,10 +89,16 @@ The user is in control and can choose a different name.
 
 ## On iPad
 
+The Trimm420 app is supposed to support exchanging text data via the **Notes** App.
+This would be the *Notizen App* in German language.
+A **Note** holding a Trimm-Item or a Trimm-File can have a life in the cloud and be the means of sharing data between Mac and iPad.
+
+Once you have pasted data into the app you may want to use the button in order to save it to Trimm-File-Auto.txt,
+so that it will be loaded when the app is started up the next time.
+It is your decision to update the file on disk, it is not done automatically.
+
 Attention: Boolean Variable `IsSandboxed` is False on iPad, even if the iPad version is of course sandboxed.
-
 Sandboxing an app on iOS means that every app has its own Documents folder.
-
 ```
 /var/mobile/Containers/Data/Application/.../Documents/
 ```
