@@ -1,0 +1,171 @@
+object FormMain: TFormMain
+  Left = 0
+  Top = 0
+  Caption = 'RG14'
+  ClientHeight = 807
+  ClientWidth = 875
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnResize = FormResize
+  DesignerMasterStyle = 0
+  object T1Btn: TButton
+    Position.X = 32.000000000000000000
+    Position.Y = 24.000000000000000000
+    TabOrder = 14
+    Text = 'T1'
+    OnClick = T1BtnClick
+  end
+  object T2Btn: TButton
+    Position.X = 120.000000000000000000
+    Position.Y = 24.000000000000000000
+    TabOrder = 13
+    Text = 'T2'
+  end
+  object T3Btn: TButton
+    Position.X = 208.000000000000000000
+    Position.Y = 24.000000000000000000
+    TabOrder = 12
+    Text = 'T3'
+  end
+  object T4Btn: TButton
+    Position.X = 296.000000000000000000
+    Position.Y = 24.000000000000000000
+    TabOrder = 11
+    Text = 'T4'
+  end
+  object T5Btn: TButton
+    Position.X = 384.000000000000000000
+    Position.Y = 24.000000000000000000
+    TabOrder = 10
+    Text = 'T5'
+  end
+  object T6Btn: TButton
+    Position.X = 472.000000000000000000
+    Position.Y = 24.000000000000000000
+    TabOrder = 9
+    Text = 'T6'
+  end
+  object T7Btn: TButton
+    Position.X = 32.000000000000000000
+    Position.Y = 64.000000000000000000
+    TabOrder = 8
+    Text = 'T7 420'
+  end
+  object T8Btn: TButton
+    Position.X = 120.000000000000000000
+    Position.Y = 64.000000000000000000
+    TabOrder = 7
+    Text = 'T8 Logo'
+  end
+  object PasteTrimmItemBtn: TButton
+    Position.X = 208.000000000000000000
+    Position.Y = 104.000000000000000000
+    TabOrder = 6
+    Text = 'pti'
+    OnClick = PasteTrimmItemBtnClick
+  end
+  object CopyTrimmFileBtn: TButton
+    Position.X = 120.000000000000000000
+    Position.Y = 104.000000000000000000
+    TabOrder = 5
+    Text = 'ctf'
+    OnClick = CopyTrimmFileBtnClick
+  end
+  object ReadTrimmFileBtn: TButton
+    Position.X = 384.000000000000000000
+    Position.Y = 104.000000000000000000
+    TabOrder = 4
+    Text = 'rtf'
+    OnClick = ReadTrimmFileBtnClick
+  end
+  object SaveTrimmFileBtn: TButton
+    Position.X = 472.000000000000000000
+    Position.Y = 104.000000000000000000
+    TabOrder = 3
+    Text = 'stf'
+    OnClick = SaveTrimmFileBtnClick
+  end
+  object MT0Btn: TButton
+    Position.X = 384.000000000000000000
+    Position.Y = 64.000000000000000000
+    TabOrder = 2
+    Text = 'MT0'
+    OnClick = MT0BtnClick
+  end
+  object CopyTrimmItemBtn: TButton
+    Position.X = 32.000000000000000000
+    Position.Y = 104.000000000000000000
+    TabOrder = 1
+    Text = 'cti'
+    OnClick = CopyTrimmItemBtnClick
+  end
+  object LogMemo: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Position.X = 8.000000000000000000
+    Position.Y = 192.000000000000000000
+    Size.Width = 353.000000000000000000
+    Size.Height = 497.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 15
+    Viewport.Width = 349.000000000000000000
+    Viewport.Height = 493.000000000000000000
+  end
+  object CopyAndPasteBtn: TButton
+    Position.X = 472.000000000000000000
+    Position.Y = 64.000000000000000000
+    TabOrder = 17
+    Text = 'M'
+    OnClick = CopyAndPasteBtnClick
+  end
+  object ReportBtn: TButton
+    Position.X = 32.000000000000000000
+    Position.Y = 144.000000000000000000
+    TabOrder = 18
+    Text = 'rpt'
+    OnClick = ReportBtnClick
+  end
+  object LogBtn: TButton
+    Position.X = 120.000000000000000000
+    Position.Y = 144.000000000000000000
+    TabOrder = 19
+    Text = 'log'
+    OnClick = LogBtnClick
+  end
+  object StateMemo: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Position.X = 376.000000000000000000
+    Position.Y = 192.000000000000000000
+    Size.Width = 465.000000000000000000
+    Size.Height = 497.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 20
+    Viewport.Width = 461.000000000000000000
+    Viewport.Height = 493.000000000000000000
+  end
+  object StateBtn: TButton
+    Position.X = 208.000000000000000000
+    Position.Y = 144.000000000000000000
+    TabOrder = 21
+    Text = 'State'
+    OnClick = StateBtnClick
+  end
+  object JsonBtn: TButton
+    Position.X = 296.000000000000000000
+    Position.Y = 144.000000000000000000
+    TabOrder = 22
+    Text = 'Json'
+    OnClick = JsonBtnClick
+  end
+  object cbSandboxed: TCheckBox
+    Position.X = 576.000000000000000000
+    Position.Y = 104.000000000000000000
+    TabOrder = 23
+    Text = 'Sandboxed'
+    OnChange = cbSandboxedChange
+  end
+end
