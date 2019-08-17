@@ -74,7 +74,7 @@ You can paste Trimm-Item text or Trimm-File text, the app will detect what it is
 ## On Mac
 
 It should work almost the same on a Mac.
-I use the Notes Mac App to work manage content to put onto the clipboard.
+I use the Notes Mac App to manage content, to put onto the clipboard, or retrieve from clipboard.
 
 The version of the real app that I have published uses **sandboxing**, it needs to and I want it.
 
@@ -84,8 +84,10 @@ If the log reports that IsSandboxed is true,
 it means that the application will use a FileOpenDialog and FileSaveDialog whenever it wants to access a file for reading or writing,
 which is in harmony with the idea of sandboxing an app on the Mac platform.
 
-When IsSandboxed is true, Trimm-File-Auto.txt in the Documents folder is only a suggestion.
+When IsSandboxed is true, Trimm-File.txt in the Documents folder is only a suggestion.
 The user is in control and can choose a different name.
+But it should have a .txt extension, be plain UTF-8 encoded text, and preferably have a BOM.
+If all this is true it should work.
 
 ## On iPad
 
