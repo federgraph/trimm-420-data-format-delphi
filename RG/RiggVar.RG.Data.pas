@@ -911,7 +911,7 @@ end;
 
 procedure TRggData.WriteJSon(AML: TStrings);
 begin
-  AML.Add(Format('{"Name":%s,"Faktor":%d,"OffsetX":%d,"OffsetZ":%d,', [Name, Faktor, OffsetX, OffsetZ]));
+  AML.Add(Format('{"Name":"%s","Faktor":%d,"OffsetX":%d,"OffsetZ":%d,', [Name, Faktor, OffsetX, OffsetZ]));
 
   AML.Add('"RK":{');
   AML.Add(Format('"A0":{"x":%d,"y":%d,"z":%d},', [A0X, A0Y, A0Z]));
