@@ -190,7 +190,9 @@ and change currently selected slot between copy and paste operations.
 
 ## Relative Values
 
-It should be convenient to specify the Trimm data for your boat, but you need to know how.
+It should be convenient for the users to specify the Trimm data for their boats.
+
+Ok, I admit that it is currently *convenient* only if you know how.
 
 When I say convenient, I mean two things:
 
@@ -252,7 +254,7 @@ You can always file an issue, we are on GitHub.
 
 By the way T7 (420) is the default data.
 
-> Make TO contain the same data as T7 (default) to see what you are diffing against in the Trimm-File. 
+> Make T0 contain the same data as T7 (default) to see what you are diffing against in the Trimm-File. 
 
 Someone has to start writing unit tests, perhaps when we do it in SwiftUI, or Flutter.
 I am not going to change much, unless the unit tests are in place.
@@ -289,7 +291,7 @@ end;
 - T1-T6 are the user specified Trimms.
 - T0 should hold a copy of T1-T6
 - Diffing is an important feature. You are diffing against T0.
-- T7 and T8 is read only.
+- T7 and T8 are read only.
 - T7 is the default in Trimm420 app
 - T7 would be a little different in Trimm470 app
 - RggData is is temp object
@@ -407,7 +409,7 @@ The code for this test project was extracted from the real application and shows
 The test project should explain how the real application will
 - copy a Trimm-Item to the clipboard
 - copy a Trimm-File to the clipboard
-- past a Trimm-Item or Trimm-File from the clipboard
+- paste a Trimm-Item or Trimm-File from the clipboard
 - write a Trimm-File to disk
 - read a Trimm-File from disk at application startup time
 - read a Trimm-File from disk at user request
@@ -451,7 +453,9 @@ content into the clipboard and then paste into the application with `pti` button
 ## On Mac
 
 It should work almost the same on a Mac.
-I use the Notes Mac App to manage content, to put onto the clipboard, or retrieve from clipboard.
+I use the Notes Mac App to manage content.
+- From a Note in Notes I copy content to the clipboard.
+- In a Note (new Note is great) I retrieve (paste) content from the clipboard.
 
 The version of the real app that I have published uses **sandboxing**, it needs to and I want it.
 
@@ -541,7 +545,7 @@ We need a table detailing platform-rows and answer-columns:
 
 | Platform        | A | B | C | D | E |
 | :-------------- | - | - | - | - | - |
-| Windows, normal | ? | 0 | ? | 0 | 0 |
+| Windows, normal | ? | ? | ? | ? | ? |
 | Windows, appx   | 1 | 1 | 0 | 0 | 1 |
 | Mac, App Store  | 1 | 1 | 0 | 0 | 1 |
 | iPad            | 0 | 1 | 0 | 0 | 0 |
