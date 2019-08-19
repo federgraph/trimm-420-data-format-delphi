@@ -192,7 +192,7 @@ and change currently selected slot between copy and paste operations.
 
 It should be convenient to specify the Trimm data for your boat, but you need to know how.
 
-When I say convenient, I mean two thing:
+When I say convenient, I mean two things:
 
 - don't have to repeat unchanged values
 - and (!) can specify relative values
@@ -247,17 +247,54 @@ where Reset is called on the instance of TRggData.
 
 At least this is the status quo right now.
 Does it make sense?
-As I am writing this, I am merely documenting what has been implemented.
+As I am writing this, I am merely describing what has been implemented.
 You can always file an issue, we are on GitHub.
 
-> I think I will do (sell) special versions of the App !!!
+By the way T7 (420) is the default data.
 
-( And I have no idea how long this will stay on my mind. )
+> Make TO contain the same data as T7 (default) to see what you are diffing against in the Trimm-File. 
 
-Someone has to start writing unit test, perhaps when we do it in SwiftUI, or Flutter.
+Someone has to start writing unit tests, perhaps when we do it in SwiftUI, or Flutter.
+I am not going to change much, unless the unit tests are in place.
+Unit testing should have its own heading.
 
-I am not going to change much, unless the unit test are in place.
-Talk in the readme file is cheap.
+## Unit testing
+
+To be done. And should have its own readme file?
+
+## TRggData instances
+
+Just briefly, from the code, to make it clear:
+
+```pascal
+  TMain1 = class(TMain0)
+  public
+    RggData: TRggData;
+    RggMain: TRggMain;
+
+    Trimm0: TRggData;
+    Trimm1: TRggData;
+    Trimm2: TRggData;
+    Trimm3: TRggData;
+    Trimm4: TRggData;
+    Trimm5: TRggData;
+    Trimm6: TRggData;
+    Trimm7: TRggData; //420
+    Trimm8: TRggData; //Logo    
+end;
+```
+
+- I wanted to allow the user of the app to deal with a limited number of Trimms.
+- TRggData is holding a Trimm-Item in Memory.
+- T1-T6 are the user specified Trimms.
+- T0 should hold a copy of T1-T6
+- Diffing is an important feature. You are diffing against T0.
+- T7 and T8 is read only.
+- T7 is the default in Trimm420 app
+- T7 would be a little different in Trimm470 app
+- RggData is is temp object
+
+The data structure the real application uses is part of class TRigg and is omitted from this test project.
 
 ## Trimm-Item Json
 
@@ -305,7 +342,7 @@ But I think one control, perhaps a slider, would be great.
 
 ## Trimm-Item Report
 
-This is about the same data, but formatted for display on screen, overlaying the graph.
+This is about the same data but formatted for display on screen.
 ```
 A0 (2560, 765, 430)
 C0 (4140, 0, 340)
@@ -327,7 +364,22 @@ SH (140, 220, 300)
 SA (780, 850, 1000)
 SL (450, 479, 600)
 ```
-You can see it on the screen of the app.
+You can see it on the screen of the real app.
+It is visible on top of the graph when `data` is switched on by the user.
+The UI of the current real app looks like a Game.
+There is not much space available to show text.
+The Text goes into a TText control.
+
+I have added an option in the published app
+so that the user can show the log text in this component
+instead of the Trimm-Item report.
+
+Debugging the app on a device or inside of the simulator often does not work at all.
+That is why it is valuable to have some old style *in app logging* capability built into the app.
+
+> InApp logging is better for the user than InApp purchasing.
+
+Please keep this in the new UI (to be done).
 
 ## Test Project
 
@@ -383,17 +435,18 @@ Trimm-File-Auto.txt
 ```
 Both text files should be UTF-8 encoded, with BOM.
 
-- The application can write to Trimm-File-Auto.txt
-- The application will not auto-write to Trimm-File.txt
-- The application can read from Trimm-File.txt
+- The application can write to Trimm-File-Auto
+- The application can read from your Trimm-File (and from Trimm-File-Auto)
+- The application will NOT auto-write to Trimm-File
 
 You should provide a Trimm-File.txt in the expected location and press the `rtf` button to try and read it.
 For Trimm-File.txt, start out with a copy of Trimm-File-Auto.txt,
 which can be created with `wtf` button.
 
-Monitor the clipboard content. I use notepad.exe to manually put
-changed text into the clipboard and then paste into the application with `pti` button.
-You can paste Trimm-Item text or Trimm-File text, the app will detect what it is and digest either.
+Monitor the clipboard. I use notepad.exe to manually put
+content into the clipboard and then paste into the application with `pti` button.
+
+> You can paste Trimm-Item text or Trimm-File text, the app will detect what it is and digest either.
 
 ## On Mac
 
@@ -419,7 +472,7 @@ The Trimm420 app is supposed to support exchanging text data via the **Notes** A
 This would be the *Notizen App* in German language.
 A **Note** holding a Trimm-Item or a Trimm-File can have a life in the cloud and be the means of sharing data between Mac and iPad.
 
-Once you have pasted data into the app you may want to use the button in order to save it to Trimm-File-Auto.txt,
+Once you have pasted data into the app you may want to use the `wtf` button in order to save it to Trimm-File-Auto.txt,
 so that it will be loaded when the app is started up the next time.
 It is your decision to update the file on disk, it is not done automatically.
 
@@ -474,7 +527,7 @@ Until then you could use the published app (see Store) and provide data in the f
 - I am working on this.
 - It is not cast in stone.
 - Find out in the log file what the application is doing.
-- Read the source and step through the application.
+- Read the source and step through the application code.
 
 |   | Question |
 | - | :------- |
@@ -488,10 +541,11 @@ We need a table detailing platform-rows and answer-columns:
 
 | Platform        | A | B | C | D | E |
 | :-------------- | - | - | - | - | - |
-| Windows, normal | 1 | 0 | 1 | 0 | 0 |
+| Windows, normal | ? | 0 | ? | 0 | 0 |
 | Windows, appx   | 1 | 1 | 0 | 0 | 1 |
 | Mac, App Store  | 1 | 1 | 0 | 0 | 1 |
 | iPad            | 0 | 1 | 0 | 0 | 0 |
+| Android         | 0 | 1 | 0 | 0 | 0 |
 
 ## Other
 
