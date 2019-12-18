@@ -1,4 +1,20 @@
-unit RiggVar.RG.Main;
+﻿unit RiggVar.RG.Main;
+
+(*
+-
+-     F
+-    * * *
+-   *   *   G
+-  *     * *   *
+- E - - - H - - - I
+-  *     * *         *
+-   *   *   *           *
+-    * *     *             *
+-     D-------A---------------B
+-              *
+-              (C) federgraph.de
+-
+*)
 
 interface
 

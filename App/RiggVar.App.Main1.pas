@@ -2,7 +2,7 @@
 
 (*
 -
--     F            info: http://wwww.riggvar.de
+-     F
 -    * * *
 -   *   *   G
 -  *     * *   *
@@ -12,7 +12,7 @@
 -    * *     *             *
 -     D-------A---------------B
 -              *
--              (C) RiggVar Software UG (haftungsbeschränkt)
+-              (C) federgraph.de
 -
 *)
 
@@ -458,6 +458,12 @@ begin
 // or on any device where you have access to the Documents folder.
   fn := TrimmFileName;
 
+// Maybe you want to have the same behaviour on Windows and iOS
+// for debugging purpose only...
+{$ifdef MSWINDOWS}
+//  fn := TrimmFileNameAuto;
+{$endif}
+
 // on Android and iOS the location cannot be edited manually,
 // so it does not make sense to read a manually edited Trimm-File.txt
 // but you can manualy read Trimm-File-Auto.txt if already saved.
@@ -735,8 +741,8 @@ begin
     faMastfallVorlauf: result := RggMain.Param = fpMastfallVorlauf;
     faBiegung: result := RggMain.Param = fpBiegung;
     faMastfussD0X: result := RggMain.Param = fpD0X;
-    faParamT1: result := RggMain.Param = fpt1;
-    faParamT2: result := RggMain.Param = fpt2;
+    faParamT1: result := RggMain.Param = fpT1;
+    faParamT2: result := RggMain.Param = fpT2;
 
     faFixpointA0: result := RggMain.FixName = ooA0;
     faFixpointA: result := RggMain.FixName = ooA;

@@ -26,8 +26,7 @@ implementation
 
 uses
   FMX.Platform,
-  RiggVar.App.Main,
-  RiggVar.FB.Classes;
+  RiggVar.App.Main;
 
 { TMain0 }
 

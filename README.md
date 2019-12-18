@@ -325,7 +325,7 @@ Not sure if I should format this properly or leave it as is.
 
 ```
 RK = Rumpf-Koordinaten
-RL = think Mast-Längen ( ML already used for overall Mast-Length ) 
+RL = think Rigg-Längen or Mast-Längen ( ML already used for overall Mast-Length ) 
 SB = Scroll-Bars
 ```
 

@@ -1,23 +1,23 @@
-unit FrmMain;
+﻿unit FrmMain;
 
 interface
 
 uses
   System.SysUtils,
+  System.Classes,
   System.Types,
   System.UITypes,
   System.UIConsts,
-  System.Classes,
   FMX.Types,
   FMX.Controls,
   FMX.Forms,
   FMX.Graphics,
   FMX.Dialogs,
   FMX.Objects,
-  FMX.ScrollBox,
   FMX.Memo,
-  FMX.Controls.Presentation,
-  FMX.StdCtrls;
+  FMX.StdCtrls,
+  FMX.ScrollBox,
+  FMX.Controls.Presentation;
 
 type
   TFormMain = class(TForm)
@@ -45,6 +45,7 @@ type
     cbSandboxed: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormResize(Sender: TObject);
     procedure ReportBtnClick(Sender: TObject);
     procedure T1BtnClick(Sender: TObject);
     procedure LogBtnClick(Sender: TObject);
@@ -57,7 +58,6 @@ type
     procedure MT0BtnClick(Sender: TObject);
     procedure CopyAndPasteBtnClick(Sender: TObject);
     procedure JsonBtnClick(Sender: TObject);
-    procedure FormResize(Sender: TObject);
     procedure cbSandboxedChange(Sender: TObject);
   private
     procedure InitRetina;

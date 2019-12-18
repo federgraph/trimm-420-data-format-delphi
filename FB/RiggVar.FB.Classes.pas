@@ -27,8 +27,7 @@ uses
   System.Classes,
   System.Math,
   System.Math.Vectors,
-  System.Types,
-  FMX.Types3D;
+  System.Types;
 
 const
   BoolStr: array[Boolean] of string = ('False', 'True');
@@ -96,8 +95,6 @@ type
     class function Round(Value: Extended; Decimals: Integer): double; static;
     class function MakeEulerAngles(M: TMatrix3D; WantDegreeNormalize: Boolean): TPoint3D; static;
     class function IsEssentiallyZero(const Value: Single): Boolean; static;
-    class procedure Clip180(Pos: TPosition3D); static;
-    class procedure Clip360(Pos: TPosition3D); static;
   end;
 
 implementation
@@ -310,40 +307,6 @@ end;
 class function TUtils.IsEssentiallyZero(const Value: Single): Boolean;
 begin
   result := ((Value < Epsilon2) and (Value > -Epsilon2));
-end;
-
-class procedure TUtils.Clip180(Pos: TPosition3D);
-begin
-  while Pos.X > 180 do
-    Pos.X := Pos.X - 360;
-  while Pos.Y > 180 do
-    Pos.Y := Pos.Y - 360;
-  while Pos.Z > 180 do
-    Pos.Z := Pos.Z - 360;
-
-  while Pos.X < -180 do
-    Pos.X := Pos.X + 360;
-  while Pos.Y < -180 do
-    Pos.Y := Pos.Y + 360;
-  while Pos.Z < -180 do
-    Pos.Z := Pos.Z + 360;
-end;
-
-class procedure TUtils.Clip360(Pos: TPosition3D);
-begin
-  while Pos.X > 360 do
-    Pos.X := Pos.X - 360;
-  while Pos.Y > 360 do
-    Pos.Y := Pos.Y - 360;
-  while Pos.Z > 360 do
-    Pos.Z := Pos.Z - 360;
-
-  while Pos.X < -360 do
-    Pos.X := Pos.X + 360;
-  while Pos.Y < -360 do
-    Pos.Y := Pos.Y + 360;
-  while Pos.Z < -360 do
-    Pos.Z := Pos.Z + 360;
 end;
 
 { TTokenParser }

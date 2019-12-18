@@ -41,7 +41,7 @@
   32  4    FiMastfallVorlauf, Integer
   36  4    FiControllerAnschlag, Integer
   40  4    FiReserved, Integer
-  ip, TIntRiggPoints
+  iP, TIntRiggPoints
   rEA, TRiggLvektor
   EI, double
   GSB, TsbArray
@@ -52,9 +52,9 @@
 interface
 
 uses
-  Inifiles,
-  SysUtils,
-  Classes,
+  System.SysUtils,
+  System.Classes,
+  System.Inifiles,
   RggScroll,
   RggTypes;
 
@@ -70,7 +70,7 @@ type
     procedure LoadSignatureFromStream(strm: TStream);
     procedure SaveSignatureToStream(strm: TStream);
   public
-    Signature: string; // string[8];
+    Signature: string;
     { Rigg: Typ }
     SalingTyp: TSalingTyp;
     ControllerTyp: TControllerTyp;
@@ -109,11 +109,11 @@ type
     procedure ReadFromDFM(Memo: TStrings);
     procedure WriteToDFM(Memo: TStrings);
     function SaveToString: string;
-    procedure LoadFromString(S: string);
+    procedure LoadFromString(s: string);
     function SaveToXML: string;
-    procedure LoadFromXML(S: string);
+    procedure LoadFromXML(s: string);
     function SaveToXMLBase64: string;
-    function LoadFromXMLBase64(S: string): string;
+    function LoadFromXMLBase64(s: string): string;
   end;
 
 implementation
@@ -121,7 +121,6 @@ implementation
 uses
   RiggVar.App.Main,
   RiggVar.FB.Classes;
-// IdCoderMime;
 
 constructor TRggDocument.Create;
 begin
@@ -207,7 +206,6 @@ var
 begin
   { Signature }
   LoadSignatureFromStream(strm);
-
   if not SignatureOK then
     raise EFileFormatError.Create('FormatError');
 
@@ -259,7 +257,6 @@ begin
   strm.WriteBuffer(EI, SizeOf(double));
   { Grenzwerte }
   GSB.SaveToStream(strm);
-  strm.WriteBuffer(GSB, SizeOf(TsbArray));
   { Trimmtabelle }
   strm.WriteBuffer(TrimmTabDaten, SizeOf(TTrimmTabDaten));
 end;
@@ -278,8 +275,7 @@ begin
     begin
       S := 'Rigg';
       SalingTyp := TSalingTyp(ReadInteger(S, 'SalingTyp', Ord(stFest)));
-      ControllerTyp := TControllerTyp(ReadInteger(S, 'ControllerTyp',
-        Ord(ctDruck)));
+      ControllerTyp := TControllerTyp(ReadInteger(S, 'ControllerTyp', Ord(ctDruck)));
       CalcTyp := TCalcTyp(ReadInteger(S, 'CalcTyp', Ord(ctBiegeKnicken)));
 
       S := 'Trimmtabelle';
@@ -287,8 +283,7 @@ begin
       with TrimmTabDaten do
       begin
         try
-          T.TabellenTyp := TTabellenTyp(ReadInteger(S, 'TabellenTyp',
-            Ord(itParabel)));
+          T.TabellenTyp := TTabellenTyp(ReadInteger(S, 'TabellenTyp', Ord(itParabel)));
           S1 := ReadString(S, 'a0', FloatToStrF(T.a0, ffGeneral, 8, 2));
           T.a0 := StrToFloat(S1);
           S1 := ReadString(S, 'a1', FloatToStrF(T.a1, ffGeneral, 8, 2));
@@ -313,8 +308,7 @@ begin
       FiMastunten := ReadInteger(S, 'Mastunten', FiMastunten);
       FiMastoben := ReadInteger(S, 'Mastoben', FiMastoben);
       FiMastfallVorlauf := ReadInteger(S, 'MastfallVorlauf', FiMastfallVorlauf);
-      FiControllerAnschlag := ReadInteger(S, 'ControllerAnschlag',
-        FiControllerAnschlag);
+      FiControllerAnschlag := ReadInteger(S, 'ControllerAnschlag', FiControllerAnschlag);
       EI := ReadInteger(S, 'EI', 14700) * 1E6;
 
       S := 'Ist';
@@ -772,7 +766,7 @@ begin
   { Grenzwerte und Istwerte }
 
   GSB.Controller.Ist := 100; { Controllerposition bzw. Abstand E0-E }
-  GSB.Winkel.Ist := Round(90 + ArcTan(1 / 3) * 180 / pi);
+  GSB.Winkel.Ist := Round(90 + arctan2(1, 3) * 180 / pi);
   { Winkel der unteren Wantabschnitte Winkel in Grad }
   GSB.Vorstag.Ist := Round(sqrt(288) * 10 * f);
   GSB.Wante.Ist := Round((sqrt(40) + sqrt(56)) * 10 * f);
@@ -984,81 +978,6 @@ begin
   end;
 end;
 
-(*
-  procedure TRggDocument.WriteToDFM(Memo: TStrings);
-  var
-  i, tempEI: Integer;
-  begin
-  with Memo do
-  begin
-  //Rigg - diese Properties werden im Objektinspektor gesetzt
-  //Add(Format('SalingTyp=%d',[Ord(SalingTyp)]));
-  //Add(Format('ControllerTyp=%d',[Ord(ControllerTyp)]));
-  //Add(Format('CalcTyp=%d',[Ord(CalcTyp)]));
-
-  //Trimmtabelle
-  with TrimmTabDaten do
-  begin
-  Add(Format('TabellenTyp = %d',[Ord(TabellenTyp)]));
-  Add(Format('Ta0 = %10.5f',[a0]));
-  Add(Format('Ta1 = %10.5f',[a1]));
-  Add(Format('Ta2 = %10.5f',[a2]));
-  Add(Format('Tx0 = %10.5f',[x0]));
-  Add(Format('Tx1 = %10.5f',[x1]));
-  Add(Format('Tx2 = %10.5f',[x2]));
-  end;
-
-  //Mast
-  Add(Format('MastL = %d',[FiMastL]));
-  Add(Format('Mastunten = %d',[FiMastunten]));
-  Add(Format('Mastoben = %d',[FiMastoben]));
-  Add(Format('MastfallVorlauf = %d',[FiMastfallVorlauf]));
-  tempEI := Round(EI/1E6);
-  Add(Format('EI = %d',[tempEI]));
-
-  //GSB
-  Add(Format('%10s = %6d %6d %6d',
-  ['Controller',GSB[Controller,Min],GSB[Controller,Ist],GSB[Controller,Max]]));
-  Add(Format('%10s = %6d %6d %6d',
-  ['Winkel',GSB[Winkel,Min],GSB[Winkel,Ist],GSB[Winkel,Max]]));
-  Add(Format('%10s = %6d %6d %6d',
-  ['Vorstag',GSB[Vorstag,Min],GSB[Vorstag,Ist],GSB[Vorstag,Max]]));
-  Add(Format('%10s = %6d %6d %6d',
-  ['Wante',GSB[Wante,Min],GSB[Wante,Ist],GSB[Wante,Max]]));
-  Add(Format('%10s = %6d %6d %6d',
-  ['Woben',GSB[Woben,Min],GSB[Woben,Ist],GSB[Woben,Max]]));
-  Add(Format('%10s = %6d %6d %6d',
-  ['SalingH',GSB[SalingH,Min],GSB[SalingH,Ist],GSB[SalingH,Max]]));
-  Add(Format('%10s = %6d %6d %6d',
-  ['SalingA',GSB[SalingA,Min],GSB[SalingA,Ist],GSB[SalingA,Max]]));
-  Add(Format('%10s = %6d %6d %6d',
-  ['SalingL',GSB[SalingL,Min],GSB[SalingL,Ist],GSB[SalingL,Max]]));
-  Add(Format('%10s = %6d %6d %6d',
-  ['VorstagOS',GSB[VorstagOS,Min],GSB[VorstagOS,Ist],GSB[VorstagOS,Max]]));
-  Add(Format('%10s = %6d %6d %6d',
-  ['WPowerOS',GSB[WPowerOS,Min],GSB[WPowerOS,Ist],GSB[WPowerOS,Max]]));
-
-  //Koordinaten
-  Add(Format('%10s = %6d %6d %6d',['A0',iP[ooA0,x],iP[ooA0,y],iP[ooA0,z]]));
-  Add(Format('%10s = %6d %6d %6d',['B0',iP[ooB0,x],iP[ooB0,y],iP[ooB0,z]]));
-  Add(Format('%10s = %6d %6d %6d',['C0',iP[ooC0,x],iP[ooC0,y],iP[ooC0,z]]));
-  Add(Format('%10s = %6d %6d %6d',['D0',iP[ooD0,x],iP[ooD0,y],iP[ooD0,z]]));
-  Add(Format('%10s = %6d %6d %6d',['E0',iP[ooE0,x],iP[ooE0,y],iP[ooE0,z]]));
-  Add(Format('%10s = %6d %6d %6d',['F0',iP[ooF0,x],iP[ooF0,y],iP[ooF0,z]]));
-  Add(Format('%10s = %6d %6d %6d',['A' , iP[ooA,x], iP[ooA,y], iP[ooA,z]]));
-  Add(Format('%10s = %6d %6d %6d',['B' , iP[ooB,x], iP[ooB,y], iP[ooB,z]]));
-  Add(Format('%10s = %6d %6d %6d',['C' , iP[ooC,x], iP[ooC,y], iP[ooC,z]]));
-  Add(Format('%10s = %6d %6d %6d',['D' , iP[ooD,x], iP[ooD,y], iP[ooD,z]]));
-  Add(Format('%10s = %6d %6d %6d',['E' , iP[ooE,x], iP[ooE,y], iP[ooE,z]]));
-  Add(Format('%10s = %6d %6d %6d',['F' , iP[ooF,x], iP[ooF,y], iP[ooF,z]]));
-
-  //EA
-  for i := 0 to 19 do
-  Add(Format('EA2%d = %.6g',[i,rEA[i]]));
-  end;
-  end;
-*)
-
 procedure TRggDocument.WriteToDFM(Memo: TStrings);
 var
   i, tempEI: Integer;
@@ -1103,18 +1022,12 @@ begin
     Add(Format('%s= %6d %6d %6d', ['WPowerOS', GSB.WPowerOS.Min, GSB.WPowerOS.Ist, GSB.WPowerOS.Max]));
 
     // Koordinaten
-    Add(Format('%s= %6d %6d %6d', ['A0', iP[ooA0, x], iP[ooA0, y],
-      iP[ooA0, z]]));
-    Add(Format('%s= %6d %6d %6d', ['B0', iP[ooB0, x], iP[ooB0, y],
-      iP[ooB0, z]]));
-    Add(Format('%s= %6d %6d %6d', ['C0', iP[ooC0, x], iP[ooC0, y],
-      iP[ooC0, z]]));
-    Add(Format('%s= %6d %6d %6d', ['D0', iP[ooD0, x], iP[ooD0, y],
-      iP[ooD0, z]]));
-    Add(Format('%s= %6d %6d %6d', ['E0', iP[ooE0, x], iP[ooE0, y],
-      iP[ooE0, z]]));
-    Add(Format('%s= %6d %6d %6d', ['F0', iP[ooF0, x], iP[ooF0, y],
-      iP[ooF0, z]]));
+    Add(Format('%s= %6d %6d %6d', ['A0', iP[ooA0, x], iP[ooA0, y], iP[ooA0, z]]));
+    Add(Format('%s= %6d %6d %6d', ['B0', iP[ooB0, x], iP[ooB0, y], iP[ooB0, z]]));
+    Add(Format('%s= %6d %6d %6d', ['C0', iP[ooC0, x], iP[ooC0, y], iP[ooC0, z]]));
+    Add(Format('%s= %6d %6d %6d', ['D0', iP[ooD0, x], iP[ooD0, y], iP[ooD0, z]]));
+    Add(Format('%s= %6d %6d %6d', ['E0', iP[ooE0, x], iP[ooE0, y], iP[ooE0, z]]));
+    Add(Format('%s= %6d %6d %6d', ['F0', iP[ooF0, x], iP[ooF0, y], iP[ooF0, z]]));
     Add(Format('%s= %6d %6d %6d', ['A', iP[ooA, x], iP[ooA, y], iP[ooA, z]]));
     Add(Format('%s= %6d %6d %6d', ['B', iP[ooB, x], iP[ooB, y], iP[ooB, z]]));
     Add(Format('%s= %6d %6d %6d', ['C', iP[ooC, x], iP[ooC, y], iP[ooC, z]]));
@@ -1313,11 +1226,11 @@ end;
 // Decoder.Free;
 // end;
 
- function TRggDocument.SaveToString: string;
+function TRggDocument.SaveToString: string;
 // var
 // Encoder: TIdEncoderMime;
 // Stream: TStream;
- begin
+begin
 // Stream := TMemoryStream.Create;
 // Encoder := TIdEncoderMime.Create(nil);
 // SaveToStream(Stream);
@@ -1325,194 +1238,194 @@ end;
 // result := Encoder.Encode(Stream, Stream.Size);
 // Stream.Free;
 // Encoder.Free;
- end;
+end;
 
- function TRggDocument.SaveToXMLBase64: string;
+function TRggDocument.SaveToXMLBase64: string;
 // var
 //   Encoder: TIdEncoderMime;
- begin
+begin
 //   Encoder := TIdEncoderMime.Create(nil);
 //   result := Encoder.Encode(SaveToXML);
 //   Encoder.Free;
- end;
+end;
 
- function TRggDocument.LoadFromXMLBase64(s: string): string;
+function TRggDocument.LoadFromXMLBase64(s: string): string;
 // var
 //   Decoder: TIdDecoderMime;
- begin
+begin
 //   Decoder := TIdDecoderMime.Create(nil);
 //   result := Decoder.DecodeString(s);
 //   Decoder.Free;
- end;
+end;
 
-procedure TRggDocument.LoadFromXML(S: string);
+procedure TRggDocument.LoadFromXML(s: string);
 begin
 end;
 
 function TRggDocument.SaveToXML: string;
-// var
-// i: Integer;
-// rp: TRiggPoints;
-// tempEI: double;
-// SBParam: TsbParam; // = (Ist, Min, Max, TinyStep, BigStep);
-// SBName: TSBName;
-// g: TXMLGenerator;
-// OldDecimalSeparator: Char;
+//var
+//  i: Integer;
+//  rp: TRiggPoints;
+//  tempEI: double;
+//  SBParam: TsbParam; // = (Ist, Min, Max, TinyStep, BigStep);
+//  SBName: TsbName;
+//  g: TXMLGenerator;
+//  OldDecimalSeparator: Char;
 begin
-  // OldDecimalSeparator := DecimalSeparator;
-  // g := TXMLGenerator.CreateWithEncoding(8 * 1024, encUTF_8);
-  // try
-  // g.StartTag('RggDoc');
-  //
-  // { RiggType }
-  // g.SetAttribute('SalingTyp', IntToStr(Ord(SalingTyp)));
-  // g.SetAttribute('ControllerTyp', IntToStr(Ord(ControllerTyp)));
-  // g.SetAttribute('CalcTyp', IntToStr(Ord(CalcTyp)));
-  //
-  // { Koord }
-  // g.StartTag('Koordinaten');
-  // g.StartTag('Rumpf');
-  // for rp := ooA0 to ooP0 do
-  // begin
-  // g.StartTag('Koord');
-  // g.SetAttribute('ID', KoordTexteXML[rp]);
-  // g.SetAttribute('Label', XMLKoordLabels[rp]);
-  // g.SetAttribute('x', IntToStr(iP[rp][x]));
-  // g.SetAttribute('y', IntToStr(iP[rp][y]));
-  // g.SetAttribute('z', IntToStr(iP[rp][z]));
-  // g.StopTag;
-  // end;
-  // g.StopTag;
-  // g.StartTag('Rigg');
-  // for rp := ooA to ooP do
-  // begin
-  // g.StartTag('Koord');
-  // g.SetAttribute('ID', KoordTexteXML[rp]);
-  // g.SetAttribute('Label', XMLKoordLabels[rp]);
-  // g.SetAttribute('x', IntToStr(iP[rp][x]));
-  // g.SetAttribute('y', IntToStr(iP[rp][y]));
-  // g.SetAttribute('z', IntToStr(iP[rp][z]));
-  // g.StopTag;
-  // end;
-  // g.StopTag;
-  // g.StopTag;
-  //
-  // { Mast: Abmessungen in mm }
-  // g.StartTag('Mast');
-  // g.StartTag('L');
-  // g.SetAttribute('ID', 'D0F');
-  // g.SetAttribute('Label', 'Mastfuss-Top');
-  // g.AddData(IntToStr(FiMastL));
-  // g.StopTag;
-  //
-  // g.StartTag('L');
-  // g.SetAttribute('ID', 'D0D');
-  // g.SetAttribute('Label', 'Mastfuss-Saling');
-  // g.AddData(IntToStr(FiMastunten));
-  // g.StopTag;
-  //
-  // g.StartTag('L');
-  // g.SetAttribute('ID', 'DC');
-  // g.SetAttribute('Label', 'Saling-Vorstag');
-  // g.AddData(IntToStr(FiMastoben));
-  // g.StopTag;
-  //
-  // g.StartTag('Zusaetzlich');
-  // g.StartTag('L');
-  // g.SetAttribute('ID', 'FX');
-  // g.SetAttribute('Label', 'MastfallVorlauf');
-  // g.AddData(IntToStr(FiMastfallVorlauf));
-  // g.StopTag;
-  //
-  // g.StartTag('L');
-  // g.SetAttribute('ID', 'C0X');
-  // g.SetAttribute('Label', 'ControllerAnschlag');
-  // g.AddData(IntToStr(FiControllerAnschlag));
-  // g.StopTag;
-  //
-  // //g.StartTag('L');
-  // //g.SetAttribute('ID', 'Reserved');
-  // //g.SetAttribute('Label', 'Reserved');
-  // //g.AddData(IntToStr(FiReserved));
-  // //g.StopTag;
-  // g.StopTag;
-  // g.StopTag;
-  //
-  // { GSB - Grenzwerte und Istwerte }
-  // g.StartTag('Scrollbar');
-  // for SBName := Low(TSBName) to SalingL do
-  // begin
-  // g.StartTag('Param');
-  // g.SetAttribute('ID', XMLSBName[SBName]);
-  // g.SetAttribute('Label', XMLSBNameLabels[SBName]);
-  // for SBParam := Low(TSBParam) to High(TSBParam) do
-  // begin
-  // g.SetAttribute(XMLSBParamLabels[SBParam], IntToStr(GSB[SBName, SBParam]));
-  // end;
-  // g.StopTag;
-  // end;
-  // g.StopTag;
-  //
-  // DecimalSeparator := '.';
-  //
-  // { Festigkeitswerte }
-  // g.StartTag('Festigkeit');
-  // g.StartTag('ZugDruck');
-  // for i := 0 to 19 do
-  // begin
-  // g.StartTag('EA');
-  // g.SetAttribute('Stab', IntToStr(i));
-  // g.SetAttribute('Value', Format('%.6g', [rEA[i]]));
-  // g.StopTag;
-  // end;
-  // g.StopTag;
-  // g.StartTag('Biegung');
-  // g.StartTag('EI');
-  // tempEI := Round(EI/1E6);
-  // g.SetAttribute('Label', 'Mast');
-  // g.SetAttribute('Value', Format('%.6g', [tempEI]));
-  // g.StopTag;
-  // g.StopTag;
-  // g.StopTag;
-  //
-  // { Trimmtabelle }
-  // g.StartTag('Trimmtabelle');
-  // with TrimmTabDaten do
-  // begin
-  // g.SetAttribute('KurvenTyp', IntToStr(Ord(TabellenTyp)));
-  // g.StartTag('T');
-  // g.SetAttribute('ID', 'a0');
-  // g.AddData(Format('%.6g',[a0]));
-  // g.StopTag;
-  // g.StartTag('T');
-  // g.SetAttribute('ID', 'a1');
-  // g.AddData(Format('%.6g',[a1]));
-  // g.StopTag;
-  // g.StartTag('T');
-  // g.SetAttribute('ID', 'a2');
-  // g.AddData(Format('%.6g',[a2]));
-  // g.StopTag;
-  // g.StartTag('T');
-  // g.SetAttribute('ID', 'x0');
-  // g.AddData(Format('%.6g',[x0]));
-  // g.StopTag;
-  // g.StartTag('T');
-  // g.SetAttribute('ID', 'x1');
-  // g.AddData(Format('%.6g',[x1]));
-  // g.StopTag;
-  // g.StartTag('T');
-  // g.SetAttribute('ID', 'x2');
-  // g.AddData(Format('%.6g',[x2]));
-  // g.StopTag;
-  // end;
-  // g.StopTag;
-  //
-  // g.StopTag;
-  // result := g.AsUTF8;
-  // finally
-  // g.Free;
-  // DecimalSeparator := OldDecimalSeparator;
-  // end;
+//  OldDecimalSeparator := DecimalSeparator;
+//  g := TXMLGenerator.CreateWithEncoding(8 * 1024, encUTF_8);
+//  try
+//    g.StartTag('RggDoc');
+//
+//      { RiggType }
+//      g.SetAttribute('SalingTyp', IntToStr(Ord(SalingTyp)));
+//      g.SetAttribute('ControllerTyp', IntToStr(Ord(ControllerTyp)));
+//      g.SetAttribute('CalcTyp', IntToStr(Ord(CalcTyp)));
+//
+//      { Koord }
+//      g.StartTag('Koordinaten');
+//        g.StartTag('Rumpf');
+//          for rp := ooA0 to ooP0 do
+//          begin
+//          g.StartTag('Koord');
+//          g.SetAttribute('ID', KoordTexteXML[rp]);
+//          g.SetAttribute('Label', XMLKoordLabels[rp]);
+//          g.SetAttribute('x', IntToStr(iP[rp][x]));
+//          g.SetAttribute('y', IntToStr(iP[rp][y]));
+//          g.SetAttribute('z', IntToStr(iP[rp][z]));
+//          g.StopTag;
+//          end;
+//        g.StopTag;
+//        g.StartTag('Rigg');
+//          for rp := ooA to ooP do
+//          begin
+//          g.StartTag('Koord');
+//          g.SetAttribute('ID', KoordTexteXML[rp]);
+//          g.SetAttribute('Label', XMLKoordLabels[rp]);
+//          g.SetAttribute('x', IntToStr(iP[rp][x]));
+//          g.SetAttribute('y', IntToStr(iP[rp][y]));
+//          g.SetAttribute('z', IntToStr(iP[rp][z]));
+//          g.StopTag;
+//          end;
+//        g.StopTag;
+//      g.StopTag;
+//
+//      { Mast: Abmessungen in mm }
+//      g.StartTag('Mast');
+//        g.StartTag('L');
+//        g.SetAttribute('ID', 'D0F');
+//        g.SetAttribute('Label', 'Mastfuss-Top');
+//        g.AddData(IntToStr(FiMastL));
+//        g.StopTag;
+//
+//        g.StartTag('L');
+//        g.SetAttribute('ID', 'D0D');
+//        g.SetAttribute('Label', 'Mastfuss-Saling');
+//        g.AddData(IntToStr(FiMastunten));
+//        g.StopTag;
+//
+//        g.StartTag('L');
+//        g.SetAttribute('ID', 'DC');
+//        g.SetAttribute('Label', 'Saling-Vorstag');
+//        g.AddData(IntToStr(FiMastoben));
+//        g.StopTag;
+//
+//        g.StartTag('Zusaetzlich');
+//          g.StartTag('L');
+//          g.SetAttribute('ID', 'FX');
+//          g.SetAttribute('Label', 'MastfallVorlauf');
+//          g.AddData(IntToStr(FiMastfallVorlauf));
+//          g.StopTag;
+//
+//          g.StartTag('L');
+//          g.SetAttribute('ID', 'C0X');
+//          g.SetAttribute('Label', 'ControllerAnschlag');
+//          g.AddData(IntToStr(FiControllerAnschlag));
+//          g.StopTag;
+//
+//          //g.StartTag('L');
+//          //g.SetAttribute('ID', 'Reserved');
+//          //g.SetAttribute('Label', 'Reserved');
+//          //g.AddData(IntToStr(FiReserved));
+//          //g.StopTag;
+//        g.StopTag;
+//      g.StopTag;
+//
+//      { GSB - Grenzwerte und Istwerte }
+//      g.StartTag('Scrollbar');
+//        for SBName := Low(TsbName) to SalingL do
+//        begin
+//        g.StartTag('Param');
+//        g.SetAttribute('ID', XMLSBName[SBName]);
+//        g.SetAttribute('Label', XMLSBNameLabels[SBName]);
+//        for SBParam := Low(TSBParam) to High(TSBParam) do
+//        begin
+//        g.SetAttribute(XMLSBParamLabels[SBParam], IntToStr(GSB[SBName, SBParam]));
+//        end;
+//        g.StopTag;
+//        end;
+//      g.StopTag;
+//
+//      DecimalSeparator := '.';
+//
+//      { Festigkeitswerte }
+//      g.StartTag('Festigkeit');
+//        g.StartTag('ZugDruck');
+//          for i := 0 to 19 do
+//          begin
+//          g.StartTag('EA');
+//          g.SetAttribute('Stab', IntToStr(i));
+//          g.SetAttribute('Value', Format('%.6g', [rEA[i]]));
+//          g.StopTag;
+//          end;
+//        g.StopTag;
+//        g.StartTag('Biegung');
+//          g.StartTag('EI');
+//          tempEI := Round(EI/1E6);
+//          g.SetAttribute('Label', 'Mast');
+//          g.SetAttribute('Value', Format('%.6g', [tempEI]));
+//          g.StopTag;
+//        g.StopTag;
+//      g.StopTag;
+//
+//      { Trimmtabelle }
+//      g.StartTag('Trimmtabelle');
+//      with TrimmTabDaten do
+//      begin
+//        g.SetAttribute('KurvenTyp', IntToStr(Ord(TabellenTyp)));
+//        g.StartTag('T');
+//        g.SetAttribute('ID', 'a0');
+//        g.AddData(Format('%.6g',[a0]));
+//        g.StopTag;
+//        g.StartTag('T');
+//        g.SetAttribute('ID', 'a1');
+//        g.AddData(Format('%.6g',[a1]));
+//        g.StopTag;
+//        g.StartTag('T');
+//        g.SetAttribute('ID', 'a2');
+//        g.AddData(Format('%.6g',[a2]));
+//        g.StopTag;
+//        g.StartTag('T');
+//        g.SetAttribute('ID', 'x0');
+//        g.AddData(Format('%.6g',[x0]));
+//        g.StopTag;
+//        g.StartTag('T');
+//        g.SetAttribute('ID', 'x1');
+//        g.AddData(Format('%.6g',[x1]));
+//        g.StopTag;
+//        g.StartTag('T');
+//        g.SetAttribute('ID', 'x2');
+//        g.AddData(Format('%.6g',[x2]));
+//        g.StopTag;
+//      end;
+//      g.StopTag;
+//
+//    g.StopTag;
+//    result := g.AsUTF8;
+//  finally
+//    g.Free;
+//    DecimalSeparator := OldDecimalSeparator;
+//  end;
   result := '';
 end;
 
