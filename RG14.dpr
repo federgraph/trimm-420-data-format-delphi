@@ -14,6 +14,7 @@ uses
   RiggVar.Util.AppUtils in 'Util\RiggVar.Util.AppUtils.pas',
   RiggVar.RG.Data in 'RG\RiggVar.RG.Data.pas',
   RiggVar.RG.Def in 'RG\RiggVar.RG.Def.pas',
+  RiggVar.RG.Report in 'RG\RiggVar.RG.Report.pas',
   RiggVar.RG.Main in 'RG\RiggVar.RG.Main.pas';
 
 {$R *.res}

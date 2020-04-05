@@ -55,6 +55,11 @@ uses
   System.SysUtils,
   System.Classes,
   System.Inifiles,
+  System.Math,
+{$ifdef MSWindows}
+  Xml.XmlDoc,
+  Xml.XmlIntf,
+{$endif}
   RggScroll,
   RggTypes;
 
@@ -92,6 +97,9 @@ type
     { Trimmtabelle }
     TrimmTabDaten: TTrimmTabDaten;
 
+    WantFestigkeitsWerteInXml: Boolean;
+    WantTrimmTabInXml: Boolean;
+
     constructor Create;
     destructor Destroy; override;
 
@@ -110,6 +118,10 @@ type
     procedure WriteToDFM(Memo: TStrings);
     function SaveToString: string;
     procedure LoadFromString(s: string);
+{$ifdef MSWindows}
+    procedure WriteXML(ML: TStrings);
+    function SaveToXML(d: IXMLNode): string;
+{$endif}
     procedure LoadFromXML(s: string);
     function SaveToXMLBase64: string;
     function LoadFromXMLBase64(s: string): string;
@@ -1262,7 +1274,7 @@ procedure TRggDocument.LoadFromXML(s: string);
 begin
 end;
 
-(*
+{$ifdef MSWindows}
 procedure TRggDocument.WriteXML(ML: TStrings);
 var
   doc: IXMLDocument;
@@ -1419,6 +1431,6 @@ begin
   end;
   result := '';
 end;
-*)
+{$endif}
 
 end.
