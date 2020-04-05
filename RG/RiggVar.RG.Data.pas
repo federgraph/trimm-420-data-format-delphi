@@ -2,7 +2,7 @@
 
 (*
 -
--     F            info: http://wwww.riggvar.de
+-     F
 -    * * *
 -   *   *   G
 -  *     * *   *
@@ -12,7 +12,7 @@
 -    * *     *             *
 -     D-------A---------------B
 -              *
--              (C) RiggVar Software UG (haftungsbeschränkt)
+-              (C) federgraph.de
 -
 *)
 
@@ -22,7 +22,7 @@ uses
   System.SysUtils,
   System.Classes,
   System.Math,
-  RiggVar.FB.DefConst;
+  RiggVar.RG.Def;
 
 type
   TRggData = class

@@ -1,4 +1,4 @@
-﻿unit Rggdoc;
+﻿unit RggDoc;
 
 {
   Als primäre Daten werden die Rumpfkoordinaten und die RiggLängen betrachtet.
@@ -64,7 +64,7 @@ const
 type
   TRggDocument = class
   private
-    FFileName: String; // nur zum Zwischenspeichern des Dateinamens
+    FFileName: string; // nur zum Zwischenspeichern des Dateinamens
     procedure GetLogoDoc;
     procedure GetDefaultDoc;
     procedure LoadSignatureFromStream(strm: TStream);
@@ -88,7 +88,7 @@ type
     rEA: TRiggLvektor; { N }
     EI: double; { Nmm^2 }
     { Grenzwerte und Istwerte }
-    GSB: TRggFactArray;
+    GSB: TRggFA;
     { Trimmtabelle }
     TrimmTabDaten: TTrimmTabDaten;
 
@@ -99,18 +99,17 @@ type
 
     function SignatureOK: Boolean; virtual;
     procedure GetDefaultDocument; virtual;
-    procedure LoadFromFile(FileName: String); virtual;
-    procedure SaveToFile(FileName: String); virtual;
+    procedure LoadFromFile(FileName: string); virtual;
+    procedure SaveToFile(FileName: string); virtual;
     procedure LoadFromStream(strm: TStream); virtual;
     procedure SaveToStream(strm: TStream); virtual;
-    procedure LoadFromIniFile(FileName: String); virtual;
-    procedure WriteToIniFile(FileName: String); virtual;
+    procedure LoadFromIniFile(FileName: string); virtual;
+    procedure WriteToIniFile(FileName: string); virtual;
     procedure DumpToMemo(Memo: TStrings); virtual;
     procedure ReadFromDFM(Memo: TStrings);
     procedure WriteToDFM(Memo: TStrings);
     function SaveToString: string;
     procedure LoadFromString(s: string);
-    function SaveToXML: string;
     procedure LoadFromXML(s: string);
     function SaveToXMLBase64: string;
     function LoadFromXMLBase64(s: string): string;
@@ -120,12 +119,13 @@ implementation
 
 uses
   RiggVar.App.Main,
+  RiggVar.RG.Def,
   RiggVar.FB.Classes;
 
 constructor TRggDocument.Create;
 begin
   inherited Create;
-  GSB := TRggFactArray.Create;
+  GSB := TRggFA.Create;
 end;
 
 destructor TRggDocument.Destroy;
@@ -134,7 +134,7 @@ begin
   inherited;
 end;
 
-procedure TRggDocument.LoadFromFile(FileName: String);
+procedure TRggDocument.LoadFromFile(FileName: string);
 var
   S: TFileStream;
 begin
@@ -147,7 +147,7 @@ begin
   end;
 end;
 
-procedure TRggDocument.SaveToFile(FileName: String);
+procedure TRggDocument.SaveToFile(FileName: string);
 var
   S: TFileStream;
 begin
@@ -261,9 +261,9 @@ begin
   strm.WriteBuffer(TrimmTabDaten, SizeOf(TTrimmTabDaten));
 end;
 
-procedure TRggDocument.LoadFromIniFile(FileName: String);
+procedure TRggDocument.LoadFromIniFile(FileName: string);
 var
-  S, S1, S2: String;
+  S, S1, S2: string;
   i: Integer;
   T: TTrimmTabDaten;
   IniFile: TIniFile;
@@ -400,9 +400,9 @@ begin
   end;
 end;
 
-procedure TRggDocument.WriteToIniFile(FileName: String);
+procedure TRggDocument.WriteToIniFile(FileName: string);
 var
-  S, S1, S2: String;
+  S, S1, S2: string;
   i, tempEI: Integer;
   IniFile: TIniFile;
 begin
@@ -827,10 +827,10 @@ end;
 
 function TRggDocument.SignatureOK: Boolean;
 var
-  S, SCaption, S1: String;
+  S, SCaption, S1: string;
 begin
   result := False;
-  if Signature = String(RggDocSignature) then
+  if Signature = string(RggDocSignature) then
     result := True
   else
   begin
@@ -840,7 +840,7 @@ begin
     if S1 = 'RGGDOC' then
     begin
       S := S + #13 + 'vorliegend: Version ' + Signature;
-      S := S + #13 + 'erforderlich: Version ' + String(RggDocSignature);
+      S := S + #13 + 'erforderlich: Version ' + string(RggDocSignature);
     end
     else
     begin
@@ -853,7 +853,7 @@ end;
 
 procedure TRggDocument.DumpToMemo(Memo: TStrings);
 var
-  S1, S2: String;
+  S1, S2: string;
   i, tempEI: Integer;
 begin
   with Memo do
@@ -1042,9 +1042,9 @@ begin
 end;
 
 procedure TRggDocument.ReadFromDFM(Memo: TStrings);
-  procedure ReadGSB(c: TsbName; S: String);
+  procedure ReadGSB(c: TsbName; S: string);
   var
-    S1: String;
+    S1: string;
     sb: TRggSB;
   begin
     if S = '' then
@@ -1060,9 +1060,9 @@ procedure TRggDocument.ReadFromDFM(Memo: TStrings);
     sb.Ist := StrToInt(S1);
     sb.Max := StrToInt(S);
   end;
-  procedure ReadKoord(k: TRiggPoints; S: String);
+  procedure ReadKoord(k: TRiggPoint; S: string);
   var
-    S1: String;
+    S1: string;
   begin
     if S = '' then
       Exit;
@@ -1074,13 +1074,13 @@ procedure TRggDocument.ReadFromDFM(Memo: TStrings);
     iP[k, y] := StrToInt(S1);
     iP[k, z] := StrToInt(S);
   end;
-  procedure ReadInteger(S: String; var a: Integer);
+  procedure ReadInteger(S: string; var a: Integer);
   begin
     if S = '' then
       Exit;
     a := StrToInt(S);
   end;
-  procedure ReadFloat(S: String; var a: double);
+  procedure ReadFloat(S: string; var a: double);
   begin
     if S = '' then
       Exit;
@@ -1088,7 +1088,7 @@ procedure TRggDocument.ReadFromDFM(Memo: TStrings);
   end;
 
 var
-  S: String;
+  S: string;
   i, tempEI: Integer;
   T: TTrimmTabDaten;
 begin
@@ -1142,25 +1142,25 @@ begin
 
     // GSB (Min,Ist,Max)
     S := Values['Controller'];
-    ReadGSB(Controller, S);
+    ReadGSB(fpController, S);
     S := Values['Winkel'];
-    ReadGSB(Winkel, S);
+    ReadGSB(fpWinkel, S);
     S := Values['Vorstag'];
-    ReadGSB(Vorstag, S);
+    ReadGSB(fpVorstag, S);
     S := Values['Wante'];
-    ReadGSB(Wante, S);
+    ReadGSB(fpWante, S);
     S := Values['Woben'];
-    ReadGSB(Woben, S);
+    ReadGSB(fpWoben, S);
     S := Values['SalingH'];
-    ReadGSB(SalingH, S);
+    ReadGSB(fpSalingH, S);
     S := Values['SalingA'];
-    ReadGSB(SalingA, S);
+    ReadGSB(fpSalingA, S);
     S := Values['SalingL'];
-    ReadGSB(SalingL, S);
+    ReadGSB(fpSalingL, S);
     S := Values['VorstagOS'];
-    ReadGSB(VorstagOS, S);
+    ReadGSB(fpVorstagOS, S);
     S := Values['WPowerOS'];
-    ReadGSB(WPowerOS, S);
+    ReadGSB(fpWPowerOS, S);
 
     // Koordinaten (x,y,z)
     S := Values['A0'];
@@ -1262,171 +1262,163 @@ procedure TRggDocument.LoadFromXML(s: string);
 begin
 end;
 
-function TRggDocument.SaveToXML: string;
-//var
-//  i: Integer;
-//  rp: TRiggPoints;
-//  tempEI: double;
-//  SBParam: TsbParam; // = (Ist, Min, Max, TinyStep, BigStep);
-//  SBName: TsbName;
-//  g: TXMLGenerator;
-//  OldDecimalSeparator: Char;
+(*
+procedure TRggDocument.WriteXML(ML: TStrings);
+var
+  doc: IXMLDocument;
+  root: IXMLNode;
 begin
-//  OldDecimalSeparator := DecimalSeparator;
-//  g := TXMLGenerator.CreateWithEncoding(8 * 1024, encUTF_8);
-//  try
-//    g.StartTag('RggDoc');
-//
-//      { RiggType }
-//      g.SetAttribute('SalingTyp', IntToStr(Ord(SalingTyp)));
-//      g.SetAttribute('ControllerTyp', IntToStr(Ord(ControllerTyp)));
-//      g.SetAttribute('CalcTyp', IntToStr(Ord(CalcTyp)));
-//
-//      { Koord }
-//      g.StartTag('Koordinaten');
-//        g.StartTag('Rumpf');
-//          for rp := ooA0 to ooP0 do
-//          begin
-//          g.StartTag('Koord');
-//          g.SetAttribute('ID', KoordTexteXML[rp]);
-//          g.SetAttribute('Label', XMLKoordLabels[rp]);
-//          g.SetAttribute('x', IntToStr(iP[rp][x]));
-//          g.SetAttribute('y', IntToStr(iP[rp][y]));
-//          g.SetAttribute('z', IntToStr(iP[rp][z]));
-//          g.StopTag;
-//          end;
-//        g.StopTag;
-//        g.StartTag('Rigg');
-//          for rp := ooA to ooP do
-//          begin
-//          g.StartTag('Koord');
-//          g.SetAttribute('ID', KoordTexteXML[rp]);
-//          g.SetAttribute('Label', XMLKoordLabels[rp]);
-//          g.SetAttribute('x', IntToStr(iP[rp][x]));
-//          g.SetAttribute('y', IntToStr(iP[rp][y]));
-//          g.SetAttribute('z', IntToStr(iP[rp][z]));
-//          g.StopTag;
-//          end;
-//        g.StopTag;
-//      g.StopTag;
-//
-//      { Mast: Abmessungen in mm }
-//      g.StartTag('Mast');
-//        g.StartTag('L');
-//        g.SetAttribute('ID', 'D0F');
-//        g.SetAttribute('Label', 'Mastfuss-Top');
-//        g.AddData(IntToStr(FiMastL));
-//        g.StopTag;
-//
-//        g.StartTag('L');
-//        g.SetAttribute('ID', 'D0D');
-//        g.SetAttribute('Label', 'Mastfuss-Saling');
-//        g.AddData(IntToStr(FiMastunten));
-//        g.StopTag;
-//
-//        g.StartTag('L');
-//        g.SetAttribute('ID', 'DC');
-//        g.SetAttribute('Label', 'Saling-Vorstag');
-//        g.AddData(IntToStr(FiMastoben));
-//        g.StopTag;
-//
-//        g.StartTag('Zusaetzlich');
-//          g.StartTag('L');
-//          g.SetAttribute('ID', 'FX');
-//          g.SetAttribute('Label', 'MastfallVorlauf');
-//          g.AddData(IntToStr(FiMastfallVorlauf));
-//          g.StopTag;
-//
-//          g.StartTag('L');
-//          g.SetAttribute('ID', 'C0X');
-//          g.SetAttribute('Label', 'ControllerAnschlag');
-//          g.AddData(IntToStr(FiControllerAnschlag));
-//          g.StopTag;
-//
-//          //g.StartTag('L');
-//          //g.SetAttribute('ID', 'Reserved');
-//          //g.SetAttribute('Label', 'Reserved');
-//          //g.AddData(IntToStr(FiReserved));
-//          //g.StopTag;
-//        g.StopTag;
-//      g.StopTag;
-//
-//      { GSB - Grenzwerte und Istwerte }
-//      g.StartTag('Scrollbar');
-//        for SBName := Low(TsbName) to SalingL do
-//        begin
-//        g.StartTag('Param');
-//        g.SetAttribute('ID', XMLSBName[SBName]);
-//        g.SetAttribute('Label', XMLSBNameLabels[SBName]);
-//        for SBParam := Low(TSBParam) to High(TSBParam) do
-//        begin
-//        g.SetAttribute(XMLSBParamLabels[SBParam], IntToStr(GSB[SBName, SBParam]));
-//        end;
-//        g.StopTag;
-//        end;
-//      g.StopTag;
-//
-//      DecimalSeparator := '.';
-//
-//      { Festigkeitswerte }
-//      g.StartTag('Festigkeit');
-//        g.StartTag('ZugDruck');
-//          for i := 0 to 19 do
-//          begin
-//          g.StartTag('EA');
-//          g.SetAttribute('Stab', IntToStr(i));
-//          g.SetAttribute('Value', Format('%.6g', [rEA[i]]));
-//          g.StopTag;
-//          end;
-//        g.StopTag;
-//        g.StartTag('Biegung');
-//          g.StartTag('EI');
-//          tempEI := Round(EI/1E6);
-//          g.SetAttribute('Label', 'Mast');
-//          g.SetAttribute('Value', Format('%.6g', [tempEI]));
-//          g.StopTag;
-//        g.StopTag;
-//      g.StopTag;
-//
-//      { Trimmtabelle }
-//      g.StartTag('Trimmtabelle');
-//      with TrimmTabDaten do
-//      begin
-//        g.SetAttribute('KurvenTyp', IntToStr(Ord(TabellenTyp)));
-//        g.StartTag('T');
-//        g.SetAttribute('ID', 'a0');
-//        g.AddData(Format('%.6g',[a0]));
-//        g.StopTag;
-//        g.StartTag('T');
-//        g.SetAttribute('ID', 'a1');
-//        g.AddData(Format('%.6g',[a1]));
-//        g.StopTag;
-//        g.StartTag('T');
-//        g.SetAttribute('ID', 'a2');
-//        g.AddData(Format('%.6g',[a2]));
-//        g.StopTag;
-//        g.StartTag('T');
-//        g.SetAttribute('ID', 'x0');
-//        g.AddData(Format('%.6g',[x0]));
-//        g.StopTag;
-//        g.StartTag('T');
-//        g.SetAttribute('ID', 'x1');
-//        g.AddData(Format('%.6g',[x1]));
-//        g.StopTag;
-//        g.StartTag('T');
-//        g.SetAttribute('ID', 'x2');
-//        g.AddData(Format('%.6g',[x2]));
-//        g.StopTag;
-//      end;
-//      g.StopTag;
-//
-//    g.StopTag;
-//    result := g.AsUTF8;
-//  finally
-//    g.Free;
-//    DecimalSeparator := OldDecimalSeparator;
-//  end;
+  doc := NewXMLDocument();
+  doc.Options := doc.Options + [doNodeAutoIndent];
+  doc.Active := True;
+
+  root := doc.AddChild('RG');
+  SaveToXML(root);
+  ML.Text := doc.XML.Text;
+  doc.Active := false;
+end;
+
+function TRggDocument.SaveToXML(d: IXMLNode): string;
+var
+  OldDecimalSeparator: Char;
+  i: Integer;
+  rp: TRiggPoint;
+  tempEI: double;
+  SBParam: TsbParam; // = (Ist, Min, Max, TinyStep, BigStep);
+  SBName: TsbName;
+  a, b, c: IXMLNode;
+begin
+  OldDecimalSeparator := FormatSettings.DecimalSeparator;
+  try
+    { RiggType }
+    d.SetAttribute('SalingTyp', IntToStr(Ord(SalingTyp)));
+    d.SetAttribute('ControllerTyp', IntToStr(Ord(ControllerTyp)));
+    d.SetAttribute('CalcTyp', IntToStr(Ord(CalcTyp)));
+
+    { GSB - Grenzwerte und Istwerte }
+    a := d.AddChild('Scrollbar');
+    for SBName := Low(TsbName) to fpSalingL do
+    begin
+      b := a.AddChild('Param');
+      b.SetAttribute('ID', XMLSBName[SBName]);
+      b.SetAttribute('Label', XMLSBNameLabels[SBName]);
+      for SBParam := Low(TSBParam) to High(TSBParam) do
+      begin
+        b.SetAttribute(XMLSBParamLabels[SBParam], IntToStr(Round(GSB.GetSB(SBName).GetValue(SBParam))));
+      end;
+    end;
+
+    { Koord }
+    a := d.AddChild('Koordinaten');
+
+    b := a.AddChild('Rigg');
+    for rp := ooA to ooP do
+    begin
+      c := b.AddChild('Koord');
+      c.SetAttribute('ID', KoordTexteXML[rp]);
+      c.SetAttribute('Label', XMLKoordLabels[rp]);
+      c.SetAttribute('x', IntToStr(Round(iP[rp][x])));
+      c.SetAttribute('y', IntToStr(Round(iP[rp][y])));
+      c.SetAttribute('z', IntToStr(Round(iP[rp][z])));
+    end;
+
+    b := a.AddChild('Rumpf');
+    for rp := ooA0 to ooP0 do
+    begin
+      c := b.AddChild('Koord');
+      c.SetAttribute('ID', KoordTexteXML[rp]);
+      c.SetAttribute('Label', XMLKoordLabels[rp]);
+      c.SetAttribute('x', IntToStr(Round(iP[rp][x])));
+      c.SetAttribute('y', IntToStr(Round(iP[rp][y])));
+      c.SetAttribute('z', IntToStr(Round(iP[rp][z])));
+    end;
+
+    { Mast: Abmessungen in mm }
+    a := d.AddChild('Mast');
+
+    b := a.AddChild('L');
+    b.SetAttribute('ID', 'D0F');
+    b.SetAttribute('Label', 'Mastfuss-Top');
+    b.Text := IntToStr(FiMastL);
+
+    b := a.AddChild('L');
+    b.SetAttribute('ID', 'D0D');
+    b.SetAttribute('Label', 'Mastfuss-Saling');
+    b.Text :=IntToStr(FiMastunten);
+
+    b := a.AddChild('L');
+    b.SetAttribute('ID', 'DC');
+    b.SetAttribute('Label', 'Saling-Vorstag');
+    b.Text := IntToStr(FiMastoben);
+
+    b := a.AddChild('L');
+    b.SetAttribute('ID', 'FX');
+    b.SetAttribute('Label', 'MastfallVorlauf');
+    b.Text := IntToStr(FiMastfallVorlauf);
+
+    b := a.AddChild('L');
+    b.SetAttribute('ID', 'C0X');
+    b.SetAttribute('Label', 'ControllerAnschlag');
+    b.Text := IntToStr(FiControllerAnschlag);
+
+    FormatSettings.DecimalSeparator := '.';
+
+    if WantFestigkeitsWerteInXml then
+    begin
+      { Festigkeitswerte }
+      a := d.AddChild('Festigkeit');
+      b := a.AddChild('ZugDruck');
+      for i := 0 to 19 do
+      begin
+        c := b.AddChild('EA');
+        c.SetAttribute('Stab', IntToStr(i));
+        c.SetAttribute('Value', Format('%.6g', [rEA[i]]));
+      end;
+      b := a.AddChild('Biegung');
+      c := b.AddChild('EI');
+      tempEI := Round(EI/1E6);
+      c.SetAttribute('Label', 'Mast');
+      c.SetAttribute('Value', Format('%.6g', [tempEI]));
+    end;
+
+    if WantTrimmTabInXml then
+    begin
+      { Trimmtabelle }
+      a := d.AddChild('Trimmtabelle');
+      with TrimmTabDaten do
+      begin
+        a.SetAttribute('KurvenTyp', IntToStr(Ord(TabellenTyp)));
+        b := a.AddChild('T');
+        b.SetAttribute('ID', 'a0');
+        b.Text := Format('%.6g',[a0]);
+
+        b := a.AddChild('T');
+        b.SetAttribute('ID', 'a1');
+        b.Text := Format('%.6g',[a1]);
+
+        b := a.AddChild('T');
+        b.SetAttribute('ID', 'a2');
+        b.Text := Format('%.6g',[a2]);
+
+        b := a.AddChild('T');
+        b.SetAttribute('ID', 'x0');
+        b.Text := Format('%.6g',[x0]);
+
+        b := a.AddChild('T');
+        b.SetAttribute('ID', 'x1');
+        b.Text := Format('%.6g',[x1]);
+
+        b := a.AddChild('T');
+        b.SetAttribute('ID', 'x2');
+        b.Text := Format('%.6g',[x2]);
+      end;
+    end;
+
+  finally
+    FormatSettings.DecimalSeparator := OldDecimalSeparator;
+  end;
   result := '';
 end;
+*)
 
 end.

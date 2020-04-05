@@ -2,7 +2,7 @@
 
 (*
 -
--     F            info: http://wwww.riggvar.de
+-     F
 -    * * *
 -   *   *   G
 -  *     * *   *
@@ -12,7 +12,7 @@
 -    * *     *             *
 -     D-------A---------------B
 -              *
--              (C) RiggVar Software UG (haftungsbeschränkt)
+-              (C) federgraph.de
 -
 *)
 
@@ -51,15 +51,12 @@ type
 
 implementation
 
-uses
-  FMX.Types;
-
 const
   MaxLogLines = 24;
 
 procedure TLogger.Write(s: string);
 begin
-  log.d(s);
+//  log.d(s);
   TL.Add(s);
   if TL.Count > MaxLogLines then
   begin

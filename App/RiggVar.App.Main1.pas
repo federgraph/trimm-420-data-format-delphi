@@ -22,7 +22,8 @@ uses
   System.SysUtils,
   System.Classes,
   RiggVar.App.Main0,
-//  RiggVar.FB.ActionConst,
+  RiggVar.FB.ActionConst,
+  RiggVar.RG.Def,
   RiggVar.RG.Data,
   RiggVar.RG.Main;
 
@@ -61,15 +62,17 @@ type
     Trimm8: TRggData; //Logo
 
     ReportCounter: Integer;
+    ResizeCounter: Integer;
 
     constructor Create;
     destructor Destroy; override;
 
-//    procedure HandleAction(fa: TFederAction); override;
-//    function GetChecked(fa: TFederAction): Boolean; override;
+    procedure ExecuteAction(fa: Integer); override;
+    procedure HandleAction(fa: TFederAction);
+    function GetChecked(fa: TFederAction): Boolean; override;
 
-    procedure DoBigWheel(Delta: single); //override;
-    procedure DoSmallWheel(Delta: single); //override;
+    procedure DoBigWheel(Delta: single);
+    procedure DoSmallWheel(Delta: single);
 
     function GetTrimmItem(i: Integer): TRggData;
     function GetTrimmItemReport: string;
@@ -91,7 +94,7 @@ type
 
     procedure ReadText(ML: TStrings);
 
-    procedure DropTargetDropped(fn: string); override;
+    procedure DropTargetDropped(fn: string);
     procedure DoReport;
     procedure DoCleanReport;
     procedure ShowDebugData;
@@ -116,7 +119,6 @@ uses
 //  RggTypes,
   System.Rtti,
   FMX.Platform,
-//  RiggVar.FB.Def,
   RiggVar.FB.Classes,
   RiggVar.App.Main,
   RiggVar.Util.AppUtils;
@@ -127,6 +129,7 @@ constructor TMain1.Create;
 begin
   Main := self;
   MainVar.RG := True;
+
   inherited;
 
   RggData := TRggData.Create;
@@ -476,7 +479,9 @@ begin
 
   s := fp + fn;
   if IsSandboxed then
+  begin
     s := FormMain.GetOpenFileName(fp, fn);
+  end;
 
   if s <> '' then
   begin
@@ -562,7 +567,9 @@ begin
 
   s := fp + fn;
   if IsSandboxed then
+  begin
     s := FormMain.GetSaveFileName(fp, fn);
+  end;
 
   if s <> '' then
   begin
@@ -618,23 +625,30 @@ begin
 end;
 
 function TMain1.GetIsRggParam: Boolean;
-//var
-//  i: Integer;
 begin
-  result := False;
-//  i := Integer(RggMain.Param);
-//  result := TFederUtils.IsRggParam(i);
+  result := True;
 end;
 
-(*
+procedure TMain1.ExecuteAction(fa: Integer);
+begin
+  HandleAction(fa);
+end;
+
 procedure TMain1.HandleAction(fa: TFederAction);
 begin
+(*
+  if IsUp then
   case fa of
+    faToggleTouchFrame: FederText.ToggleTouchFrame;
+
+    faActionPageM: CycleToolSet(-1);
+    faActionPageP: CycleToolSet(1);
+
+    faCycleColorSchemeM: CycleColorSchemeM;
+    faCycleColorSchemeP: CycleColorSchemeP;
+
     faUpdateReportText: DoCleanReport;
     faToggleDebugText: ShowDebugData;
-
-    faPlusOne: PlusOne;
-    faPlusTen: PlusTen;
 
     faParamValueMinus1, faWheelLeft: DoMouseWheel([ssShift], -1);
     faParamValuePlus1, faWheelRight: DoMouseWheel([ssShift], 1);
@@ -658,22 +672,23 @@ begin
     faParamT1: RggMain.SetParameter(faParamT1);
     faParamT2: RggMain.SetParameter(faParamT2);
 
-    faFixpointA0: RggMain.FixName := ooA0;
-    faFixpointA: RggMain.FixName := ooA;
-    faFixpointB0: RggMain.FixName := ooB0;
-    faFixpointB: RggMain.FixName := ooB;
-    faFixpointC0: RggMain.FixName := ooC0;
-    faFixpointC: RggMain.FixName := ooC;
-    faFixpointD0: RggMain.FixName := ooD0;
-    faFixpointD: RggMain.FixName := ooD;
-    faFixpointE0: RggMain.FixName := ooE0;
-    faFixpointE: RggMain.FixName := ooE;
-    faFixpointF0: RggMain.FixName := ooF0;
-    faFixpointF: RggMain.FixName := ooF;
+    faFixpointA0: RggMain.FixPoint := ooA0;
+    faFixpointA: RggMain.FixPoint := ooA;
+    faFixpointB0: RggMain.FixPoint := ooB0;
+    faFixpointB: RggMain.FixPoint := ooB;
+    faFixpointC0: RggMain.FixPoint := ooC0;
+    faFixpointC: RggMain.FixPoint := ooC;
+    faFixpointD0: RggMain.FixPoint := ooD0;
+    faFixpointD: RggMain.FixPoint := ooD;
+    faFixpointE0: RggMain.FixPoint := ooE0;
+    faFixpointE: RggMain.FixPoint := ooE;
+    faFixpointF0: RggMain.FixPoint := ooF0;
+    faFixpointF: RggMain.FixPoint := ooF;
 
-    faSalingTypOhne: RggMain.InitSalingTyp(0);
-    faSalingTypDrehbar: RggMain.InitSalingTyp(1);
-    faSalingTypFest: RggMain.InitSalingTyp(2);
+    faSalingTypOhneStarr,
+    faSalingTypOhne,
+    faSalingTypDrehbar,
+    faSalingTypFest: RggMain.InitSalingTyp(fa);
 
     faWantRenderH,
     faWantRenderP,
@@ -681,10 +696,10 @@ begin
     faWantRenderE,
     faWantRenderS: RggMain.ToggleRenderOption(fa);
 
-    faViewpointS: ViewpointS;
-    faViewpointA: ViewpointA;
-    faViewpointT: ViewpointT;
-    faViewpoint3: Viewpoint3;
+    faViewpointS: RggMain.ViewPoint := vpSeite;
+    faViewpointA: RggMain.ViewPoint := vpAchtern;
+    faViewpointT: RggMain.ViewPoint := vpTop;
+    faViewpoint3: RggMain.ViewPoint := vp3D;
 
     faHull: RggMain.SetOption(faHull);
     faDemo: RggMain.SetOption(faDemo);
@@ -716,16 +731,16 @@ begin
       ShowDataText := not ShowDataText;
     end;
 
-    faToggleViewType: IsOrthoProjection := not IsOrthoProjection;
-
     else
-      inherited;
+      FormMain.HandleAction(fa);
   end;
+*)
 end;
 
 function TMain1.GetChecked(fa: TFederAction): Boolean;
 begin
-  result := false;
+  result := False;
+(*
   case fa of
     faController: result := RggMain.Param = fpController;
     faWinkel: result := RggMain.Param = fpWinkel;
@@ -744,18 +759,18 @@ begin
     faParamT1: result := RggMain.Param = fpT1;
     faParamT2: result := RggMain.Param = fpT2;
 
-    faFixpointA0: result := RggMain.FixName = ooA0;
-    faFixpointA: result := RggMain.FixName = ooA;
-    faFixpointB0: result := RggMain.FixName = ooB0;
-    faFixpointB: result := RggMain.FixName = ooB;
-    faFixpointC0: result := RggMain.FixName = ooC0;
-    faFixpointC: result := RggMain.FixName = ooC;
-    faFixpointD0: result := RggMain.FixName = ooD0;
-    faFixpointD: result := RggMain.FixName = ooD;
-    faFixpointE0: result := RggMain.FixName = ooE0;
-    faFixpointE: result := RggMain.FixName = ooE;
-    faFixpointF0: result := RggMain.FixName = ooF0;
-    faFixpointF: result := RggMain.FixName = ooF;
+    faFixpointA0: result := RggMain.FixPoint = ooA0;
+    faFixpointA: result := RggMain.FixPoint = ooA;
+    faFixpointB0: result := RggMain.FixPoint = ooB0;
+    faFixpointB: result := RggMain.FixPoint = ooB;
+    faFixpointC0: result := RggMain.FixPoint = ooC0;
+    faFixpointC: result := RggMain.FixPoint = ooC;
+    faFixpointD0: result := RggMain.FixPoint = ooD0;
+    faFixpointD: result := RggMain.FixPoint = ooD;
+    faFixpointE0: result := RggMain.FixPoint = ooE0;
+    faFixpointE: result := RggMain.FixPoint = ooE;
+    faFixpointF0: result := RggMain.FixPoint = ooF0;
+    faFixpointF: result := RggMain.FixPoint = ooF;
 
     faSalingTypFest: result := RggMain.Rigg.SalingTyp = stFest;
     faSalingTypDrehbar: result := RggMain.Rigg.SalingTyp = stDrehbar;
@@ -771,24 +786,27 @@ begin
     fa420: result := Trimm = 7;
     faLogo: result := Trimm = 8;
 
-    faWantRenderH: result := RggMain.StrokeRigg.WantRenderH;
-    faWantRenderP: result := RggMain.StrokeRigg.WantRenderP;
-    faWantRenderF: result := RggMain.StrokeRigg.WantRenderF;
-    faWantRenderE: result := RggMain.StrokeRigg.WantRenderE;
-    faWantRenderS: result := RggMain.StrokeRigg.WantRenderS;
+//    faWantRenderH,
+//    faWantRenderP,
+//    faWantRenderF,
+//    faWantRenderE,
+//    faWantRenderS:
+//    begin
+//      result := RggMain.StrokeRigg.QueryRenderOption(fa);
+//    end;
 
-    faHull: result := RggMain.HullVisible;
-    faDemo: result := RggMain.Demo;
+//    faHull: result := RggMain.HullVisible;
+//    faDemo: result := RggMain.Demo;
 
-    faToggleDataText: result := Main.FederText.DataVisible;
-    faToggleDiffText: result := Main.FederText.DiffVisible;
-    faToggleTrimmText: result := Main.FederText.TrimmVisible;
+//    faToggleDataText: result := Main.FederText.DataVisible;
+//    faToggleDiffText: result := Main.FederText.DiffVisible;
+//    faToggleTrimmText: result := Main.FederText.TrimmVisible;
 
     else
-      inherited;
+      result := inherited;
   end;
-end;
 *)
+end;
 
 procedure TMain1.DropTargetDropped(fn: string);
 var
@@ -818,12 +836,9 @@ begin
 
   ML.Add('Report:');
   ML.Add('  ReportCounter = ' + IntToStr(ReportCounter));
-  ML.Add('  Scale = ' + FloatToStr(RetinaScale));
-  ML.Add('  Retina = ' + BoolStr[IsRetina]);
   ML.Add('  Sandboxed = ' + BoolStr[IsSandboxed]);
   ML.Add('  WantOnResize = ' + BoolStr[MainVar.WantOnResize]);
-  ML.Add('  ResizeCounter = ' + IntToStr(FormMain.ResizeCounter));
-  ML.Add(Format('  (%d x %d)', [FormMain.ClientWidth, FormMain.ClientHeight]));
+  ML.Add('  ResizeCounter = ' + IntToStr(ResizeCounter));
   ML.Add('---');
   ShowDataText := true;
 end;

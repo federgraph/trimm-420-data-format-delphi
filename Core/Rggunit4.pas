@@ -1,4 +1,4 @@
-unit Rggunit4;
+﻿unit RggUnit4;
 
 interface
 
@@ -6,7 +6,7 @@ uses
   RiggVar.RG.Data;
 
 type
-  TRigg = class //TRiggFS
+  TRigg = class // (TRiggFS)
   public
     procedure SaveToFederData(fd: TRggData);
     procedure LoadFromFederData(fd: TRggData);

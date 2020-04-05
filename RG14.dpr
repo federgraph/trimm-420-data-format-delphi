@@ -1,4 +1,4 @@
-program RG14;
+﻿program RG14;
 
 uses
   System.StartUpCopy,
@@ -7,13 +7,14 @@ uses
   RiggVar.App.Main in 'App\RiggVar.App.Main.pas',
   RiggVar.App.Main0 in 'App\RiggVar.App.Main0.pas',
   RiggVar.App.Main1 in 'App\RiggVar.App.Main1.pas',
-  RiggVar.RG.Data in 'RG\RiggVar.RG.Data.pas',
+  RggUnit4 in 'Core\RggUnit4.pas',
+  RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
   RiggVar.FB.Classes in 'FB\RiggVar.FB.Classes.pas',
   RiggVar.Util.Logger in 'Util\RiggVar.Util.Logger.pas',
   RiggVar.Util.AppUtils in 'Util\RiggVar.Util.AppUtils.pas',
-  RiggVar.RG.Main in 'RG\RiggVar.RG.Main.pas',
-  Rggunit4 in 'Core\Rggunit4.pas',
-  RiggVar.FB.DefConst in 'FB\RiggVar.FB.DefConst.pas';
+  RiggVar.RG.Data in 'RG\RiggVar.RG.Data.pas',
+  RiggVar.RG.Def in 'RG\RiggVar.RG.Def.pas',
+  RiggVar.RG.Main in 'RG\RiggVar.RG.Main.pas';
 
 {$R *.res}
 
