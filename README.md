@@ -391,6 +391,8 @@ Note that I added the `dproj` and the `res` file of the test project to `.gitign
 
 > You need to recreate private versions of those (use an new empty app).
 
+You could just remove the xml from RG14.dproj.xml, which is an empty one for 10.3.3 Rio, and let the IDE generate a new res file.
+
 Please check that configuration of `output dir` and `output dir for units` in project options for Delphi-Compiler on all targets is set to the default of
 ```
 .\$(Platform)\$(Config)
@@ -550,12 +552,6 @@ We need a table detailing platform-rows and answer-columns:
 | Mac, App Store  | 1 | 1 | 0 | 0 | 1 |
 | iPad            | 0 | 1 | 0 | 0 | 0 |
 | Android         | 0 | 1 | 0 | 0 | 0 |
-
-## Other
-
-The Rggdoc.pas unit in folder Core is not used in the test project.
-Maybe I should delete it from here soon.
-But it may give you and idea of how it looked in the past.
 
 ## Links
 
