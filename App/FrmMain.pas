@@ -47,22 +47,17 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
-    procedure MemoMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
-  private
+  protected
     procedure UpdateLog;
-    procedure UpdateMemo;
     procedure UpdateReport;
     procedure UpdateJson;
   private
-    TL: TStrings;
     RL: TStrings;
+    AllProps: Boolean;
     CurrentReport: TRggReport;
-    procedure InitTrimmCombo;
-    procedure InitParamCombo;
-    procedure InitReportListbox;
-    procedure ACI(fp: TFederParam);
-    procedure ShowTrimm;
+    Counter: Integer;
     procedure ShowCurrentReport;
+    procedure ShowTrimmData;
     function GetReportCaption(r: TRggReport): string;
     procedure HandleShowHint(Sender: TObject);
   public
@@ -76,22 +71,22 @@ type
     T1Btn: TSpeedButton;
     T2Btn: TSpeedButton;
     T3Btn: TSpeedButton;
+    T4Btn: TSpeedButton;
+    T5Btn: TSpeedButton;
+    T6Btn: TSpeedButton;
+    T7Btn: TSpeedButton;
+    T8Btn: TSpeedButton;
 
-    LogBtn: TSpeedButton;
-    ReportBtn: TSpeedButton;
+    ShortBtn: TSpeedButton;
+    LongBtn: TSpeedButton;
     StateBtn: TSpeedButton;
     JsonBtn: TSpeedButton;
   public
     HintText: TText;
     SpeedPanel: TPanel;
-    TrimmMemo: TMemo;
-    ReportListbox: TListBox;
     ReportLabel: TText;
     ReportMemo: TMemo;
     LogMemo: TMemo;
-
-    TrimmCombo: TComboBox;
-    ParamCombo: TComboBox;
 
     MT0Btn: TSpeedButton;
     ReadTrimmFileBtn: TSpeedButton;
@@ -100,28 +95,11 @@ type
     CopyTrimmItemBtn: TSpeedButton;
     PasteTrimmItemBtn: TSpeedButton;
     CopyAndPasteBtn: TSpeedButton;
-
-    M1Btn: TSpeedButton;
-    M10Btn: TSpeedButton;
-    P1Btn: TSpeedButton;
-    P10Btn: TSpeedButton;
-
     SandboxedBtn: TSpeedButton;
-    WantAllBtn: TSpeedButton;
-
-    procedure ReportBtnClick(Sender: TObject);
-    procedure T1BtnClick(Sender: TObject);
-    procedure LogBtnClick(Sender: TObject);
+    procedure ShortBtnClick(Sender: TObject);
+    procedure LongBtnClick(Sender: TObject);
     procedure StateBtnClick(Sender: TObject);
     procedure JsonBtnClick(Sender: TObject);
-
-    procedure ReportListboxClick(Sender: TObject);
-    procedure TrimmComboChange(Sender: TObject);
-    procedure ParamComboChange(Sender: TObject);
-    procedure M10BtnClick(Sender: TObject);
-    procedure M1BtnClick(Sender: TObject);
-    procedure P1BtnClick(Sender: TObject);
-    procedure P10BtnClick(Sender: TObject);
     procedure SandboxedBtnClick(Sender: TObject);
     procedure CopyAndPasteBtnClick(Sender: TObject);
     procedure CopyTrimmFileBtnClick(Sender: TObject);
@@ -130,6 +108,7 @@ type
     procedure PasteTrimmItemBtnClick(Sender: TObject);
     procedure ReadTrimmFileBtnClick(Sender: TObject);
     procedure SaveTrimmFileBtnClick(Sender: TObject);
+    procedure TrimmBtnClick(Sender: TObject);
   protected
     Raster: Integer;
     Margin: Integer;
@@ -149,7 +128,6 @@ type
     procedure InitLayoutProps;
     procedure LayoutComponents;
     procedure InitSpeedButtons;
-    procedure LinkComponents;
   protected
     function FindStyleByName(AParent: TFMXObject; AName: string): TFMXObject;
     procedure InitSpeedButton(SB: TSpeedButton);
@@ -158,8 +136,6 @@ type
     procedure SetupComboBox(CB: TComboBox);
     procedure SetupListbox(LB: TListBox);
     procedure SetupListboxItems(LB: TListbox; cla: TAlphaColor);
-  public
-//    ReportManager: TRggReportManager;
   end;
 
 var
@@ -170,9 +146,7 @@ implementation
 {$R *.fmx}
 
 uses
-  RiggVar.App.Main,
-  RiggVar.FB.ActionConst,
-  RiggVar.FB.Classes;
+  RiggVar.App.Main;
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
@@ -189,17 +163,10 @@ begin
   Margin := 10;
   Raster := 70;
 
-  { RSP-20787 when TFormPosition.ScreenCenter}
-//  Self.Position := TFormPosition.ScreenCenter;
-
   CreateComponents;
   InitLayoutProps;
   LayoutComponents;
 
-  SetupListbox(ReportListbox);
-  SetupMemo(TrimmMemo);
-  SetupComboBox(TrimmCombo);
-  SetupComboBox(ParamCombo);
   SetupMemo(ReportMemo);
   SetupMemo(LogMemo);
   SetupText(HintText);
@@ -212,43 +179,27 @@ begin
   Main.IsUp := True;
 
   InitSpeedButtons;
-  LinkComponents;
 
-  TL := TrimmMemo.Lines;
   RL := ReportMemo.Lines;
-//  ReportManager := TRggReportManager.Create(ML);
-//  ReportManager.InitLB(ReportListbox.Items);
-
-  TrimmMemo.ShowScrollBars := False;
-  TrimmMemo.Width := ReportListbox.Width;
-
-  InitReportListbox;
-  InitTrimmCombo;
-  InitParamCombo;
-
-  TrimmCombo.ItemIndex := 0;
-  ParamCombo.ItemIndex := 0;
-  ReportListbox.ItemIndex := 0;
 
   Main.Trimm := 1;
   MT0BtnClick(nil);
-  ShowTrimm;
 
   HintText.BringToFront;
   HintText.TextSettings.FontColor := claPurple;
+
   ReportLabel.TextSettings.FontColor := claDodgerblue;
 
   UpdateLog;
-  UpdateMemo;
+  CurrentReport := rgJson;
+  ShowCurrentReport;
 
   Application.OnHint := HandleShowHint;
-  SetupListboxItems(ReportListbox, claDodgerblue);
-  Self.OnResize := FormResize;
+  self.OnResize := FormResize;
 end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
 begin
-//  ReportManager.Free;
   Main.Free;
   Main := nil;
 end;
@@ -264,15 +215,10 @@ begin
   HintText.Text := Application.Hint;
 end;
 
-procedure TFormMain.HandleAction(fa: TFederAction);
+procedure TFormMain.HandleAction(fa: Integer);
 begin
 
 end;
-
-//function TFormMain.GetIsUp: Boolean;
-//begin
-//  result := (Main <> nil) and Main.IsUp;
-//end;
 
 function TFormMain.GetOpenFileName(dn, fn: string): string;
 begin
@@ -380,24 +326,33 @@ begin
   Main.CurrentTrimm.WriteJson(RL);
 end;
 
-procedure TFormMain.UpdateMemo;
+procedure TFormMain.ShortBtnClick(Sender: TObject);
 begin
-  UpdateJson;
+  AllProps := False;
+  ShowTrimmData;
+  ReportLabel.Text := 'Short Data';
 end;
 
-procedure TFormMain.ReportBtnClick(Sender: TObject);
+procedure TFormMain.LongBtnClick(Sender: TObject);
 begin
-//  Main.DoCleanReport;
-  Main.DoReport;
-  UpdateLog;
+  AllProps := True;
+  ShowTrimmData;
+  ReportLabel.Text := 'Long Data';
 end;
 
-procedure TFormMain.LogBtnClick(Sender: TObject);
+procedure TFormMain.StateBtnClick(Sender: TObject);
 begin
-  UpdateLog;
+  CurrentReport := rgData;
+  ShowCurrentReport;
 end;
 
-procedure TFormMain.T1BtnClick(Sender: TObject);
+procedure TFormMain.JsonBtnClick(Sender: TObject);
+begin
+  CurrentReport := rgJson;
+  ShowCurrentReport;
+end;
+
+procedure TFormMain.TrimmBtnClick(Sender: TObject);
 var
   t: Integer;
 begin
@@ -406,19 +361,8 @@ begin
   begin
     Main.Trimm := t;
     UpdateLog;
-    UpdateMemo;
+    ShowCurrentReport;
   end;
-end;
-
-procedure TFormMain.StateBtnClick(Sender: TObject);
-begin
-  //ML.Text := Main.TrimmData;
-  UpdateReport;
-end;
-
-procedure TFormMain.JsonBtnClick(Sender: TObject);
-begin
-  UpdateJson;
 end;
 
 function TFormMain.AddSpeedBtn(N: string; AGroupSpace: Integer): TSpeedButton;
@@ -462,24 +406,23 @@ var
 begin
   { Report Buttons }
 
-  BtnColor := claOrange;
+  BtnColor := claCrimson;
 
-  sb := AddSpeedBtn('LogBtn', BtnGroupSpace);
-  LogBtn := sb;
-  sb.Text := 'Log';
-  sb.Hint := 'Log Btn';
+  sb := AddSpeedBtn('ShortBtn', BtnGroupSpace);
+  ShortBtn := sb;
+  sb.Text := 'dat';
+  sb.Hint := 'Data (Short)';
   sb.StaysPressed := False;
   sb.IsPressed := False;
-  sb.OnClick := LogBtnClick;
+  sb.OnClick := ShortBtnClick;
   InitSpeedButton(sb);
 
-  sb := AddSpeedBtn('ReportBtn');
-  ReportBtn := sb;
-  sb.Text := 'Rep';
-  sb.Hint := 'Report Btn';
+  sb := AddSpeedBtn('LongBtn');
+  LongBtn := sb;
+  sb.Text := 'DAT';
+  sb.Hint := 'Data (Long)';
   sb.StaysPressed := False;
-  sb.IsPressed := False;
-  sb.OnClick := ReportBtnClick;
+  sb.OnClick := LongBtnClick;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('StateBtn');
@@ -487,7 +430,6 @@ begin
   sb.Text := 'Sta';
   sb.Hint := 'State Btn';
   sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := StateBtnClick;
   InitSpeedButton(sb);
 
@@ -496,8 +438,19 @@ begin
   sb.Text := 'Jsn';
   sb.Hint := 'Json Btn';
   sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := JsonBtnClick;
+  InitSpeedButton(sb);
+
+  { Option Buttons }
+
+  BtnColor := claPurple;
+
+  sb := AddSpeedBtn('SandboxedBtn', BtnGroupSpace);
+  SandboxedBtn := sb;
+  sb.Text := 'SB';
+  sb.Hint := 'Sandboxed';
+  sb.StaysPressed := True;
+  sb.OnClick := SandboxedBtnClick;
   InitSpeedButton(sb);
 
   { Data Buttons }
@@ -509,16 +462,14 @@ begin
   sb.Text := 'MT0';
   sb.Hint := 'Memory Btn';
   sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := MT0BtnClick;
   InitSpeedButton(sb);
 
-  sb := AddSpeedBtn('ReadTrimmFileBtn', BtnGroupSpace);
+  sb := AddSpeedBtn('ReadTrimmFileBtn');
   ReadTrimmFileBtn := sb;
   sb.Text := 'rtf';
   sb.Hint := 'Read Trimm File';
   sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := ReadTrimmFileBtnClick;
   InitSpeedButton(sb);
 
@@ -527,7 +478,6 @@ begin
   sb.Text := 'stf';
   sb.Hint := 'Save Trimm File';
   sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := SaveTrimmFileBtnClick;
   InitSpeedButton(sb);
 
@@ -536,7 +486,6 @@ begin
   sb.Text := 'cti';
   sb.Hint := 'Copy Trimm Item';
   sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := CopyTrimmItemBtnClick;
   InitSpeedButton(sb);
 
@@ -545,7 +494,6 @@ begin
   sb.Text := 'pti';
   sb.Hint := 'Paste Trimm Item';
   sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := PasteTrimmItemBtnClick;
   InitSpeedButton(sb);
 
@@ -554,105 +502,85 @@ begin
   sb.Text := 'M';
   sb.Hint := 'Copy And Paste';
   sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := CopyAndPasteBtnClick;
-  InitSpeedButton(sb);
-
-  { Param Value Button }
-
-  BtnColor := claBlue;
-
-  sb := AddSpeedBtn('M10Btn', BtnGroupSpace);
-  M10Btn := sb;
-  sb.Text := '-10';
-  sb.Hint := 'Param Value Minus 10';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
-  sb.OnClick := M10BtnClick;
-  InitSpeedButton(sb);
-
-  sb := AddSpeedBtn('M1Btn');
-  M1Btn := sb;
-  sb.Text := '-1';
-  sb.Hint := 'Param Value Minus 1';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
-  sb.OnClick := M1BtnClick;
-  InitSpeedButton(sb);
-
-  sb := AddSpeedBtn('P1Btn');
-  P1Btn := sb;
-  sb.Text := '+1';
-  sb.Hint := 'Param Value Plus 1';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
-  sb.OnClick := P1BtnClick;
-  InitSpeedButton(sb);
-
-  sb := AddSpeedBtn('P10Btn');
-  P10Btn := sb;
-  sb.Text := '+10';
-  sb.Hint := 'Param Value Plus 10';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
-  sb.OnClick := P10BtnClick;
-  InitSpeedButton(sb);
-
-  { Check Box Buttons }
-
-  BtnColor := claPurple;
-
-  sb := AddSpeedBtn('SandboxedBtn', BtnGroupSpace);
-  SandboxedBtn := sb;
-  sb.Text := 'SB';
-  sb.Hint := 'Sandboxed';
-  sb.StaysPressed := True;
-  sb.IsPressed := False;
-  sb.OnClick := SandboxedBtnClick;
-  InitSpeedButton(sb);
-
-  sb := AddSpeedBtn('WantAllBtn');
-  WantAllBtn := sb;
-  sb.Text := 'WA';
-  sb.Hint := 'Want All Xml Items';
-  sb.StaysPressed := True;
-  sb.IsPressed := False;
   InitSpeedButton(sb);
 
   { Trimm Buttons }
 
-  BtnColor := claGreen;
+  BtnColor := claBlue;
 
   sb := AddSpeedBtn('T1Btn', BtnGroupSpace);
   T1Btn := sb;
   sb.Text := 'T1';
   sb.Hint := 'Trimm 1 Btn';
   sb.StaysPressed := False;
-  sb.IsPressed := False;
-  sb.OnClick := T1BtnClick;
+  sb.OnClick := TrimmBtnClick;
   sb.Tag := 1;
   InitSpeedButton(sb);
 
-  sb := AddSpeedBtn('T2Btn', BtnGroupSpace);
+  sb := AddSpeedBtn('T2Btn');
   T2Btn := sb;
   sb.Text := 'T2';
   sb.Hint := 'Trimm 2 Btn';
   sb.StaysPressed := False;
-  sb.IsPressed := False;
-  sb.OnClick := T1BtnClick;
+  sb.OnClick := TrimmBtnClick;
   sb.Tag := 2;
   InitSpeedButton(sb);
 
-  sb := AddSpeedBtn('T3Btn', BtnGroupSpace);
+  sb := AddSpeedBtn('T3Btn');
   T3Btn := sb;
   sb.Text := 'T3';
   sb.Hint := 'Trimm 3 Btn';
   sb.StaysPressed := False;
-  sb.IsPressed := False;
-  sb.OnClick := T1BtnClick;
+  sb.OnClick := TrimmBtnClick;
   sb.Tag := 3;
   InitSpeedButton(sb);
 
+  sb := AddSpeedBtn('T4Btn');
+  T4Btn := sb;
+  sb.Text := 'T4';
+  sb.Hint := 'Trimm 4 Btn';
+  sb.StaysPressed := False;
+  sb.OnClick := TrimmBtnClick;
+  sb.Tag := 4;
+  InitSpeedButton(sb);
+
+  sb := AddSpeedBtn('T5Btn');
+  T5Btn := sb;
+  sb.Text := 'T5';
+  sb.Hint := 'Trimm 5 Btn';
+  sb.StaysPressed := False;
+  sb.IsPressed := False;
+  sb.OnClick := TrimmBtnClick;
+  sb.Tag := 5;
+  InitSpeedButton(sb);
+
+  sb := AddSpeedBtn('T6Btn');
+  T6Btn := sb;
+  sb.Text := 'T6';
+  sb.Hint := 'Trimm 6 Btn';
+  sb.StaysPressed := False;
+  sb.OnClick := TrimmBtnClick;
+  sb.Tag := 6;
+  InitSpeedButton(sb);
+
+  sb := AddSpeedBtn('T7Btn');
+  T7Btn := sb;
+  sb.Text := 'T7';
+  sb.Hint := 'Trimm 7 Btn (420)';
+  sb.StaysPressed := False;
+  sb.OnClick := TrimmBtnClick;
+  sb.Tag := 7;
+  InitSpeedButton(sb);
+
+  sb := AddSpeedBtn('T8Btn');
+  T8Btn := sb;
+  sb.Text := 'T8';
+  sb.Hint := 'Trimm 8 Btn (Logo)';
+  sb.StaysPressed := False;
+  sb.OnClick := TrimmBtnClick;
+  sb.Tag := 8;
+  InitSpeedButton(sb);
 end;
 
 procedure TFormMain.CopyTrimmItemBtnClick(Sender: TObject);
@@ -665,6 +593,7 @@ procedure TFormMain.PasteTrimmItemBtnClick(Sender: TObject);
 begin
   Main.PasteTrimmItem;
   UpdateLog;
+  ShowCurrentReport;
 end;
 
 procedure TFormMain.CopyAndPasteBtnClick(Sender: TObject);
@@ -683,6 +612,7 @@ procedure TFormMain.ReadTrimmFileBtnClick(Sender: TObject);
 begin
   Main.ReadTrimmFile;
   UpdateLog;
+  ShowCurrentReport;
 end;
 
 procedure TFormMain.SaveTrimmFileBtnClick(Sender: TObject);
@@ -694,8 +624,8 @@ end;
 procedure TFormMain.MT0BtnClick(Sender: TObject);
 begin
   Main.UpdateTrimm0;
-  //Main.FederText.UpdateText;
   UpdateLog;
+  ShowCurrentReport;
 end;
 
 procedure TFormMain.SandboxedBtnClick(Sender: TObject);
@@ -703,78 +633,15 @@ begin
   IsSandboxed := SandboxedBtn.IsPressed;
 end;
 
-procedure TFormMain.M10BtnClick(Sender: TObject);
-begin
-  Main.HandleAction(faParamValueMinus10);
-  ShowTrimm;
-end;
-
-procedure TFormMain.M1BtnClick(Sender: TObject);
-begin
-  Main.HandleAction(faParamValueMinus1);
-  ShowTrimm;
-end;
-
-procedure TFormMain.P10BtnClick(Sender: TObject);
-begin
-  Main.HandleAction(faParamValuePlus10);
-  ShowTrimm;
-end;
-
-procedure TFormMain.P1BtnClick(Sender: TObject);
-begin
-  Main.HandleAction(faParamValuePlus1);
-  ShowTrimm;
-end;
-
-procedure TFormMain.InitReportListBox;
-var
-  ML: TStrings;
-  r: TRggReport;
-begin
-  ML := ReportListbox.Items;
-
-  for r := Low(TRggReport) to High(TRggReport) do
-    ML.Add(GetReportCaption(r));
-end;
-
-procedure TFormMain.ReportListboxClick(Sender: TObject);
-var
-  ii: Integer;
-begin
-  RL.Clear;
-  ii := ReportListbox.ItemIndex;
-  if (ii >= 0) and (ii <= Integer(High(TRggReport)))then
-  begin
-    CurrentReport := TRggReport(ii);
-    ShowCurrentReport;
-  end;
-end;
-
 procedure TFormMain.ShowCurrentReport;
 begin
+  Inc(Counter);
   RL.BeginUpdate;
   RL.Clear;
   case CurrentReport of
     rgLog: RL.Text := Main.Logger.TL.Text;
-    rgJson: Main.RggData.WriteJSon(RL);
-    rgData: Main.RggData.WriteReport(RL);
-//    rgAusgabeRL:
-//    begin
-//      RiggReport.ML.Clear;
-//      RiggReport.AusgabeRL(Main.RggMain.Rigg.rL);
-//      ML.Assign(RiggReport.ML);
-//    end;
-//    rgAusgabeRP:
-//    begin
-//      RiggReport.ML.Clear;
-//      RiggReport.AusgabeRP(Main.RggMain.Rigg.rP);
-//      ML.Assign(RiggReport.ML);
-//    end;
-//    rgXML: Main.RggMain.Rigg.WriteXml(ML);
-//    rgDiffText: Main.RggMain.UpdateDiffText(ML);
-//    rgDataText: Main.RggMain.UpdateDataText(ML);
-//    rgTrimmText: Main.RggMain.UpdateTrimmText(ML);
+    rgJson: Main.CurrentTrimm.WriteJSon(RL);
+    rgData: Main.CurrentTrimm.WriteReport(RL);
     rgDebugReport:
     begin
       Main.DoCleanReport;
@@ -782,94 +649,20 @@ begin
     end;
   end;
   RL.EndUpdate;
-
   ReportLabel.Text := GetReportCaption(CurrentReport)
 end;
 
-procedure TFormMain.ACI(fp: TFederParam);
-var
-  s: string;
+procedure TFormMain.ShowTrimmData;
 begin
-  s := Main.RggMain.Param2Text(fp);
-  ParamCombo.Items.AddObject(s, TObject(fp));
-end;
-
-procedure TFormMain.InitParamCombo;
-begin
-  ACI(fpVorstag);
-  ACI(fpWinkel);
-  ACI(fpController);
-  ACI(fpWante);
-  ACI(fpWoben);
-  ACI(fpSalingH);
-  ACI(fpSalingA);
-  ACI(fpSalingL);
-  ACI(fpSalingW);
-  ACI(fpMastfallF0C);
-  ACI(fpMastfallF0F);
-  ACI(fpMastfallVorlauf);
-  ACI(fpBiegung);
-  ACI(fpD0X);
-end;
-
-procedure TFormMain.InitTrimmCombo;
-var
-  cl: TStrings;
-begin
-  cl := TrimmCombo.Items;
-  cl.AddObject('Trimm1', TObject(1));
-  cl.AddObject('Trimm2', TObject(2));
-  cl.AddObject('Trimm3', TObject(3));
-  cl.AddObject('Trimm4', TObject(4));
-  cl.AddObject('Trimm5', TObject(5));
-  cl.AddObject('Trimm6', TObject(6));
-  cl.AddObject('Trimm7 (420)', TObject(7));
-  cl.AddObject('Trimm8 (Logo)', TObject(8));
-end;
-
-procedure TFormMain.TrimmComboChange(Sender: TObject);
-var
-  t: Integer;
-  ii: Integer;
-begin
-  ii := TrimmCombo.ItemIndex;
-  t := Integer(TrimmCombo.Items.Objects[ii]);
-  Main.Trimm := t;
-
   RL.BeginUpdate;
   try
     RL.Clear;
-
-    //Main.CurrentTrimm.SaveTrimmFile(ML);
-
-    Main.CurrentTrimm.WantAll := WantAllBtn.IsPressed;
+    Main.CurrentTrimm.WantAll := AllProps;
     Main.CurrentTrimm.SaveTrimmItem(RL);
     Main.CurrentTrimm.WantAll := False;
-
-    //Main.CurrentTrimm.WriteReport(ML);
-
-    ReportLabel.Text := 'Trimm' + IntToStr(t);
   finally
     RL.EndUpdate;
   end;
-end;
-
-procedure TFormMain.ParamComboChange(Sender: TObject);
-var
-  ii: Integer;
-  fp: TFederParam;
-begin
-  ii := ParamCombo.ItemIndex;
-  fp := TFederParam(ParamCombo.Items.Objects[ii]);
-  Main.RggMain.Param := fp;
-  ShowTrimm;
-end;
-
-procedure TFormMain.ShowTrimm;
-begin
-  if TL <> nil then
-    Main.RggMain.UpdateTrimmText(TL);
-  ShowCurrentReport;
 end;
 
 procedure TFormMain.InitLayoutProps;
@@ -889,8 +682,8 @@ function TFormMain.GetReportCaption(r: TRggReport): string;
 begin
   case r of
     rgLog: result := 'Log';
-    rgJson: result := 'Main.RggData.WriteJson';
-    rgData: result := 'Main.RggData.WriteReport';
+    rgJson: result := 'Main.CurrentTrimm.WriteJson';
+    rgData: result := 'Main.CurrentTrimm.WriteReport';
     rgTrimmText: result := 'Trimm Text';
     rgDataText: result := 'Data Text';
     rgDiffText: result := 'Diff Text';
@@ -901,22 +694,7 @@ begin
     else
       result := 'Unknown';
   end;
-end;
-
-procedure TFormMain.MemoMouseWheel(Sender: TObject; Shift: TShiftState;
-  WheelDelta: Integer; var Handled: Boolean);
-begin
-  if ssShift in Shift then
-    Main.RggMain.DoBigWheel(WheelDelta)
-  else if not (ssCtrl in Shift) then
-    Main.RggMain.DoSmallWheel(WheelDelta);
-
-  if (ssShift in Shift) or (ssCtrl in Shift) then
-  begin
-    Main.DoMouseWheel(Shift, WheelDelta);
-    ShowTrimm;
-    Handled := True;
-  end;
+  result := Format('%s (%d)', [result, Counter]);
 end;
 
 procedure TFormMain.CreateComponents;
@@ -927,51 +705,14 @@ begin
 
   HintText := TText.Create(Self);
   HintText.Parent := Self;
-//  HintText.WordWrap := False;
-//  HintText.AutoSize := True;
-//  HintText.HorzTextAlign := TTextAlign.Leading;
-//  HintText.Font.Family := 'Consolas';
-//  HintText.Font.Size := 18;
 
   ReportLabel := TText.Create(Self);
   ReportLabel.Parent := Self;
-
-//  HelpText := TText.Create(Self);
-//  HelpText.Parent := Self;
-//  HelpText.WordWrap := False;
-//  HelpText.HorzTextAlign := TTextAlign.Leading;
-//  HelpText.Font.Family := 'Courier New';
-//  HelpText.Font.Size := 16;
-//  HelpText.AutoSize := True;
-//
-//  ReportText := TText.Create(Self);
-//  ReportText.Parent := Self;
-//  ReportText.WordWrap := False;
-//  ReportText.HorzTextAlign := TTextAlign.Leading;
-//  ReportText.Font.Family := 'Courier New';
-//  ReportText.Font.Size := 16;
-//  ReportText.AutoSize := True;
 
   SpeedPanel := TPanel.Create(Self);
   SpeedPanel.Parent := Self;
   SpeedPanel.ShowHint := True;
   SpeedPanel.Opacity := OpacityValue;
-
-  TrimmMemo := TMemo.Create(Self);
-  TrimmMemo.Parent := Self;
-  TrimmMemo.ReadOnly := True;
-  TrimmMemo.CanFocus := False;
-  TrimmMemo.Opacity := OpacityValue;
-
-  TrimmCombo := TComboBox.Create(Self);
-  TrimmCombo.Parent := Self;
-
-  ParamCombo := TComboBox.Create(Self);
-  ParamCombo.Parent := Self;
-
-  ReportListbox := TListbox.Create(Self);
-  ReportListbox.Parent := Self;
-  ReportListbox.Opacity := OpacityValue;
 
   LogMemo := TMemo.Create(Self);
   LogMemo.Parent := Self;
@@ -984,33 +725,9 @@ begin
   ReportMemo.ReadOnly := True;
   ReportMemo.CanFocus := False;
   ReportMemo.Opacity := OpacityValue;
-
-//  Bitmap := TBitmap.Create(1024, 768);
-
-//  Image := TImage.Create(Self);
-//  Image.Parent := Self;
-//  Image.Bitmap := Bitmap;
-//  Image.WrapMode := TImageWrapMode.Original;
-
-//  MT0Btn := TSpeedButton.Create(Self);
-//  ReadTrimmFileBtn := TSpeedButton.Create(Self);
-//  SaveTrimmFileBtn := TSpeedButton.Create(Self);
-//  PasteTrimmItemBtn := TSpeedButton.Create(Self);
-//  CopyTrimmItemBtn := TSpeedButton.Create(Self);
-//  CopyAndPasteBtn := TSpeedButton.Create(Self);
-//
-//  M10Btn := TSpeedButton.Create(Self);
-//  M1Btn := TSpeedButton.Create(Self);
-//  P1Btn := TSpeedButton.Create(Self);
-//  P10Btn := TSpeedButton.Create(Self);
-//
-//  SandboxedBtn := TSpeedButton.Create(Self);
-//  WantAllBtn := TSpeedButton.Create(Self);
 end;
 
 procedure TFormMain.LayoutComponents;
-var
-  ComboHeight: single;
 begin
   SpeedPanel.Align := TAlignLayout.Top;
   SpeedPanel.Height := SpeedPanelHeight;
@@ -1023,68 +740,17 @@ begin
   ReportLabel.Position.Y := SpeedPanelHeight + Margin;
   ReportLabel.Height := 30;
 
-  TrimmMemo.Position.X := Margin;
-  TrimmMemo.Position.Y := SpeedPanel.Height + HintText.Height + Margin;
-  TrimmMemo.Height := 185;
-  TrimmMemo.Width := 200;
-
-  TrimmCombo.Position.X := TrimmMemo.Position.X;
-  ParamCombo.Position.X := TrimmCombo.Position.X;
-
-  TrimmCombo.Width := TrimmMemo.Width;
-  ParamCombo.Width := TrimmCombo.Width;
-
-  ComboHeight := TrimmCombo.Height + Margin;
-  TrimmCombo.Position.Y := TrimmMemo.Position.Y + TrimmMemo.Height + Margin;
-  ParamCombo.Position.Y := TrimmCombo.Position.Y + ComboHeight;
-
-  ReportListbox.Position.X := TrimmMemo.Position.X;
-  ReportListbox.Position.Y := ParamCombo.Position.Y + ComboHeight;
-  ReportListbox.Width := TrimmMemo.Width;
-  ReportListbox.Height := ClientHeight - ReportListbox.Position.Y - Margin;
-  ReportListbox.Anchors := ReportListbox.Anchors + [TAnchorKind.akBottom];
-
-  LogMemo.Position.X := ReportListbox.Position.X + ReportListbox.Width + Margin;
-  LogMemo.Position.Y := TrimmMemo.Position.Y;
+  LogMemo.Position.X := Margin;
+  LogMemo.Position.Y := SpeedPanel.Height + HintText.Height + Margin;;
   LogMemo.Height := ClientHeight - LogMemo.Position.Y - Margin;
   LogMemo.Width := 400;
   LogMemo.Anchors := LogMemo.Anchors + [TAnchorKind.akBottom];
 
   ReportMemo.Position.X := LogMemo.Position.X + LogMemo.Width + Margin;
-  ReportMemo.Position.Y := TrimmMemo.Position.Y;
+  ReportMemo.Position.Y := LogMemo.Position.Y;
   ReportMemo.Height := ClientHeight - ReportMemo.Position.Y - Margin;
   ReportMemo.Width := ClientWidth - ReportMemo.Position.X - Margin;
   ReportMemo.Anchors := ReportMemo.Anchors + [TAnchorKind.akRight, TAnchorKind.akBottom];
-
-//  Image.Position.X := ReportMemo.Position.X + ReportMemo.Width + Margin;
-//  Image.Position.Y := SpeedPanel.Position.Y + SpeedPanel.Height + Margin;
-//  Image.Width := ClientWidth - Image.Position.X - Margin;
-//  Image.Height := ClientHeight - Image.Position.Y - Margin;
-//  Image.Anchors := Image.Anchors + [TAnchorKind.akRight, TAnchorKind.akBottom];
-end;
-
-procedure TFormMain.LinkComponents;
-begin
-//  MT0Btn.OnClick := MT0BtnClick;
-//  CopyAndPasteBtn.OnClick := CopyAndPasteBtnClick;
-//  PasteTrimmItemBtn.OnClick := PasteTrimmItemBtnClick;
-//  CopyTrimmItemBtn.OnClick := CopyTrimmItemBtnClick;
-//  ReadTrimmFileBtn.OnClick := ReadTrimmFileBtnClick;
-//  SaveTrimmFileBtn.OnClick := SaveTrimmFileBtnClick;
-//
-//  M1Btn.OnClick := M1BtnClick;
-//  M10Btn.OnClick := M10BtnClick;
-//  P1Btn.OnClick := P1BtnClick;
-//  P10Btn.OnClick := P10BtnClick;
-//  SandboxedBtn.OnClick := SandboxedBtnClick;
-
-  ReportListbox.OnClick := ReportListboxClick;
-  ReportListbox.OnChange := ReportListboxClick;
-
-  TrimmCombo.OnChange := TrimmComboChange;
-  ParamCombo.OnChange := ParamComboChange;
-
-  ReportMemo.OnMouseWheel := MemoMouseWheel;
 end;
 
 procedure TFormMain.SetupListboxItems(LB: TListbox; cla: TAlphaColor);

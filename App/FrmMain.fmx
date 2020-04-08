@@ -1,4 +1,4 @@
-object FormMain: TFormMain
+﻿object FormMain: TFormMain
   Left = 90
   Top = 60
   Caption = 'RG14'
@@ -10,6 +10,7 @@ object FormMain: TFormMain
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnResize = FormResize
   Left = 90
   Top = 60
   DesignerMasterStyle = 0
