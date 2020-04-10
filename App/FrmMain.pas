@@ -19,6 +19,7 @@
 interface
 
 uses
+  RggUnit4,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
   System.SysUtils,
@@ -47,7 +48,10 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
+    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
+    procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
   protected
+    procedure ApplicationEventsException(Sender: TObject; E: Exception);
     procedure UpdateLog;
     procedure UpdateReport;
     procedure UpdateJson;
@@ -77,6 +81,7 @@ type
     T7Btn: TSpeedButton;
     T8Btn: TSpeedButton;
 
+    LogBtn: TSpeedButton;
     ShortBtn: TSpeedButton;
     LongBtn: TSpeedButton;
     StateBtn: TSpeedButton;
@@ -100,6 +105,7 @@ type
 
     SandboxedBtn: TSpeedButton;
 
+    procedure LogBtnClick(Sender: TObject);
     procedure ShortBtnClick(Sender: TObject);
     procedure LongBtnClick(Sender: TObject);
     procedure StateBtnClick(Sender: TObject);
@@ -138,6 +144,8 @@ type
     procedure SetupComboBox(CB: TComboBox);
     procedure SetupListbox(LB: TListBox);
     procedure SetupListboxItems(LB: TListbox; cla: TAlphaColor);
+  private
+    Rigg: TRigg;
   end;
 
 var
@@ -151,6 +159,15 @@ uses
   RiggVar.App.Main,
   RiggVar.FB.ActionConst;
 
+const
+  ApplicationTitleText = 'RG14';
+
+procedure TFormMain.ApplicationEventsException(Sender: TObject; E: Exception);
+begin
+  if (Main <> nil) and (Main.Logger <> nil) then
+    Main.Logger.Info(E.Message);
+end;
+
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
 {$ifdef Debug}
@@ -158,8 +175,10 @@ begin
 {$endif}
   FormatSettings.DecimalSeparator := '.';
 
+  Application.OnException := ApplicationEventsException;
+
   FormMain := self;
-  Caption := 'RG14';
+  Caption := ApplicationTitleText;
   Top := 20;
   Width := 1200;
   Height := 800;
@@ -180,6 +199,7 @@ begin
 
   Main.RggMain.Init;
   Main.IsUp := True;
+  Rigg := Main.RggMain.Rigg;
 
   InitSpeedButtons;
 
@@ -205,6 +225,27 @@ procedure TFormMain.FormDestroy(Sender: TObject);
 begin
   Main.Free;
   Main := nil;
+end;
+
+procedure TFormMain.FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
+  Shift: TShiftState);
+begin
+  //
+end;
+
+procedure TFormMain.FormMouseWheel(Sender: TObject; Shift: TShiftState;
+  WheelDelta: Integer; var Handled: Boolean);
+begin
+  if ssShift in Shift then
+  begin
+    Main.RggMain.DoSmallWheel(WheelDelta);
+    ShowCurrentReport;
+  end
+  else if ssCtrl in Shift then
+  begin
+    Main.RggMain.DoBigWheel(WheelDelta);
+    ShowCurrentReport;
+  end;
 end;
 
 procedure TFormMain.FormResize(Sender: TObject);
@@ -267,10 +308,10 @@ end;
 procedure TFormMain.SetupText(T: TText);
 begin
   T.WordWrap := False;
-  T.AutoSize := True;
   T.HorzTextAlign := TTextAlign.Leading;
   T.Font.Family := 'Consolas';
   T.Font.Size := 18;
+  T.AutoSize := True;
 end;
 
 procedure TFormMain.SetupComboBox(CB: TComboBox);
@@ -333,6 +374,14 @@ procedure TFormMain.UpdateJson;
 begin
   RL.Clear;
   Main.CurrentTrimm.WriteJson(RL);
+end;
+
+procedure TFormMain.LogBtnClick(Sender: TObject);
+begin
+  Main.DoCleanReport;
+//  Main.DoReport;
+
+  UpdateLog;
 end;
 
 procedure TFormMain.ShortBtnClick(Sender: TObject);
@@ -413,6 +462,19 @@ procedure TFormMain.InitSpeedButtons;
 var
   sb: TSpeedButton;
 begin
+  { update log }
+
+  BtnColor := claOrange;
+
+  sb := AddSpeedBtn('LogBtn', BtnGroupSpace);
+  LogBtn := sb;
+  sb.Text := 'Log';
+  sb.Hint := 'Log Btn';
+  sb.StaysPressed := False;
+  sb.IsPressed := False;
+  sb.OnClick := LogBtnClick;
+  InitSpeedButton(sb);
+
   { Report Buttons }
 
   BtnColor := claCrimson;
@@ -523,7 +585,7 @@ begin
   sb := AddSpeedBtn('CopyAndPasteBtn');
   CopyAndPasteBtn := sb;
   sb.Text := 'cap';
-  sb.Hint := 'Copy And Paste';
+  sb.Hint := 'Copy And Paste Trimm Item';
   sb.StaysPressed := False;
   sb.OnClick := CopyAndPasteBtnClick;
   sb.Tag := faCopyAndPaste;
@@ -657,6 +719,25 @@ begin
   IsSandboxed := SandboxedBtn.IsPressed;
 end;
 
+function TFormMain.GetReportCaption(r: TRggReport): string;
+begin
+  case r of
+    rgLog: result := 'Log';
+    rgJson: result := 'Rigg.Data.WriteJson';
+    rgData: result := 'Rigg.Data.WriteReport';
+    rgTrimmText: result := 'Trimm Text';
+    rgDataText: result := 'Data Text';
+    rgDiffText: result := 'Diff Text';
+    rgAusgabeRL: result := 'Ausgabe rL';
+    rgAusgabeRP: result := 'Ausgabe rP';
+    rgXML: result := 'Write XML';
+    rgDebugReport: result := 'Debug Report';
+    else
+      result := 'Unknown';
+  end;
+  result := Format('%s (%d)', [result, Counter]);
+end;
+
 procedure TFormMain.ShowCurrentReport;
 begin
   Inc(Counter);
@@ -664,8 +745,8 @@ begin
   RL.Clear;
   case CurrentReport of
     rgLog: RL.Text := Main.Logger.TL.Text;
-    rgJson: Main.CurrentTrimm.WriteJSon(RL);
-    rgData: Main.CurrentTrimm.WriteReport(RL);
+    rgJson: Rigg.Data.WriteJSon(RL);
+    rgData: Rigg.Data.WriteReport(RL);
     rgDebugReport:
     begin
       Main.DoCleanReport;
@@ -700,25 +781,6 @@ begin
   BtnHeight := 30;
   BtnColor := claBlue;
   SpeedPanelHeight := BtnHeight + 2 * BtnTop;
-end;
-
-function TFormMain.GetReportCaption(r: TRggReport): string;
-begin
-  case r of
-    rgLog: result := 'Log';
-    rgJson: result := 'Main.CurrentTrimm.WriteJson';
-    rgData: result := 'Main.CurrentTrimm.WriteReport';
-    rgTrimmText: result := 'Trimm Text';
-    rgDataText: result := 'Data Text';
-    rgDiffText: result := 'Diff Text';
-    rgAusgabeRL: result := 'Ausgabe rL';
-    rgAusgabeRP: result := 'Ausgabe rP';
-    rgXML: result := 'Write XML';
-    rgDebugReport: result := 'Debug Report';
-    else
-      result := 'Unknown';
-  end;
-  result := Format('%s (%d)', [result, Counter]);
 end;
 
 procedure TFormMain.CreateComponents;
@@ -783,6 +845,8 @@ var
   cr: TListBoxItem;
   T: TText;
 begin
+  if LB = nil then
+    Exit;
   if LB.Items.Count > 0 then
   for i := 0 to LB.Items.Count - 1 do
   begin

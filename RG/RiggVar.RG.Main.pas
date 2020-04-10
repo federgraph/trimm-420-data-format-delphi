@@ -30,6 +30,8 @@ type
   private
     FParam: TFederParam;
     procedure SetParam(const Value: TFederParam);
+    function GetParamValue(index: TFederParam): single;
+    procedure SetParamValue(index: TFederParam; const Value: single);
   public
     Rigg: TRigg;
 
@@ -50,6 +52,7 @@ type
     function Text2Param(T: string): TFederParam;
 
     property Param: TFederParam read FParam write SetParam;
+    property ParamValue[index: TFederParam]: single read GetParamValue write SetParamValue;
   end;
 
 implementation
@@ -60,6 +63,7 @@ constructor TRggMain.Create;
 begin
   inherited Create;
   Rigg := TRigg.Create;
+  FParam := fpVorstag;
 end;
 
 destructor TRggMain.Destroy;
@@ -70,27 +74,56 @@ end;
 
 procedure TRggMain.DoBigWheel(Delta: single);
 begin
-
+  if Delta > 0 then
+    ParamValue[fpVorstag] := ParamValue[fpVorstag] + 5
+  else
+    ParamValue[fpVorstag] := ParamValue[fpVorstag] - 5;
 end;
 
 procedure TRggMain.DoSmallWheel(Delta: single);
 begin
+  if Delta > 0 then
+    ParamValue[fpVorstag] := ParamValue[fpVorstag] + 1
+  else
+    ParamValue[fpVorstag] := ParamValue[fpVorstag] - 1;
+end;
 
+function TRggMain.GetParamValue(index: TFederParam): single;
+begin
+  if index = fpVorstag then
+    result := Rigg.Data.VOPos
+  else
+    result := 0;
+end;
+
+procedure TRggMain.SetParamValue(index: TFederParam; const Value: single);
+var
+  t: Integer;
+begin
+  if FParam = fpVorstag then
+  begin
+    t := Round(Value);
+    if t < Rigg.Data.VOMin then
+      t := rigg.Data.VOMin;
+    if t > Rigg.Data.VOMax then
+      t := rigg.Data.VOMax;
+    Rigg.Data.VOPos := t;
+  end;
 end;
 
 procedure TRggMain.Init;
 begin
-
+  Rigg.Data.Reset;
 end;
 
 procedure TRggMain.LoadTrimm(fd: TRggData);
 begin
-
+  Rigg.LoadFromFederData(fd);
 end;
 
 procedure TRggMain.SaveTrimm(fd: TRggData);
 begin
-
+  Rigg.SaveToFederData(fd);
 end;
 
 procedure TRggMain.SetParam(const Value: TFederParam);
@@ -100,7 +133,8 @@ end;
 
 procedure TRggMain.UpdateTrimmText(ML: TStrings);
 begin
-
+  ML.Clear;
+  ML.Add('V0Pos = ' + IntToStr(Rigg.Data.VOPos));
 end;
 
 function TRggMain.Text2Param(T: string): TFederParam;

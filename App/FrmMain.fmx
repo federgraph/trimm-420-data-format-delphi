@@ -10,6 +10,8 @@ object FormMain: TFormMain
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyUp = FormKeyUp
+  OnMouseWheel = FormMouseWheel
   OnResize = FormResize
   Left = 90
   Top = 60
