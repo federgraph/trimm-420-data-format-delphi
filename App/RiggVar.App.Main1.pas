@@ -731,8 +731,20 @@ begin
       ShowDataText := not ShowDataText;
     end;
 
+    faToggleViewType: IsOrthoProjection := not IsOrthoProjection;
+
     else
       FormMain.HandleAction(fa);
+  end;
+
+  if IsUp then
+  begin
+    if (fa in ParamsRange) then
+      FormMain.UpdateItemIndexParams
+    else if (fa in ReportsRange) then
+      FormMain.UpdateItemIndexReports
+    else if (fa in TrimmsRange) then
+      FormMain.UpdateItemIndexTrimms;
   end;
 *)
 end;
@@ -801,6 +813,11 @@ begin
 //    faToggleDataText: result := Main.FederText.DataVisible;
 //    faToggleDiffText: result := Main.FederText.DiffVisible;
 //    faToggleTrimmText: result := Main.FederText.TrimmVisible;
+
+    faSofortBtn: result := RggMain.SofortBerechnen;
+    faGrauBtn: result := RggMain.BtnGrauDown;
+    faBlauBtn: result := RggMain.BtnBlauDown;
+    faMemoryBtn: result := False;
 
     else
       result := inherited;

@@ -89,25 +89,29 @@ type
     LogMemo: TMemo;
 
     MT0Btn: TSpeedButton;
+
     ReadTrimmFileBtn: TSpeedButton;
     SaveTrimmFileBtn: TSpeedButton;
+    CopyTrimmFileBtn: TSpeedButton;
 
     CopyTrimmItemBtn: TSpeedButton;
     PasteTrimmItemBtn: TSpeedButton;
     CopyAndPasteBtn: TSpeedButton;
+
     SandboxedBtn: TSpeedButton;
+
     procedure ShortBtnClick(Sender: TObject);
     procedure LongBtnClick(Sender: TObject);
     procedure StateBtnClick(Sender: TObject);
     procedure JsonBtnClick(Sender: TObject);
     procedure SandboxedBtnClick(Sender: TObject);
-    procedure CopyAndPasteBtnClick(Sender: TObject);
-    procedure CopyTrimmFileBtnClick(Sender: TObject);
-    procedure CopyTrimmItemBtnClick(Sender: TObject);
-    procedure MT0BtnClick(Sender: TObject);
-    procedure PasteTrimmItemBtnClick(Sender: TObject);
     procedure ReadTrimmFileBtnClick(Sender: TObject);
     procedure SaveTrimmFileBtnClick(Sender: TObject);
+    procedure CopyTrimmFileBtnClick(Sender: TObject);
+    procedure CopyTrimmItemBtnClick(Sender: TObject);
+    procedure PasteTrimmItemBtnClick(Sender: TObject);
+    procedure CopyAndPasteBtnClick(Sender: TObject);
+    procedure MT0BtnClick(Sender: TObject);
     procedure TrimmBtnClick(Sender: TObject);
   protected
     Raster: Integer;
@@ -123,12 +127,10 @@ type
     BtnColor: TAlphaColor;
     function AddSpeedBtn(N: string; AGroupSpace: Integer = 0): TSpeedButton;
     function RefSpeedBtn(B: TSpeedButton; AGroupSpace: Integer = 0): TSpeedButton;
-
     procedure CreateComponents;
     procedure InitLayoutProps;
     procedure LayoutComponents;
     procedure InitSpeedButtons;
-  protected
     function FindStyleByName(AParent: TFMXObject; AName: string): TFMXObject;
     procedure InitSpeedButton(SB: TSpeedButton);
     procedure SetupMemo(MM: TMemo);
@@ -146,7 +148,8 @@ implementation
 {$R *.fmx}
 
 uses
-  RiggVar.App.Main;
+  RiggVar.App.Main,
+  RiggVar.FB.ActionConst;
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
@@ -272,6 +275,9 @@ end;
 
 procedure TFormMain.SetupComboBox(CB: TComboBox);
 begin
+  if CB = nil then
+    Exit;
+
 {$ifdef Vcl}
   CB.Style := csDropDownList;
   CB.DropDownCount := Integer(High(TFederParam));
@@ -283,6 +289,9 @@ end;
 
 procedure TFormMain.SetupListBox(LB: TListBox);
 begin
+  if LB = nil then
+    Exit;
+
 {$ifdef Vcl}
   LB.Font.Name := 'Consolas';
   LB.Font.Size := 11;
@@ -463,6 +472,7 @@ begin
   sb.Hint := 'Memory Btn';
   sb.StaysPressed := False;
   sb.OnClick := MT0BtnClick;
+  sb.Tag := faUpdateTrimm0;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('ReadTrimmFileBtn');
@@ -471,6 +481,7 @@ begin
   sb.Hint := 'Read Trimm File';
   sb.StaysPressed := False;
   sb.OnClick := ReadTrimmFileBtnClick;
+  sb.Tag := faReadTrimmFile;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('SaveTrimmFileBtn');
@@ -479,6 +490,16 @@ begin
   sb.Hint := 'Save Trimm File';
   sb.StaysPressed := False;
   sb.OnClick := SaveTrimmFileBtnClick;
+  sb.Tag := faSaveTrimmFile;
+  InitSpeedButton(sb);
+
+  sb := AddSpeedBtn('CopyTrimmFileBtn');
+  CopyTrimmFileBtn := sb;
+  sb.Text := 'ctf';
+  sb.Hint := 'Copy Trimm File';
+  sb.StaysPressed := False;
+  sb.OnClick := CopyTrimmFileBtnClick;
+  sb.Tag := faCopyTrimmFile;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('CopyTrimmItemBtn');
@@ -487,6 +508,7 @@ begin
   sb.Hint := 'Copy Trimm Item';
   sb.StaysPressed := False;
   sb.OnClick := CopyTrimmItemBtnClick;
+  sb.Tag := faCopyTrimmItem;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('PasteTrimmItemBtn');
@@ -495,14 +517,16 @@ begin
   sb.Hint := 'Paste Trimm Item';
   sb.StaysPressed := False;
   sb.OnClick := PasteTrimmItemBtnClick;
+  sb.Tag := faPasteTrimmItem;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('CopyAndPasteBtn');
   CopyAndPasteBtn := sb;
-  sb.Text := 'M';
+  sb.Text := 'cap';
   sb.Hint := 'Copy And Paste';
   sb.StaysPressed := False;
   sb.OnClick := CopyAndPasteBtnClick;
+  sb.Tag := faCopyAndPaste;
   InitSpeedButton(sb);
 
   { Trimm Buttons }

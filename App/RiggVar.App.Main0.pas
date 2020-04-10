@@ -67,8 +67,8 @@ end;
 
 destructor TMain0.Destroy;
 begin
-  FL.Free;
   Logger.Free;
+  FL.Free;
   inherited;
 end;
 

@@ -238,7 +238,7 @@ faMemeToggleReport = 158;
 faButtonFrameReport = 159;
 faToggleFontColor = 160;
 faToggleSandboxed = 161;
-faToggleAllXmlTags = 162;
+faToggleAllTags = 162;
 
 faTL01 = 163;
 faTL02 = 164;
@@ -282,6 +282,10 @@ faMB07 = 197;
 faMB08 = 198;
 
 faMax = 199;
+
+ParamsRange = [faController .. faMastfussD0X];
+ReportsRange = [faReportNone .. faReportReadme];
+TrimmsRange = [faTrimm0 .. faLogo];
 
 implementation
 
