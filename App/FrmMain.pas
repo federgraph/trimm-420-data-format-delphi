@@ -19,9 +19,9 @@
 interface
 
 uses
-  RggUnit4,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
+  RggUnit4,
   System.SysUtils,
   System.Classes,
   System.Types,
@@ -726,6 +726,7 @@ begin
     rgJson: result := 'Rigg.Data.WriteJson';
     rgData: result := 'Rigg.Data.WriteReport';
     rgTrimmText: result := 'Trimm Text';
+    rgJsonText: result := 'Json Text';
     rgDataText: result := 'Data Text';
     rgDiffText: result := 'Diff Text';
     rgAusgabeRL: result := 'Ausgabe rL';

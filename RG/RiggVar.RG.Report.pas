@@ -8,6 +8,7 @@ type
     rgJson,
     rgData,
     rgTrimmText,
+    rgJsonText,
     rgDataText,
     rgDiffText,
     rgAusgabeRL,
