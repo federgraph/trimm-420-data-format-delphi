@@ -58,8 +58,8 @@ type
     Trimm4: TRggData;
     Trimm5: TRggData;
     Trimm6: TRggData;
-    Trimm7: TRggData; //420
-    Trimm8: TRggData; //Logo
+    Trimm7: TRggData; // 420
+    Trimm8: TRggData; // Logo
 
     ReportCounter: Integer;
     ResizeCounter: Integer;
@@ -226,7 +226,7 @@ begin
   FL.Clear;
   fd := RggData;
   RggMain.SaveTrimm(fd);
-//    fd.WriteJSon(FL);
+//  fd.WriteJSon(FL);
   fd.WantAll := True;
   fd.SaveTrimmItem(FL);
 //  FederText.FlashCaption := 'RggCopy';
@@ -456,8 +456,8 @@ begin
   Logger.Info('in ReadTrimmFile');
   fp := GetTrimmFilePath;
 
-// By default you try and load the manually edited Trimm-File.txt
-// This should make sense on on the Desktop,
+// By default you try and load the 'manually edited' Trimm-File.txt;
+// this should make sense on the Desktop,
 // or on any device where you have access to the Documents folder.
   fn := TrimmFileName;
 
@@ -467,9 +467,10 @@ begin
 //  fn := TrimmFileNameAuto;
 {$endif}
 
-// on Android and iOS the location cannot be edited manually,
-// so it does not make sense to read a manually edited Trimm-File.txt
-// but you can manualy read Trimm-File-Auto.txt if already saved.
+// On Android and iOS the Trimm-File in the known location cannot be edited,
+// so it does not make sense to read a 'manually edited' Trimm-File.txt,
+// but you can manualy read a Trimm-File-Auto.txt if already saved,
+// e.g. by clicking on a button.
 {$ifdef IOS}
   fn := TrimmFileNameAuto;
 {$endif}
