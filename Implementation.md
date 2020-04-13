@@ -29,7 +29,7 @@ Just briefly, from the code, to make it clear:
     { example data slots }
     Trimm7: TRggData; // 420
     Trimm8: TRggData; // Logo
-end;
+  end;
 ```
 
 - I wanted to allow the user of the app to deal with a limited number of Trimms.
@@ -41,6 +41,7 @@ end;
 - T7 is the default in Trimm 420 app.
 - T7 would be a little different in Trimm 470 app.
 - RggData is is temporary object.
+- The main model object of the app is hiding in RggMain.Rigg.
 
 The data structure the real application (RG38) uses is part of class TRigg and is omitted from this test project.
 
@@ -130,3 +131,46 @@ which contain cached data from the time of loading, be it internal hardcoded dat
 This repository has the MIT license, so that you can provide data in the format.
 
 See repository RiggVar-RG38 (with GPL license) for real implementation of TRigg.
+
+## Actions and Buttons
+
+| Caption | Alt | Hint | Category | Explanation |
+| :-- | :- | - | - | - |
+| Log |    |Log Btn|Log| reset log and show in LogMemo |
+| dat |    |Data (Short)|Report| Short Trimm-Item Text |
+| DAT |    |Data (Long) |Report| Long Trimm-Item Text |
+| Sta |~D  |DataText|Report| DataText|
+| Jsn |~J  |JsonText|Report| Json Report |
+| SB  |    |Sandboxed|Option| Toggle IsSandboxed |
+| ct0 |MT0 |Memory Btn|IO|Copy from current to Trimm 0 |
+| rtf |    |Read Trimm File|IO| Read File |
+| stf |    |Save Trimm File|IO| Save File |
+| ctf |    |Copy Trimm File|IO| to clipboard as Trimm-File Text |
+| cti |    |Copy Trimm Item|IO| to clipboard as Trimm-Item Text |
+| pti |    |Paste Trimm Item|IO| Trimm-Item or Trimm-File |
+| cap |M   |Copy and Paste|IO| from Current to Slot via Clipboard |
+| T1  |    | Trimm 1 |Slot| select, read, and load |
+| T2  |    | Trimm 2 |Slot| read from Slot 2 |
+| T3  |    | Trimm 3 |Slot| read from T3 |
+| T4  |    | Trimm 4 |Slot| read from Trimm 4 |
+| T5  |    | Trimm 5 |Slot| read from Trimm 5 |
+| T6  |    | Trimm 6 |Slot| read from Trimm 6 |
+| T7  |420 | Trimm 7 |Slot| init T7 and then read |
+| T8  |Logo| Trimm 8 |Slot| init, select, read, load |
+
+The short captions of actions, shown on buttons, should be unique across the whole range of actions used in the app.
+
+Log: It clears the log, at least almost. Actually, it replaces the current log output in the LogMemo control with some status information.
+
+dat: This is not normally used. The program will always use the long, explicit form when copying data to the clipboard. The short form is used by humans, when providing input. This is not even a regular report. Maybe it should be.
+
+Dat: This also is not currently a regular report, and as such part of the enumeration of available reports, managed by the ReportManager. Maye it should be. I have provided this here in the test application because I think it makes sense.
+
+Sta: Status. The DataText report. This is a regular report. It takes the data from the Model via RggData. I am in need of a good caption, already used Dat for something else.
+
+Jsn: This is also a regular report, it will show the current data from the Model, formatted as Json. Actually, it is a subset of the data, containing mostly the info which is surfaced as Trimm-Item. The older original application still has features that are not currently surfaced in the published app. Here we are dealing with the basics only, the kinematics of the abstraction, with no forces and material properties involved. But at least the report shows is actual data from Rigg, the current state of the model used by the app, not just what happens to be in the temp data transfer object - RggData - from whatever the latest IO operation was.
+I think I am using too many words here. And that is because the test app does not have a real implementation of TRigg. I needed to put an instance of TRggData into the dummy Rigg to keep some state. Before I did that there was nothing, and my test application showed the content of RggData in TMain1 instead, which did not change at all. It turned out that I need to be able to apply some changes to Rigg in order to test TRggData, together with the IO code that uses it.
+
+MT0: Has been used in the previously published app. This is one of the operations that effect RggData instances. I think it should better be named ct0. MT0 is the Memory button which saves the current state to Trimm slot T0. It copies to T0.
+
+M: Has been used in the previously published app. The problem with M is that it is already used by another action, in the app that has more features. So I may use the new caption for the button - cap - in the future, which fits in nicely with the other three lower case character short captions for the IO operations.

@@ -4,7 +4,7 @@ When working with the data it helps to use the textual reports.
 
 ## Trimm-Item Json
 
-This is what a Trimm-Item look like in json format:
+This is what a Trimm-Item looks like in json format:
 ```json
 {"Name":"T0","Faktor":1,"OffsetX":0,"OffsetZ":0,
 "RK":{
