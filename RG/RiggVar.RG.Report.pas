@@ -13,8 +13,14 @@ type
     rgDiffText,
     rgAusgabeRL,
     rgAusgabeRP,
+    rgAusgabeRLE,
+    rgAusgabeRPE,
+    rgAusgabeDiffL,
+    rgAusgabeDiffP,
     rgXML,
-    rgDebugReport
+    rgDebugReport,
+    rgReadme,
+    rgNone
   );
 
 implementation
