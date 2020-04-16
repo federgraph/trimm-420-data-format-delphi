@@ -81,9 +81,10 @@ type
     procedure DoSmallWheel(Delta: single);
 
     function GetTrimmItem(i: Integer): TRggData;
-    function GetTrimmItemReport(WantJson: Boolean): string;
+    function GetTrimmItemReport(ReportID: Integer): string;
     function GetTrimmItemReportData: string;
     function GetTrimmItemReportJson: string;
+    function GetTrimmItemReportShort: string;
 
     procedure WriteTrimmItem;
     procedure WriteTrimmFile;
@@ -216,29 +217,42 @@ begin
 //  result := FederText.DataVisible;
 end;
 
-function TMain1.GetTrimmItemReport(WantJson: Boolean): string;
+function TMain1.GetTrimmItemReport(ReportID: Integer): string;
 begin
   if Assigned(RggMain) and Assigned(RggMain.Rigg) and Assigned(RggData) and Assigned(FL) then
   begin
     RggMain.Rigg.SaveToFederData(RggData);
     FL.Clear;
-    if WantJson then
-      RggData.WriteJSon(FL)
+    case ReportID of
+      1: RggData.WriteJSon(FL);
+
+      2:
+      begin
+        RggData.WantAll := False;
+        RggData.SaveTrimmItem(FL);
+      end;
+
     else
-    RggData.WriteReport(FL);
+      RggData.WriteReport(FL);
+    end;
     result := FL.Text;
     FL.Clear;
   end;
 end;
 
+function TMain1.GetTrimmItemReportShort: string;
+begin
+  result := GetTrimmItemReport(2);
+end;
+
 function TMain1.GetTrimmItemReportJson: string;
 begin
-  result := GetTrimmItemReport(True);
+  result := GetTrimmItemReport(1);
 end;
 
 function TMain1.GetTrimmItemReportData: string;
 begin
-  result := GetTrimmItemReport(False);
+  result := GetTrimmItemReport(0);
 end;
 
 procedure TMain1.WriteTrimmItem;

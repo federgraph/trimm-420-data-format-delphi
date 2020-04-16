@@ -386,6 +386,7 @@ end;
 
 procedure TFormMain.ShortBtnClick(Sender: TObject);
 begin
+  CurrentReport := rgShort;
   AllProps := False;
   ShowTrimmData;
   ReportLabel.Text := 'Short Data';
@@ -393,6 +394,7 @@ end;
 
 procedure TFormMain.LongBtnClick(Sender: TObject);
 begin
+  CurrentReport := rgLong;
   AllProps := True;
   ShowTrimmData;
   ReportLabel.Text := 'Long Data';
@@ -748,6 +750,16 @@ begin
     rgLog: RL.Text := Main.Logger.TL.Text;
     rgJson: Rigg.Data.WriteJSon(RL);
     rgData: Rigg.Data.WriteReport(RL);
+    rgShort:
+    begin
+      Rigg.Data.WantAll := False;
+      Rigg.Data.SaveTrimmItem(RL);
+    end;
+    rgLong:
+    begin
+      Rigg.Data.WantAll := True;
+      Rigg.Data.SaveTrimmItem(RL);
+    end;
     rgDebugReport:
     begin
       Main.DoCleanReport;

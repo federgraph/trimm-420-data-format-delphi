@@ -22,6 +22,7 @@ implementation
 constructor TRigg.Create;
 begin
   Data := TRggData.Create;
+  Data.Name := 'Rigg.Data';
 end;
 
 destructor TRigg.Destroy;

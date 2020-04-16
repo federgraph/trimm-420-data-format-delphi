@@ -7,6 +7,8 @@ type
     rgLog,
     rgJson,
     rgData,
+    rgShort,
+    rgLong,
     rgTrimmText,
     rgJsonText,
     rgDataText,
