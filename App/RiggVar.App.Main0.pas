@@ -89,35 +89,14 @@ begin
   case fa of
     faNoop: ;
 
-//    faToggleTouchFrame: FederText.ToggleTouchFrame;
-
-//    faActionPageM: CycleToolSet(-1);
-//    faActionPageP: CycleToolSet(1);
-
-//    faCycleColorSchemeM: CycleColorSchemeM;
-//    faCycleColorSchemeP: CycleColorSchemeP;
-
     else
       FormMain.HandleAction(fa);
   end;
 end;
 
 function TMain0.GetChecked(fa: TFederAction): Boolean;
-//var
-//  F: TFormMain;
 begin
-//  F := FormMain;
   result := false;
-//  if not IsUp then
-//    Exit;
-
-//  case fa of
-//    faMemeToggleHelp: result := F.HelpText.Visible;
-//    faMemeToggleReport: result := F.ReportText.Visible;
-//    faButtonFrameReport: result := F.WantButtonFrameReport;
-//    faChartRect..faChartReset: result := F.ChartGraph.GetChecked(fa);
-//  end;
-
 end;
 
 procedure TMain0.DoTouchbarLeft(Delta: single);

@@ -50,7 +50,7 @@ type
     procedure FormResize(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
-  protected
+  public
     procedure ApplicationEventsException(Sender: TObject; E: Exception);
     procedure UpdateLog;
     procedure UpdateReport;
