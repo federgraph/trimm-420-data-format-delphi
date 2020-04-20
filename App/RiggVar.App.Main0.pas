@@ -37,7 +37,7 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    procedure ExecuteAction(fa: Integer); virtual;
+    procedure HandleAction(fa: Integer); virtual;
     function GetChecked(fa: TFederAction): Boolean; virtual;
 
     procedure DoTouchbarLeft(Delta: single);
@@ -83,7 +83,7 @@ begin
   end;
 end;
 
-procedure TMain0.ExecuteAction(fa: Integer);
+procedure TMain0.HandleAction(fa: Integer);
 begin
   if IsUp then
   case fa of

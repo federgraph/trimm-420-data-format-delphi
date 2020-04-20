@@ -48,19 +48,22 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormResize(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
   public
+    FormShown: Boolean;
     procedure ApplicationEventsException(Sender: TObject; E: Exception);
     procedure UpdateLog;
     procedure UpdateReport;
     procedure UpdateJson;
-  private
+  public
     RL: TStrings;
     AllProps: Boolean;
     CurrentReport: TRggReport;
     Counter: Integer;
     procedure ShowCurrentReport;
+    procedure ShowTrimm;
     procedure ShowTrimmData;
     function GetReportCaption(r: TRggReport): string;
     procedure HandleShowHint(Sender: TObject);
@@ -90,6 +93,7 @@ type
     HintText: TText;
     SpeedPanel: TPanel;
     ReportLabel: TText;
+    TrimmText: TText;
     ReportMemo: TMemo;
     LogMemo: TMemo;
 
@@ -120,6 +124,15 @@ type
     procedure MT0BtnClick(Sender: TObject);
     procedure TrimmBtnClick(Sender: TObject);
   protected
+    procedure CreateComponents;
+    procedure InitLayoutProps;
+    procedure LayoutComponents;
+    procedure SetupMemo(MM: TMemo);
+    procedure SetupComboBox(CB: TComboBox);
+    procedure SetupListbox(LB: TListBox);
+    procedure SetupListboxItems(LB: TListbox; cla: TAlphaColor);
+    procedure SetupText(T: TText);
+  private
     Raster: Integer;
     Margin: Integer;
     BtnTop: Integer;
@@ -133,17 +146,9 @@ type
     BtnColor: TAlphaColor;
     function AddSpeedBtn(N: string; AGroupSpace: Integer = 0): TSpeedButton;
     function RefSpeedBtn(B: TSpeedButton; AGroupSpace: Integer = 0): TSpeedButton;
-    procedure CreateComponents;
-    procedure InitLayoutProps;
-    procedure LayoutComponents;
     procedure InitSpeedButtons;
     function FindStyleByName(AParent: TFMXObject; AName: string): TFMXObject;
     procedure InitSpeedButton(SB: TSpeedButton);
-    procedure SetupMemo(MM: TMemo);
-    procedure SetupText(T: TText);
-    procedure SetupComboBox(CB: TComboBox);
-    procedure SetupListbox(LB: TListBox);
-    procedure SetupListboxItems(LB: TListbox; cla: TAlphaColor);
   private
     Rigg: TRigg;
   end;
@@ -187,11 +192,9 @@ begin
 
   CreateComponents;
   InitLayoutProps;
-  LayoutComponents;
 
   SetupMemo(ReportMemo);
   SetupMemo(LogMemo);
-  SetupText(HintText);
   SetupText(ReportLabel);
 
   Main := TMain.Create;
@@ -203,22 +206,27 @@ begin
 
   InitSpeedButtons;
 
+  { Reports }
   RL := ReportMemo.Lines;
 
   Main.Trimm := 1;
-  MT0BtnClick(nil);
+  Main.UpdateTrimm0;
+  FormMain.ShowTrimm;
 
   HintText.BringToFront;
   HintText.TextSettings.FontColor := claPurple;
 
+  ReportLabel.BringToFront;
   ReportLabel.TextSettings.FontColor := claDodgerblue;
+
+  TrimmText.BringToFront;
+  TrimmText.TextSettings.FontColor := claBlue;
 
   UpdateLog;
   CurrentReport := rgJson;
   ShowCurrentReport;
 
   Application.OnHint := HandleShowHint;
-  self.OnResize := FormResize;
 end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
@@ -239,19 +247,40 @@ begin
   if ssShift in Shift then
   begin
     Main.RggMain.DoSmallWheel(WheelDelta);
-    ShowCurrentReport;
+    Handled := True;
   end
   else if ssCtrl in Shift then
   begin
     Main.RggMain.DoBigWheel(WheelDelta);
+    Handled := True;
+  end;
+
+  if Handled then
+  begin
+    if CurrentReport = rgLong then
+       CurrentReport := rgShort;
     ShowCurrentReport;
+  end;
+end;
+
+procedure TFormMain.FormShow(Sender: TObject);
+begin
+  if not FormShown then
+  begin
+    FormShown := True;
+    { ClientHeigt is now available }
+    LayoutComponents;
   end;
 end;
 
 procedure TFormMain.FormResize(Sender: TObject);
 begin
-  if Main <> nil then
+  MainVar.ClientWidth := ClientWidth;
+  MainVar.ClientHeight := ClientHeight;
+  if (Main <> nil) then
+  begin
     Inc(Main.ResizeCounter);
+  end;
 end;
 
 procedure TFormMain.HandleShowHint(Sender: TObject);
@@ -307,11 +336,13 @@ end;
 
 procedure TFormMain.SetupText(T: TText);
 begin
+  T.Parent := Self;
   T.WordWrap := False;
   T.HorzTextAlign := TTextAlign.Leading;
   T.Font.Family := 'Consolas';
   T.Font.Size := 18;
   T.AutoSize := True;
+  T.HitTest := False;
 end;
 
 procedure TFormMain.SetupComboBox(CB: TComboBox);
@@ -342,6 +373,9 @@ end;
 
 procedure TFormMain.SetupMemo(MM: TMemo);
 begin
+  if MM = nil then
+    Exit;
+
 {$ifdef FMX}
   MM.ControlType := TControlType.Styled;
   MM.StyledSettings := [];
@@ -379,8 +413,6 @@ end;
 procedure TFormMain.LogBtnClick(Sender: TObject);
 begin
   Main.DoCleanReport;
-//  Main.DoReport;
-
   UpdateLog;
 end;
 
@@ -414,15 +446,12 @@ end;
 
 procedure TFormMain.TrimmBtnClick(Sender: TObject);
 var
-  t: Integer;
+  fa: Integer;
 begin
-  t := (Sender as TComponent).Tag;
-  if (t >= 1) and (t <= 8) then
-  begin
-    Main.Trimm := t;
-    UpdateLog;
-    ShowCurrentReport;
-  end;
+  fa := (Sender as TComponent).Tag;
+  Main.HandleAction(fa);
+  UpdateLog;
+  ShowCurrentReport;
 end;
 
 function TFormMain.AddSpeedBtn(N: string; AGroupSpace: Integer): TSpeedButton;
@@ -532,8 +561,8 @@ begin
 
   sb := AddSpeedBtn('MT0Btn', BtnGroupSpace);
   MT0Btn := sb;
-  sb.Text := 'MT0';
-  sb.Hint := 'Memory Btn';
+  sb.Text := 'ct0';
+  sb.Hint := 'Update Trimm 0';
   sb.StaysPressed := False;
   sb.OnClick := MT0BtnClick;
   sb.Tag := faUpdateTrimm0;
@@ -603,7 +632,7 @@ begin
   sb.Hint := 'Trimm 1 Btn';
   sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
-  sb.Tag := 1;
+  sb.Tag := faTrimm1;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('T2Btn');
@@ -612,7 +641,7 @@ begin
   sb.Hint := 'Trimm 2 Btn';
   sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
-  sb.Tag := 2;
+  sb.Tag := faTrimm2;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('T3Btn');
@@ -621,7 +650,7 @@ begin
   sb.Hint := 'Trimm 3 Btn';
   sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
-  sb.Tag := 3;
+  sb.Tag := faTrimm3;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('T4Btn');
@@ -630,7 +659,7 @@ begin
   sb.Hint := 'Trimm 4 Btn';
   sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
-  sb.Tag := 4;
+  sb.Tag := faTrimm4;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('T5Btn');
@@ -640,7 +669,7 @@ begin
   sb.StaysPressed := False;
   sb.IsPressed := False;
   sb.OnClick := TrimmBtnClick;
-  sb.Tag := 5;
+  sb.Tag := faTrimm5;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('T6Btn');
@@ -649,7 +678,7 @@ begin
   sb.Hint := 'Trimm 6 Btn';
   sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
-  sb.Tag := 6;
+  sb.Tag := faTrimm6;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('T7Btn');
@@ -658,7 +687,7 @@ begin
   sb.Hint := 'Trimm 7 Btn (420)';
   sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
-  sb.Tag := 7;
+  sb.Tag := fa420;
   InitSpeedButton(sb);
 
   sb := AddSpeedBtn('T8Btn');
@@ -667,7 +696,7 @@ begin
   sb.Hint := 'Trimm 8 Btn (Logo)';
   sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
-  sb.Tag := 8;
+  sb.Tag := faLogo;
   InitSpeedButton(sb);
 end;
 
@@ -727,6 +756,8 @@ begin
     rgLog: result := 'Log';
     rgJson: result := 'Rigg.Data.WriteJson';
     rgData: result := 'Rigg.Data.WriteReport';
+    rgShort: result := 'Trimm-Item Short';
+    rgLong: result := 'Trimm-Item Long';
     rgTrimmText: result := 'Trimm Text';
     rgJsonText: result := 'Json Text';
     rgDataText: result := 'Data Text';
@@ -767,7 +798,13 @@ begin
     end;
   end;
   RL.EndUpdate;
-  ReportLabel.Text := GetReportCaption(CurrentReport)
+  ReportLabel.Text := GetReportCaption(CurrentReport);
+  TrimmText.Text := 'Trimm ' + IntToStr(Main.Trimm);
+end;
+
+procedure TFormMain.ShowTrimm;
+begin
+  ShowCurrentReport;
 end;
 
 procedure TFormMain.ShowTrimmData;
@@ -803,10 +840,13 @@ begin
   OpacityValue := 1.0;
 
   HintText := TText.Create(Self);
-  HintText.Parent := Self;
+  SetupText(HintText);
 
   ReportLabel := TText.Create(Self);
   ReportLabel.Parent := Self;
+
+  TrimmText := TText.Create(Self);
+  SetupText(TrimmText);
 
   SpeedPanel := TPanel.Create(Self);
   SpeedPanel.Parent := Self;
@@ -838,6 +878,10 @@ begin
   ReportLabel.Position.X := 400;
   ReportLabel.Position.Y := SpeedPanelHeight + Margin;
   ReportLabel.Height := 30;
+
+  TrimmText.Position.X := 700;
+  TrimmText.Position.Y := SpeedPanelHeight + Margin;
+  TrimmText.Height := 30;
 
   LogMemo.Position.X := Margin;
   LogMemo.Position.Y := SpeedPanel.Height + HintText.Height + Margin;;

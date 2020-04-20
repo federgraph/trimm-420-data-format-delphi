@@ -48,6 +48,9 @@ type
     procedure LoadTrimm(fd: TRggData);
     procedure SaveTrimm(fd: TRggData);
 
+    procedure Init420;
+    procedure InitLogo;
+
     function Param2Text(P: TFederParam): string;
     function Text2Param(T: string): TFederParam;
 
@@ -56,6 +59,9 @@ type
   end;
 
 implementation
+
+uses
+  RiggVar.App.Main;
 
 { TRggMain }
 
@@ -114,6 +120,131 @@ end;
 procedure TRggMain.Init;
 begin
   Rigg.Data.Reset;
+end;
+
+procedure TRggMain.Init420;
+begin
+  with Rigg.Data do
+  begin
+    Name := '420';
+    A0X := 2560;
+    A0Y := 765;
+    A0Z := 430;
+    C0X := 4140;
+    C0Y := 0;
+    C0Z := 340;
+    D0X := 2870;
+    D0Y := 0;
+    D0Z := -100;
+    E0X := 2970;
+    E0Y := 0;
+    E0Z := 450;
+    F0X := -30;
+    F0Y := 0;
+    F0Z := 300;
+    MU := 2600;
+    MO := 2000;
+    ML := 6115;
+    MV := 5000;
+    CA := 50;
+    h0 := 56;
+    h2 := 0;
+    l2 := 100;
+    CPMin := 0;
+    CPPos := 100;
+    CPMax := 200;
+    SHMin := 170;
+    SHPos := 220;
+    SHMax := 1020;
+    SAMin := 250;
+    SAPos := 850;
+    SAMax := 1550;
+    SLMin := 240;
+    SLPos := 479;
+    SLMax := 1200;
+    SWMin := 15;
+    SWPos := 27;
+    SWMax := 87;
+    VOMin := 4200;
+    VOPos := 4500;
+    VOMax := 5000;
+    WIMin := 80;
+    WIPos := 94;
+    WIMax := 115;
+    WLMin := 4020;
+    WLPos := 4120;
+    WLMax := 4220;
+    WOMin := 2000;
+    WOPos := 2020;
+    WOMax := 2100;
+  end;
+  SaveTrimm(Main.Trimm7);
+  Main.TrimmNoChange := 7;
+
+  Rigg.Data.Name := 'Rigg.Data';
+end;
+
+procedure TRggMain.InitLogo;
+begin
+  with Rigg.Data do
+  begin
+    Name := 'Logo';
+    A0X := 1940;
+    A0Y := 720;
+    A0Z := 370;
+    C0X := 4100;
+    C0Y := 0;
+    C0Z := 370;
+    D0X := 2840;
+    D0Y := 0;
+    D0Z := -170;
+    E0X := 2930;
+    E0Y := 0;
+    E0Z := 550;
+    F0X := -130;
+    F0Y := 0;
+    F0Z := 370;
+    MU := 1708;
+    MO := 1138;
+    ML := 3566;
+    MV := 2674;
+    CA := 50;
+    h0 := 56;
+    h2 := 0;
+    l2 := 100;
+    CPMin := 0;
+    CPPos := 100;
+    CPMax := 200;
+    SHMin := 620;
+    SHPos := 720;
+    SHMax := 820;
+    SAMin := 1340;
+    SAPos := 1440;
+    SAMax := 1540;
+    SLMin := 918;
+    SLPos := 1018;
+    SLMax := 1118;
+    SWMin := 40;
+    SWPos := 45;
+    SWMax := 60;
+    VOMin := 2955;
+    VOPos := 3055;
+    VOMax := 3155;
+    WIMin := 70;
+    WIPos := 108;
+    WIMax := 120;
+    WLMin := 2385;
+    WLPos := 2485;
+    WLMax := 2585;
+    WOMin := 1247;
+    WOPos := 1347;
+    WOMax := 1447;
+  end;
+
+  SaveTrimm(Main.Trimm8);
+  Main.TrimmNoChange := 8;
+
+  Rigg.Data.Name := 'Rigg.Data';
 end;
 
 procedure TRggMain.LoadTrimm(fd: TRggData);

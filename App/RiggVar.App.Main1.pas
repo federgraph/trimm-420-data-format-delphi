@@ -73,8 +73,7 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    procedure ExecuteAction(fa: Integer); override;
-    procedure HandleAction(fa: TFederAction);
+    procedure HandleAction(fa: TFederAction); override;
     function GetChecked(fa: TFederAction): Boolean; override;
 
     procedure DoBigWheel(Delta: single);
@@ -165,6 +164,11 @@ begin
   InitTrimmData;
 
   RggMain := TRggMain.Create;
+
+  { this should be done after or when calling RggMain.Init }
+  RggMain.InitLogo; // sets WantLogoData to true
+  RggMain.Init420; // resets WantLogo to false
+//  WantLogoData := False;
 end;
 
 destructor TMain1.Destroy;
@@ -681,24 +685,10 @@ begin
   result := True;
 end;
 
-procedure TMain1.ExecuteAction(fa: Integer);
-begin
-  HandleAction(fa);
-end;
-
 procedure TMain1.HandleAction(fa: TFederAction);
 begin
-(*
   if IsUp then
   case fa of
-    faToggleTouchFrame: FederText.ToggleTouchFrame;
-
-    faActionPageM: CycleToolSet(-1);
-    faActionPageP: CycleToolSet(1);
-
-    faCycleColorSchemeM: CycleColorSchemeM;
-    faCycleColorSchemeP: CycleColorSchemeP;
-
     faUpdateReportText: DoCleanReport;
     faToggleDebugText: ShowDebugData;
 
@@ -707,52 +697,52 @@ begin
     faParamValuePlus10, faWheelUp: DoMouseWheel([ssCtrl], 1);
     faParamValueMinus10, faWheelDown: DoMouseWheel([ssCtrl], -1);
 
-    faController: RggMain.SetParameter(faController);
-    faWinkel: RggMain.SetParameter(faWinkel);
-    faVorstag: RggMain.SetParameter(faVorstag);
-    faWante: RggMain.SetParameter(faWante);
-    faWoben: RggMain.SetParameter(faWoben);
-    faSalingH: RggMain.SetParameter(faSalingH);
-    faSalingA: RggMain.SetParameter(faSalingA);
-    faSalingL: RggMain.SetParameter(faSalingL);
-    faSalingW: RggMain.SetParameter(faSalingW);
-    faMastfallF0C: RggMain.SetParameter(faMastfallF0C);
-    faMastfallF0F: RggMain.SetParameter(faMastfallF0F);
-    faMastfallVorlauf: RggMain.SetParameter(faMastfallVorlauf);
-    faBiegung: RggMain.SetParameter(faBiegung);
-    faMastfussD0X: RggMain.SetParameter(faMastfussD0X);
+//    faController: RggMain.SetParameter(faController);
+//    faWinkel: RggMain.SetParameter(faWinkel);
+//    faVorstag: RggMain.SetParameter(faVorstag);
+//    faWante: RggMain.SetParameter(faWante);
+//    faWoben: RggMain.SetParameter(faWoben);
+//    faSalingH: RggMain.SetParameter(faSalingH);
+//    faSalingA: RggMain.SetParameter(faSalingA);
+//    faSalingL: RggMain.SetParameter(faSalingL);
+//    faSalingW: RggMain.SetParameter(faSalingW);
+//    faMastfallF0C: RggMain.SetParameter(faMastfallF0C);
+//    faMastfallF0F: RggMain.SetParameter(faMastfallF0F);
+//    faMastfallVorlauf: RggMain.SetParameter(faMastfallVorlauf);
+//    faBiegung: RggMain.SetParameter(faBiegung);
+//    faMastfussD0X: RggMain.SetParameter(faMastfussD0X);
 
-    faFixpointA0: RggMain.FixPoint := ooA0;
-    faFixpointA: RggMain.FixPoint := ooA;
-    faFixpointB0: RggMain.FixPoint := ooB0;
-    faFixpointB: RggMain.FixPoint := ooB;
-    faFixpointC0: RggMain.FixPoint := ooC0;
-    faFixpointC: RggMain.FixPoint := ooC;
-    faFixpointD0: RggMain.FixPoint := ooD0;
-    faFixpointD: RggMain.FixPoint := ooD;
-    faFixpointE0: RggMain.FixPoint := ooE0;
-    faFixpointE: RggMain.FixPoint := ooE;
-    faFixpointF0: RggMain.FixPoint := ooF0;
-    faFixpointF: RggMain.FixPoint := ooF;
+//    faFixpointA0: RggMain.FixPoint := ooA0;
+//    faFixpointA: RggMain.FixPoint := ooA;
+//    faFixpointB0: RggMain.FixPoint := ooB0;
+//    faFixpointB: RggMain.FixPoint := ooB;
+//    faFixpointC0: RggMain.FixPoint := ooC0;
+//    faFixpointC: RggMain.FixPoint := ooC;
+//    faFixpointD0: RggMain.FixPoint := ooD0;
+//    faFixpointD: RggMain.FixPoint := ooD;
+//    faFixpointE0: RggMain.FixPoint := ooE0;
+//    faFixpointE: RggMain.FixPoint := ooE;
+//    faFixpointF0: RggMain.FixPoint := ooF0;
+//    faFixpointF: RggMain.FixPoint := ooF;
 
-    faSalingTypOhneStarr,
-    faSalingTypOhne,
-    faSalingTypDrehbar,
-    faSalingTypFest: RggMain.InitSalingTyp(fa);
+//    faSalingTypOhneStarr,
+//    faSalingTypOhne,
+//    faSalingTypDrehbar,
+//    faSalingTypFest: RggMain.InitSalingTyp(fa);
 
-    faWantRenderH,
-    faWantRenderP,
-    faWantRenderF,
-    faWantRenderE,
-    faWantRenderS: RggMain.ToggleRenderOption(fa);
+//    faWantRenderH,
+//    faWantRenderP,
+//    faWantRenderF,
+//    faWantRenderE,
+//    faWantRenderS: RggMain.ToggleRenderOption(fa);
 
-    faViewpointS: RggMain.ViewPoint := vpSeite;
-    faViewpointA: RggMain.ViewPoint := vpAchtern;
-    faViewpointT: RggMain.ViewPoint := vpTop;
-    faViewpoint3: RggMain.ViewPoint := vp3D;
+//    faViewpointS: RggMain.ViewPoint := vpSeite;
+//    faViewpointA: RggMain.ViewPoint := vpAchtern;
+//    faViewpointT: RggMain.ViewPoint := vpTop;
+//    faViewpoint3: RggMain.ViewPoint := vp3D;
 
-    faHull: RggMain.SetOption(faHull);
-    faDemo: RggMain.SetOption(faDemo);
+//    faHull: RggMain.SetOption(faHull);
+//    faDemo: RggMain.SetOption(faDemo);
 
     faTrimm0: Trimm := 0;
     faTrimm1: Trimm := 1;
@@ -761,16 +751,17 @@ begin
     faTrimm4: Trimm := 4;
     faTrimm5: Trimm := 5;
     faTrimm6: Trimm := 6;
+
     fa420:
     begin
       RggMain.Init420;
-      FormMain.UpdateReport;
+//      FormMain.UpdateReport;
     end;
 
     faLogo:
     begin
       RggMain.InitLogo;
-      FormMain.UpdateReport;
+//      FormMain.UpdateReport;
     end;
 
     faUpdateTrimm0: UpdateTrimm0;
@@ -791,19 +782,19 @@ begin
     end;
 
     else
-      FormMain.HandleAction(fa);
+      inherited HandleAction(fa);
   end;
 
-  if IsUp then
-  begin
-    if (fa in ParamsRange) then
-      FormMain.UpdateItemIndexParams
-    else if (fa in ReportsRange) then
-      FormMain.UpdateItemIndexReports
-    else if (fa in TrimmsRange) then
-      FormMain.UpdateItemIndexTrimms;
-  end;
-*)
+//  if IsUp then
+//  begin
+//    if (fa in ParamsRange) then
+//      FormMain.UpdateItemIndexParams
+//    else if (fa in ReportsRange) then
+//      FormMain.UpdateItemIndexReports
+//    else if (fa in TrimmsRange) then
+//      FormMain.UpdateItemIndexTrimms;
+//  end;
+
 end;
 
 function TMain1.GetChecked(fa: TFederAction): Boolean;
@@ -908,6 +899,8 @@ begin
 
   ML.Add('Report:');
   ML.Add('  ReportCounter = ' + IntToStr(ReportCounter));
+//  ML.Add('  Scale = ' + FloatToStr(RetinaScale));
+//  ML.Add('  Retina = ' + BoolStr[IsRetina]);
   ML.Add('  Sandboxed = ' + BoolStr[IsSandboxed]);
   ML.Add('  WantOnResize = ' + BoolStr[MainVar.WantOnResize]);
   ML.Add('  ResizeCounter = ' + IntToStr(ResizeCounter));
