@@ -70,7 +70,7 @@ type
     ReportCounter: Integer;
     ResizeCounter: Integer;
 
-    constructor Create;
+    constructor Create(rggm: TRggMain);
     destructor Destroy; override;
 
     procedure HandleAction(fa: TFederAction); override;
@@ -137,12 +137,12 @@ uses
 
 { TMain1 }
 
-constructor TMain1.Create;
+constructor TMain1.Create(rggm: TRggMain);
 begin
   Main := self;
   MainVar.RG := True;
 
-  inherited;
+  inherited Create;
 
   RggData := TRggData.Create;
   RggData.Name := 'fd';
@@ -163,7 +163,7 @@ begin
 
   InitTrimmData;
 
-  RggMain := TRggMain.Create;
+  RggMain := rggm; //TRggMain.Create;
 
   { this should be done after or when calling RggMain.Init }
   RggMain.InitLogo; // sets WantLogoData to true

@@ -106,6 +106,7 @@ implementation
 {$R *.fmx}
 
 uses
+  RiggVar.RG.Main,
   RiggVar.App.Main,
   RiggVar.RG.Speed01,
   RiggVar.FB.ActionConst;
@@ -120,6 +121,8 @@ begin
 end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
+var
+  rggm: TRggMain;
 begin
 {$ifdef Debug}
   ReportMemoryLeaksOnShutdown := True;
@@ -143,12 +146,16 @@ begin
   SetupMemo(LogMemo);
   SetupText(ReportLabel);
 
-  Main := TMain.Create;
+  Rigg := TRigg.Create;
+
+  rggm := TRggMain.Create(Rigg); // rggm owns Rigg
+  Main := TMain.Create(rggm); // Main owns rggm
   Main.Logger.Verbose := True;
 
   Main.RggMain.Init;
   Main.IsUp := True;
   Rigg := Main.RggMain.Rigg;
+  Main.IsUp := True;
 
   { Reports }
   RL := TStringList.Create;
@@ -157,7 +164,7 @@ begin
 
   Main.Trimm := 1;
   Main.UpdateTrimm0;
-  FormMain.ShowTrimm;
+  ShowTrimm;
 
   HintText.BringToFront;
   HintText.TextSettings.FontColor := claPurple;

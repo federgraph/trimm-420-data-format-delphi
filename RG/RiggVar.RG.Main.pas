@@ -33,9 +33,9 @@ type
     function GetParamValue(index: TFederParam): single;
     procedure SetParamValue(index: TFederParam; const Value: single);
   public
-    Rigg: TRigg;
+    Rigg: TRigg; // owned, passed in via constructor
 
-    constructor Create;
+    constructor Create(ARigg: TRigg);
     destructor Destroy; override;
 
     procedure Init;
@@ -65,10 +65,10 @@ uses
 
 { TRggMain }
 
-constructor TRggMain.Create;
+constructor TRggMain.Create(ARigg: TRigg);
 begin
   inherited Create;
-  Rigg := TRigg.Create;
+  Rigg := ARigg;
   FParam := fpVorstag;
 end;
 
