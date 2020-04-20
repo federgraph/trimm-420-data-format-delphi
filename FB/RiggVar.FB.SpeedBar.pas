@@ -30,6 +30,7 @@ type
     BtnSpace: Integer;
     BtnGroupSpace: Integer;
     SpeedPanelHeight: Integer;
+    FontSize: Integer;
     function AddSpeedBtn(N: string; AGroupSpace: Integer = 0): TSpeedButton;
     function RefSpeedBtn(B: TSpeedButton; AGroupSpace: Integer = 0): TSpeedButton;
     procedure InitSpeedButton(SB: TSpeedButton);
@@ -72,14 +73,15 @@ end;
 
 procedure TActionSpeedBar.InitLayoutProps;
 begin
+  BtnColor := claBlue;
   BtnCounter := 0;
   BtnLeft := 0;
   BtnTop := 3;
   BtnSpace := 2;
   BtnGroupSpace := 16;
-  BtnWidth := 35;
-  BtnHeight := 30;
-  BtnColor := claBlue;
+  BtnWidth := 50;
+  BtnHeight := 50;
+  FontSize := 24;
   SpeedPanelHeight := BtnHeight + 2 * BtnTop;
 end;
 
@@ -167,7 +169,7 @@ begin
     cr.HotColor := claBeige;
     cr.NormalColor := BtnColor;
     cr.PressedColor := BtnColor;
-    cr.Font.Size := 16;
+    cr.Font.Size := FontSize;
   end;
 end;
 

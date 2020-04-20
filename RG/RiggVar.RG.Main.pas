@@ -70,6 +70,7 @@ begin
   inherited Create;
   Rigg := ARigg;
   FParam := fpVorstag;
+  Init;
 end;
 
 destructor TRggMain.Destroy;

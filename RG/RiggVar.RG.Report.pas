@@ -3,7 +3,8 @@
 interface
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+  System.Classes;
 
 type
   TRggReport = (
@@ -33,12 +34,15 @@ type
 
   TRggReportManager = class
   private
-    FCounter: Integer;
+    ML: TStrings; // not owned
     FCurrentReport: TRggReport;
     FXmlAllTags: Boolean;
-    procedure SetCurrentReport(const Value: TRggReport);
     procedure SetXmlAllTags(const Value: Boolean);
+    procedure SetCurrentReport(const Value: TRggReport);
   public
+    Counter: Integer;
+    constructor Create(MemoLines: TStrings);
+    procedure ShowCurrentReport;
     function GetReportCaption(r: TRggReport): string;
     property CurrentReport: TRggReport read FCurrentReport write SetCurrentReport;
     property XmlAllTags: Boolean read FXmlAllTags write SetXmlAllTags;
@@ -46,7 +50,16 @@ type
 
 implementation
 
+uses
+  RiggVar.App.Main,
+  RiggVar.RG.Data;
+
 { TRggReportManager }
+
+constructor TRggReportManager.Create(MemoLines: TStrings);
+begin
+  ML := MemoLines;
+end;
 
 procedure TRggReportManager.SetCurrentReport(const Value: TRggReport);
 begin
@@ -60,7 +73,7 @@ end;
 
 function TRggReportManager.GetReportCaption(r: TRggReport): string;
 begin
-  Inc(FCounter);
+  Inc(Counter);
   case r of
     rgLog: result := 'Log';
     rgJson: result := 'Rigg.Data.WriteJson';
@@ -78,7 +91,40 @@ begin
     else
       result := 'Unknown';
   end;
-  result := Format('%s (%d)', [result, FCounter]);
+  result := Format('%s (%d)', [result, Counter]);
+end;
+
+procedure TRggReportManager.ShowCurrentReport;
+var
+  cr: TRggData;
+begin
+  cr := Main.RggMain.Rigg.Data;
+  ML.BeginUpdate;
+  try
+    ML.Clear;
+    case CurrentReport of
+      rgLog: ML.Text := Main.Logger.TL.Text;
+      rgJson: cr.WriteJSon(ML);
+      rgData: cr.WriteReport(ML);
+      rgShort:
+      begin
+        cr.WantAll := False;
+        cr.SaveTrimmItem(ML);
+      end;
+      rgLong:
+      begin
+        cr.WantAll := True;
+        cr.SaveTrimmItem(ML);
+      end;
+      rgDebugReport:
+      begin
+        Main.DoCleanReport;
+        ML.Text := Main.Logger.TL.Text;
+      end;
+    end;
+  finally
+    ML.EndUpdate;
+  end;
 end;
 
 end.

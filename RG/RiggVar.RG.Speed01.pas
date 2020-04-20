@@ -72,6 +72,7 @@ type
   protected
     procedure SpeedButtonClick(Sender: TObject); override;
   public
+    constructor Create(AOwner: TComponent); override;
     procedure InitSpeedButtons; override;
     procedure UpdateSpeedButtonDown; override;
   end;
@@ -85,6 +86,14 @@ uses
   RiggVar.RG.Report;
 
 { TActionSpeedBarRG01 }
+
+constructor TActionSpeedBarRG01.Create(AOwner: TComponent);
+begin
+  inherited;
+  BtnWidth := 35;
+  BtnHeight := 30;
+  FontSize := 16;
+end;
 
 procedure TActionSpeedBarRG01.InitSpeedButtons;
 var
@@ -105,7 +114,7 @@ begin
 
   { Report Buttons }
 
-  BtnColor := claCrimson;
+  BtnColor := claOrange;
 
   sb := AddSpeedBtn('ShortBtn', BtnGroupSpace);
   ShortBtn := sb;
@@ -142,7 +151,7 @@ begin
 
   { Check Box Buttons }
 
-  BtnColor := claPurple;
+  BtnColor := claOrangeRed;
 
   sb := AddSpeedBtn('SandboxedBtn', BtnGroupSpace);
   SandboxedBtn := sb;
@@ -176,7 +185,7 @@ begin
 
   { Data Buttons }
 
-  BtnColor := claTeal;
+  BtnColor := claLime;
 
   sb := AddSpeedBtn('MT0Btn', BtnGroupSpace);
   MT0Btn := sb;
@@ -250,7 +259,7 @@ begin
 
   { Param Value Buttons }
 
-  BtnColor := claGray;
+  BtnColor := claAqua;
 
   sb := AddSpeedBtn('M10Btn', BtnGroupSpace);
   M10Btn := sb;
@@ -294,7 +303,7 @@ begin
 
   { Trimm Buttons }
 
-  BtnColor := claBlue;
+  BtnColor := claYellow;
 
   sb := AddSpeedBtn('T1Btn', BtnGroupSpace);
   T1Btn := sb;
@@ -374,49 +383,42 @@ procedure TActionSpeedBarRG01.CopyTrimmItemBtnClick(Sender: TObject);
 begin
   Main.CopyTrimmItem;
   FormMain.ShowTrimm;
-  FormMain.UpdateLog;
 end;
 
 procedure TActionSpeedBarRG01.PasteTrimmItemBtnClick(Sender: TObject);
 begin
   Main.PasteTrimmItem;
   FormMain.ShowTrimm;
-  FormMain.UpdateLog;
 end;
 
 procedure TActionSpeedBarRG01.CopyAndPasteBtnClick(Sender: TObject);
 begin
   Main.CopyAndPaste;
   FormMain.ShowTrimm;
-  FormMain.UpdateLog;
 end;
 
 procedure TActionSpeedBarRG01.CopyTrimmFileBtnClick(Sender: TObject);
 begin
   Main.CopyTrimmFile;
   FormMain.ShowTrimm;
-  FormMain.UpdateLog;
 end;
 
 procedure TActionSpeedBarRG01.ReadTrimmFileBtnClick(Sender: TObject);
 begin
   Main.ReadTrimmFile;
   FormMain.ShowTrimm;
-  FormMain.UpdateLog;
 end;
 
 procedure TActionSpeedBarRG01.SaveTrimmFileBtnClick(Sender: TObject);
 begin
   Main.SaveTrimmFile;
   FormMain.ShowTrimm;
-  FormMain.UpdateLog;
 end;
 
 procedure TActionSpeedBarRG01.MT0BtnClick(Sender: TObject);
 begin
   Main.UpdateTrimm0;
   FormMain.ShowTrimm;
-  FormMain.UpdateLog;
 end;
 
 procedure TActionSpeedBarRG01.SandboxedBtnClick(Sender: TObject);
@@ -535,8 +537,7 @@ begin
   fa := (Sender as TComponent).Tag;
   begin
     Main.HandleAction(fa);
-    FormMain.UpdateLog;
-    FormMain.ShowCurrentReport;
+    FormMain.ShowTrimm;
   end;
 end;
 

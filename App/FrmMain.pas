@@ -38,9 +38,7 @@ uses
   FMX.ScrollBox,
   FMX.Memo,
   FMX.Listbox,
-  FMX.Dialogs,
-  FMX.Styles.Objects,
-  FMX.Controls.Presentation;
+  FMX.Dialogs;
 
 {$define FMX}
 
@@ -52,19 +50,23 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
-  public
+  private
     FormShown: Boolean;
     procedure ApplicationEventsException(Sender: TObject; E: Exception);
     procedure HandleShowHint(Sender: TObject);
-  public
+  protected
     RL: TStrings;
+  public
     AllProps: Boolean;
-    procedure ShowCurrentReport;
     procedure ShowTrimm;
     procedure ShowTrimmData;
+  public
+    FWantButtonFrameReport: Boolean;
+    BackgroundColor: TAlphaColor;
     procedure UpdateLog;
     procedure UpdateReport;
-    procedure UpdateJson;
+    procedure ShowCurrentReport;
+    property WantButtonFrameReport: Boolean read FWantButtonFrameReport;
   public
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
@@ -96,6 +98,8 @@ type
   public
     Rigg: TRigg;
     ReportManager: TRggReportManager;
+    function GetIsUp: Boolean;
+    property IsUp: Boolean read GetIsUp;
   end;
 
 var
@@ -151,33 +155,33 @@ begin
   rggm := TRggMain.Create(Rigg); // rggm owns Rigg
   Main := TMain.Create(rggm); // Main owns rggm
   Main.Logger.Verbose := True;
-
-  Main.RggMain.Init;
-  Main.IsUp := True;
-  Rigg := Main.RggMain.Rigg;
-  Main.IsUp := True;
+  rggm.InitLogo; // sets WantLogoData to true
+  rggm.Init420; // resets WantLogoData to false
 
   { Reports }
   RL := TStringList.Create;
-  ReportManager := TRggReportManager.Create; //(RL);
-  ReportManager.CurrentReport := rgDataText;
+  ReportManager := TRggReportManager.Create(RL);
+  ReportManager.CurrentReport := rgJson;
 
+  HintText.BringToFront;
+  HintText.TextSettings.FontColor := claYellow;
+
+  ReportLabel.BringToFront;
+  ReportLabel.TextSettings.FontColor := claOrange;
+
+  TrimmText.BringToFront;
+  TrimmText.TextSettings.FontColor := claChartreuse;
+  TrimmText.Visible := True;
+
+  Main.IsUp := True;
   Main.Trimm := 1;
   Main.UpdateTrimm0;
   ShowTrimm;
 
-  HintText.BringToFront;
-  HintText.TextSettings.FontColor := claPurple;
-
-  ReportLabel.BringToFront;
-  ReportLabel.TextSettings.FontColor := claDodgerblue;
-
-  TrimmText.BringToFront;
-  TrimmText.TextSettings.FontColor := claBlue;
-
-  UpdateLog;
-  ReportManager.CurrentReport := rgJson;
-  ShowCurrentReport;
+  { Background }
+  BackgroundColor := claGray;
+  Fill.Kind := TBrushKind.Solid;
+  Fill.Color := BackgroundColor;
 
   Application.OnHint := HandleShowHint;
   InitSpeedButtons;
@@ -235,7 +239,7 @@ procedure TFormMain.FormResize(Sender: TObject);
 begin
   MainVar.ClientWidth := ClientWidth;
   MainVar.ClientHeight := ClientHeight;
-  if (Main <> nil) then
+  if (Main <> nil) and Main.IsUp then
   begin
     Inc(Main.ResizeCounter);
   end;
@@ -249,6 +253,11 @@ end;
 procedure TFormMain.HandleAction(fa: Integer);
 begin
 
+end;
+
+function TFormMain.GetIsUp: Boolean;
+begin
+  result := (Main <> nil) and Main.IsUp;
 end;
 
 function TFormMain.GetOpenFileName(dn, fn: string): string;
@@ -358,43 +367,32 @@ end;
 
 procedure TFormMain.UpdateReport;
 begin
-  RL.Clear;
-  Main.CurrentTrimm.WriteReport(RL);
-  ReportMemo.Text := RL.Text;
-end;
+  if not ReportMemo.Visible then
+    Exit;
+  if ReportManager = nil then
+    Exit;
+  if RL = nil then
+    Exit;
+  if not IsUp then
+    Exit;
 
-procedure TFormMain.UpdateJson;
-begin
   RL.Clear;
-  Main.CurrentTrimm.WriteJson(RL);
+
+  if WantButtonFrameReport then
+  begin
+//    Main.FederText.Report(RL);
+  end
+  else
+  begin
+    ReportManager.ShowCurrentReport;
+  end;
+
   ReportMemo.Text := RL.Text;
 end;
 
 procedure TFormMain.ShowCurrentReport;
 begin
-  RL.BeginUpdate;
-  RL.Clear;
-  case ReportManager.CurrentReport of
-    rgLog: RL.Text := Main.Logger.TL.Text;
-    rgJson: Rigg.Data.WriteJSon(RL);
-    rgData: Rigg.Data.WriteReport(RL);
-    rgShort:
-    begin
-      Rigg.Data.WantAll := False;
-      Rigg.Data.SaveTrimmItem(RL);
-    end;
-    rgLong:
-    begin
-      Rigg.Data.WantAll := True;
-      Rigg.Data.SaveTrimmItem(RL);
-    end;
-    rgDebugReport:
-    begin
-      Main.DoCleanReport;
-      RL.Text := Main.Logger.TL.Text;
-    end;
-  end;
-  RL.EndUpdate;
+  ReportManager.ShowCurrentReport;
   ReportLabel.Text := ReportManager.GetReportCaption(ReportManager.CurrentReport);
   ReportMemo.Text := RL.Text;
   TrimmText.Text := 'Trimm ' + IntToStr(Main.Trimm);
@@ -403,6 +401,7 @@ end;
 procedure TFormMain.ShowTrimm;
 begin
   ShowCurrentReport;
+  UpdateLog;
 end;
 
 procedure TFormMain.ShowTrimmData;

@@ -163,11 +163,11 @@ begin
 
   InitTrimmData;
 
-  RggMain := rggm; //TRggMain.Create;
+  RggMain := rggm; // TRggMain.Create;
 
   { this should be done after or when calling RggMain.Init }
-  RggMain.InitLogo; // sets WantLogoData to true
-  RggMain.Init420; // resets WantLogo to false
+//  RggMain.InitLogo; // sets WantLogoData to true
+//  RggMain.Init420; // resets WantLogo to false
 //  WantLogoData := False;
 end;
 
