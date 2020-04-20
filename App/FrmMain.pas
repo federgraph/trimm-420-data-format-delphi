@@ -60,12 +60,9 @@ type
   public
     RL: TStrings;
     AllProps: Boolean;
-    CurrentReport: TRggReport;
-    Counter: Integer;
     procedure ShowCurrentReport;
     procedure ShowTrimm;
     procedure ShowTrimmData;
-    function GetReportCaption(r: TRggReport): string;
     procedure HandleShowHint(Sender: TObject);
   public
     procedure HandleAction(fa: Integer);
@@ -151,6 +148,7 @@ type
     procedure InitSpeedButton(SB: TSpeedButton);
   private
     Rigg: TRigg;
+    ReportManager: TRggReportManager;
   end;
 
 var
@@ -207,7 +205,9 @@ begin
   InitSpeedButtons;
 
   { Reports }
-  RL := ReportMemo.Lines;
+  RL := TStringList.Create;
+  ReportManager := TRggReportManager.Create; //(RL);
+  ReportManager.CurrentReport := rgDataText;
 
   Main.Trimm := 1;
   Main.UpdateTrimm0;
@@ -223,7 +223,7 @@ begin
   TrimmText.TextSettings.FontColor := claBlue;
 
   UpdateLog;
-  CurrentReport := rgJson;
+  ReportManager.CurrentReport := rgJson;
   ShowCurrentReport;
 
   Application.OnHint := HandleShowHint;
@@ -231,6 +231,8 @@ end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
 begin
+  RL.Free;
+  ReportManager.Free;
   Main.Free;
   Main := nil;
 end;
@@ -257,8 +259,8 @@ begin
 
   if Handled then
   begin
-    if CurrentReport = rgLong then
-       CurrentReport := rgShort;
+    if ReportManager.CurrentReport = rgLong then
+       ReportManager.CurrentReport := rgShort;
     ShowCurrentReport;
   end;
 end;
@@ -402,12 +404,14 @@ procedure TFormMain.UpdateReport;
 begin
   RL.Clear;
   Main.CurrentTrimm.WriteReport(RL);
+  ReportMemo.Text := RL.Text;
 end;
 
 procedure TFormMain.UpdateJson;
 begin
   RL.Clear;
   Main.CurrentTrimm.WriteJson(RL);
+  ReportMemo.Text := RL.Text;
 end;
 
 procedure TFormMain.LogBtnClick(Sender: TObject);
@@ -418,7 +422,7 @@ end;
 
 procedure TFormMain.ShortBtnClick(Sender: TObject);
 begin
-  CurrentReport := rgShort;
+  ReportManager.CurrentReport := rgShort;
   AllProps := False;
   ShowTrimmData;
   ReportLabel.Text := 'Short Data';
@@ -426,7 +430,7 @@ end;
 
 procedure TFormMain.LongBtnClick(Sender: TObject);
 begin
-  CurrentReport := rgLong;
+  ReportManager.CurrentReport := rgLong;
   AllProps := True;
   ShowTrimmData;
   ReportLabel.Text := 'Long Data';
@@ -434,13 +438,13 @@ end;
 
 procedure TFormMain.StateBtnClick(Sender: TObject);
 begin
-  CurrentReport := rgData;
+  ReportManager.CurrentReport := rgData;
   ShowCurrentReport;
 end;
 
 procedure TFormMain.JsonBtnClick(Sender: TObject);
 begin
-  CurrentReport := rgJson;
+  ReportManager.CurrentReport := rgJson;
   ShowCurrentReport;
 end;
 
@@ -750,34 +754,11 @@ begin
   IsSandboxed := SandboxedBtn.IsPressed;
 end;
 
-function TFormMain.GetReportCaption(r: TRggReport): string;
-begin
-  case r of
-    rgLog: result := 'Log';
-    rgJson: result := 'Rigg.Data.WriteJson';
-    rgData: result := 'Rigg.Data.WriteReport';
-    rgShort: result := 'Trimm-Item Short';
-    rgLong: result := 'Trimm-Item Long';
-    rgTrimmText: result := 'Trimm Text';
-    rgJsonText: result := 'Json Text';
-    rgDataText: result := 'Data Text';
-    rgDiffText: result := 'Diff Text';
-    rgAusgabeRL: result := 'Ausgabe rL';
-    rgAusgabeRP: result := 'Ausgabe rP';
-    rgXML: result := 'Write XML';
-    rgDebugReport: result := 'Debug Report';
-    else
-      result := 'Unknown';
-  end;
-  result := Format('%s (%d)', [result, Counter]);
-end;
-
 procedure TFormMain.ShowCurrentReport;
 begin
-  Inc(Counter);
   RL.BeginUpdate;
   RL.Clear;
-  case CurrentReport of
+  case ReportManager.CurrentReport of
     rgLog: RL.Text := Main.Logger.TL.Text;
     rgJson: Rigg.Data.WriteJSon(RL);
     rgData: Rigg.Data.WriteReport(RL);
@@ -798,7 +779,8 @@ begin
     end;
   end;
   RL.EndUpdate;
-  ReportLabel.Text := GetReportCaption(CurrentReport);
+  ReportLabel.Text := ReportManager.GetReportCaption(ReportManager.CurrentReport);
+  ReportMemo.Text := RL.Text;
   TrimmText.Text := 'Trimm ' + IntToStr(Main.Trimm);
 end;
 
@@ -818,6 +800,7 @@ begin
   finally
     RL.EndUpdate;
   end;
+  ReportMemo.Text := RL.Text;
 end;
 
 procedure TFormMain.InitLayoutProps;
