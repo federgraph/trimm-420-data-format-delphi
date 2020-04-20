@@ -15,7 +15,11 @@ uses
   RiggVar.RG.Data in 'RG\RiggVar.RG.Data.pas',
   RiggVar.RG.Def in 'RG\RiggVar.RG.Def.pas',
   RiggVar.RG.Report in 'RG\RiggVar.RG.Report.pas',
-  RiggVar.RG.Main in 'RG\RiggVar.RG.Main.pas';
+  RiggVar.RG.Main in 'RG\RiggVar.RG.Main.pas',
+  RiggVar.FB.ActionLong in 'FB\RiggVar.FB.ActionLong.pas',
+  RiggVar.FB.ActionShort in 'FB\RiggVar.FB.ActionShort.pas',
+  RiggVar.FB.SpeedBar in 'FB\RiggVar.FB.SpeedBar.pas',
+  RiggVar.RG.Speed01 in 'RG\RiggVar.RG.Speed01.pas';
 
 {$R *.res}
 
