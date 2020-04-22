@@ -4,8 +4,11 @@ interface
 
 uses
   RiggVar.FB.SpeedBar,
+  RiggVar.FB.SpeedColor,
+  RiggVar.FB.SpeedProps,
   System.UIConsts,
   System.Classes,
+  FMX.Types,
   FMX.StdCtrls;
 
 type
@@ -44,6 +47,9 @@ type
     T7Btn: TSpeedButton;
     T8Btn: TSpeedButton;
 
+    ColorModeBtn: TSpeedButton;
+    FontSizeBtn: TSpeedButton;
+
     procedure M10BtnClick(Sender: TObject);
     procedure M1BtnClick(Sender: TObject);
     procedure P1BtnClick(Sender: TObject);
@@ -69,10 +75,11 @@ type
     procedure JsonBtnClick(Sender: TObject);
 
     procedure TrimmBtnClick(Sender: TObject);
+    procedure ToggleColorModeBtnClick(Sender: TObject);
+    procedure ToggleFontSizeBtnClick(Sender: TObject);
   protected
     procedure SpeedButtonClick(Sender: TObject); override;
   public
-    constructor Create(AOwner: TComponent); override;
     procedure InitSpeedButtons; override;
     procedure UpdateSpeedButtonDown; override;
   end;
@@ -87,21 +94,35 @@ uses
 
 { TActionSpeedBarRG01 }
 
-constructor TActionSpeedBarRG01.Create(AOwner: TComponent);
-begin
-  inherited;
-  BtnWidth := 35;
-  BtnHeight := 30;
-  FontSize := 16;
-end;
-
 procedure TActionSpeedBarRG01.InitSpeedButtons;
 var
   sb: TSpeedButton;
 begin
+  { SpeedPane update buttons }
+
+  BtnColor := SpeedColorScheme.claProp;
+  BtnColorValue := clvData;
+
+  sb := AddSpeedBtn('ColorModeBtn', BtnGroupSpace);
+  ColorModeBtn := sb;
+  sb.Text := 'CM';
+  sb.Hint := 'Toggle ColorMode';
+  sb.OnClick := ToggleColorModeBtnClick;
+  sb.Tag := faNoop;
+  InitSpeedButton(sb);
+
+  sb := AddSpeedBtn('FontSizeBtn');
+  FontSizeBtn := sb;
+  sb.Text := 'FS';
+  sb.Hint := 'Toggle FontSize';
+  sb.OnClick := ToggleFontSizeBtnClick;
+  sb.Tag := faNoop;
+  InitSpeedButton(sb);
+
   { update log }
 
-  BtnColor := claOrange;
+  BtnColor := SpeedColorScheme.claLog;
+  BtnColorValue := clvLog;
 
   sb := AddSpeedBtn('LogBtn', BtnGroupSpace);
   LogBtn := sb;
@@ -114,7 +135,8 @@ begin
 
   { Report Buttons }
 
-  BtnColor := claOrange;
+  BtnColor := SpeedColorScheme.claReport;
+  BtnColorValue := clvReport;
 
   sb := AddSpeedBtn('ShortBtn', BtnGroupSpace);
   ShortBtn := sb;
@@ -151,7 +173,8 @@ begin
 
   { Check Box Buttons }
 
-  BtnColor := claOrangeRed;
+  BtnColor := SpeedColorScheme.claOption;
+  BtnColorValue := clvOption;
 
   sb := AddSpeedBtn('SandboxedBtn', BtnGroupSpace);
   SandboxedBtn := sb;
@@ -163,7 +186,7 @@ begin
   sb.Tag := faToggleSandboxed;
   InitSpeedButton(sb);
 
-//  BtnColor := claGoldenrod;
+//  BtnColor := claPro;
 //
 //  sb := AddSpeedBtn('AllPropsBtn');
 //  AllPropsBtn := sb;
@@ -185,7 +208,8 @@ begin
 
   { Data Buttons }
 
-  BtnColor := claLime;
+  BtnColor := SpeedColorScheme.claData;
+  BtnColorValue := clvData;
 
   sb := AddSpeedBtn('MT0Btn', BtnGroupSpace);
   MT0Btn := sb;
@@ -259,7 +283,8 @@ begin
 
   { Param Value Buttons }
 
-  BtnColor := claAqua;
+  BtnColor := SpeedColorScheme.claWheel;
+  BtnColorValue := clvWheel;
 
   sb := AddSpeedBtn('M10Btn', BtnGroupSpace);
   M10Btn := sb;
@@ -303,7 +328,8 @@ begin
 
   { Trimm Buttons }
 
-  BtnColor := claYellow;
+  BtnColor := SpeedColorScheme.claTrimm;
+  BtnColorValue := clvTrimm;
 
   sb := AddSpeedBtn('T1Btn', BtnGroupSpace);
   T1Btn := sb;
@@ -377,6 +403,8 @@ begin
   sb.OnClick := TrimmBtnClick;
   sb.Tag := faLogo;
   InitSpeedButton(sb);
+
+  sb.Width := sb.Width + 20; // make logo button wider
 end;
 
 procedure TActionSpeedBarRG01.CopyTrimmItemBtnClick(Sender: TObject);
@@ -539,6 +567,19 @@ begin
     Main.HandleAction(fa);
     FormMain.ShowTrimm;
   end;
+end;
+
+procedure TActionSpeedBarRG01.ToggleColorModeBtnClick(Sender: TObject);
+begin
+  UpdateColor;
+  FormMain.UpdateColorScheme;
+end;
+
+procedure TActionSpeedBarRG01.ToggleFontSizeBtnClick(Sender: TObject);
+begin
+  UpdateFontSize;
+  T8Btn.Width := T8Btn.Width + 20;
+  FormMain.LayoutComponents;
 end;
 
 end.

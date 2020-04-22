@@ -11,16 +11,24 @@ uses
   FMX.Layouts,
   FMX.StdCtrls,
   FMX.Styles.Objects,
-  FMX.Controls.Presentation;
+  FMX.Controls.Presentation,
+  RiggVar.FB.SpeedColor,
+  RiggVar.FB.SpeedProps;
 
 {$define FMX}
 
 type
   TActionSpeedBar = class(TLayout)
   private
+    FDarkMode: Boolean;
+    FBigMode: Boolean;
     function FindStyleByName(AParent: TFMXObject; AName: string): TFMXObject;
     procedure InitLayoutProps;
+    procedure SetDarkMode(const Value: Boolean);
+    procedure SetBigMode(const Value: Boolean);
   protected
+    BtnColorHot: TAlphaColor;
+    BtnColorValue: TSpeedColorValue;
     BtnColor: TAlphaColor;
     BtnTop: Integer;
     BtnLeft: Integer;
@@ -30,14 +38,24 @@ type
     BtnSpace: Integer;
     BtnGroupSpace: Integer;
     SpeedPanelHeight: Integer;
-    FontSize: Integer;
+    SpeedPanelFontSize: Integer;
+    TempGroupSpace: Integer;
     function AddSpeedBtn(N: string; AGroupSpace: Integer = 0): TSpeedButton;
     function RefSpeedBtn(B: TSpeedButton; AGroupSpace: Integer = 0): TSpeedButton;
+    procedure UpdateLayoutForBtn(B: TSpeedButton; AGroupSpace: Integer);
     procedure InitSpeedButton(SB: TSpeedButton);
+    procedure UpdateSpeedButtonFontColor(SB: TSpeedButton);
+    procedure UpdateSpeedButtonFontSize(SB: TSpeedButton);
     procedure SpeedButtonClick(Sender: TObject); virtual;
     procedure UpdateCaptions;
     procedure UpdateHints;
+    procedure UpdateLayout;
+    procedure UpdateColor;
+    procedure UpdateFontSize;
   public
+    SpeedColorScheme: TSpeedColorScheme;
+    SpeedProps: ISpeedProps;
+
     constructor Create(AOwner: TComponent); override;
 
     procedure ToggleSpeedButtonText;
@@ -45,6 +63,10 @@ type
     procedure InitSpeedButtons; virtual;
     procedure UpdateSpeedButtonDown; virtual;
     procedure UpdateSpeedButtonEnabled; virtual;
+
+    property DarkMode: Boolean read FDarkMode write SetDarkMode;
+    property BigMode: Boolean read FBigMode write SetBigMode;
+    property PanelHeight: Integer read SpeedPanelHeight;
   end;
 
   TActionSpeedBarExample = class(TActionSpeedBar)
@@ -67,12 +89,15 @@ constructor TActionSpeedBar.Create(AOwner: TComponent);
 begin
   inherited;
   InitLayoutProps;
-//  StyleLookUp := 'panelstyle';
-//  InitSpeedButtons; // Main is still nil
+//  InitSpeedButtons; // Main is still nil (by design)
+  DarkMode := True;
+  BigMode := True;
+  SpeedProps := TSpeedProps.Create;
 end;
 
 procedure TActionSpeedBar.InitLayoutProps;
 begin
+  BtnColorHot := claBeige;
   BtnColor := claBlue;
   BtnCounter := 0;
   BtnLeft := 0;
@@ -81,7 +106,7 @@ begin
   BtnGroupSpace := 16;
   BtnWidth := 50;
   BtnHeight := 50;
-  FontSize := 24;
+  SpeedPanelFontSize := 24;
   SpeedPanelHeight := BtnHeight + 2 * BtnTop;
 end;
 
@@ -118,18 +143,59 @@ begin
   B.Font.Color := BtnColor;
 {$endif}
   Inc(BtnCounter);
+  TempGroupSpace := AGroupSpace;
+end;
+
+procedure TActionSpeedBar.UpdateLayoutForBtn(B: TSpeedButton; AGroupSpace: Integer);
+begin
+  BtnLeft := BtnLeft + AGroupSpace;
+{$ifdef Vcl}
+  B.Left := BtnLeft + BtnCounter * BtnWidth + BtnSpace;
+  B.Top := BtnTop;
+{$endif}
+{$ifdef FMX}
+  B.Position.X := BtnLeft + BtnCounter * (BtnWidth + BtnSpace);
+  B.Position.Y := BtnTop;
+{$endif}
+  B.Width := BtnWidth;
+  B.Height := BtnHeight;
+  Inc(BtnCounter);
+end;
+
+procedure TActionSpeedBar.UpdateLayout;
+var
+  cr: TFmxObject;
+  sb: TSpeedButton;
+  cp: TSpeedButtonProps;
+  gs: Integer;
+begin
+  InitLayoutProps;
+  BigMode := BigMode;
+  for cr in Children do
+  begin
+    if cr is TSpeedButton then
+    begin
+      sb := cr as TSpeedButton;
+      cp := SpeedProps.GetSpeedButtonProps(sb);
+      if cp.IsFirstInGroup then
+        gs := BtnGroupSpace
+      else
+        gs := 0;
+      UpdateLayoutForBtn(sb, gs);
+    end;
+  end;
 end;
 
 procedure TActionSpeedBar.UpdateCaptions;
 var
-  i: Integer;
+  cr: TFmxObject;
   sb: TSpeedButton;
 begin
-  for i := 0 to Self.ChildrenCount-1 do
+  for cr in Children do
   begin
-    if self.Children.Items[i] is TSpeedButton then
+    if cr is TSpeedButton then
     begin
-      sb := self.Children[i] as TSpeedButton;
+      sb := cr as TSpeedButton;
       sb.Text := GetFederActionShort(sb.Tag);
     end;
   end;
@@ -137,15 +203,56 @@ end;
 
 procedure TActionSpeedBar.UpdateHints;
 var
-  i: Integer;
+  cr: TFmxObject;
   sb: TSpeedButton;
 begin
-  for i := 0 to Self.ChildrenCount-1 do
+  for cr in Children do
   begin
-    if self.Children.Items[i] is TSpeedButton then
+    if cr is TSpeedButton then
     begin
-      sb := self.Children[i] as TSpeedButton;
+      sb := cr as TSpeedButton;
       sb.Text := GetFederActionLong(sb.Tag);
+    end;
+  end;
+end;
+
+procedure TActionSpeedBar.UpdateColor;
+var
+  cr: TFmxObject;
+  sb: TSpeedButton;
+  cp: TSpeedButtonProps;
+begin
+  DarkMode := not DarkMode;
+
+  BtnColor := SpeedColorScheme.claLog;
+
+  for cr in Children do
+  begin
+    if cr is TSpeedButton then
+    begin
+      sb := cr as TSpeedButton;
+      cp := SpeedProps.GetSpeedButtonProps(sb);
+      BtnColorValue := cp.ColorValue;
+      UpdateSpeedButtonFontColor(sb);
+    end;
+  end;
+end;
+
+procedure TActionSpeedBar.UpdateFontSize;
+var
+  cr: TFmxObject;
+  sb: TSpeedButton;
+begin
+  BigMode := not BigMode;
+
+  UpdateLayout;
+
+  for cr in Children do
+  begin
+    if cr is TSpeedButton then
+    begin
+      sb := cr as TSpeedButton;
+      UpdateSpeedButtonFontSize(sb);
     end;
   end;
 end;
@@ -153,7 +260,11 @@ end;
 procedure TActionSpeedBar.InitSpeedButton(SB: TSpeedButton);
 var
   cr: TButtonStyleTextObject;
+  cp: TSpeedButtonProps;
+  cla: TAlphaColor;
 begin
+  cla := SpeedColorScheme.GetColor(BtnColorValue);
+
   if SB.Tag <> faNoop then
   begin
     sb.Text := GetFederActionShort(SB.Tag);
@@ -166,10 +277,48 @@ begin
   cr := FindStyleByName(SB, 'text') as TButtonStyleTextObject;
   if cr <> nil then
   begin
-    cr.HotColor := claBeige;
-    cr.NormalColor := BtnColor;
-    cr.PressedColor := BtnColor;
-    cr.Font.Size := FontSize;
+    cr.HotColor := BtnColorHot;
+    cr.NormalColor := cla;
+    cr.PressedColor := cla;
+    cr.Font.Size := SpeedPanelFontSize;
+  end;
+
+  cp.ColorValue := BtnColorValue;
+  if TempGroupSpace = BtnGroupSpace then
+    cp.IsFirstInGroup := True
+  else
+    cp.IsFirstInGroup := False;
+
+  SpeedProps.SetSpeedButtonProps(SB, cp);
+end;
+
+procedure TActionSpeedBar.UpdateSpeedButtonFontColor(SB: TSpeedButton);
+var
+  cr: TButtonStyleTextObject;
+  cla: TAlphaColor;
+begin
+  cla := SpeedColorScheme.GetColor(BtnColorValue);
+  cr := FindStyleByName(SB, 'text') as TButtonStyleTextObject;
+  if cr <> nil then
+  begin
+//    cr.HotColor := BtnColorHot;
+    cr.NormalColor := cla;
+    cr.PressedColor := cla;
+//    cr.Font.Size := SpeedPanelFontSize;
+  end;
+end;
+
+procedure TActionSpeedBar.UpdateSpeedButtonFontSize(SB: TSpeedButton);
+var
+  cr: TButtonStyleTextObject;
+begin
+  cr := FindStyleByName(SB, 'text') as TButtonStyleTextObject;
+  if cr <> nil then
+  begin
+//    cr.HotColor := BtnColorHot;
+//    cr.NormalColor := cla;
+//    cr.PressedColor := cla;
+    cr.Font.Size := SpeedPanelFontSize;
   end;
 end;
 
@@ -224,6 +373,34 @@ begin
   end;
 end;
 
+procedure TActionSpeedBar.SetBigMode(const Value: Boolean);
+begin
+  FBigMode := Value;
+  if Value then
+  begin
+    BtnWidth := 50;
+    BtnHeight := 50;
+    SpeedPanelFontSize := 24;
+    SpeedPanelHeight := BtnHeight + 2 * BtnTop;
+  end
+  else
+  begin
+    BtnWidth := 35;
+    BtnHeight := 30;
+    SpeedPanelFontSize := 16;
+    SpeedPanelHeight := BtnHeight + 2 * BtnTop;
+  end;
+end;
+
+procedure TActionSpeedBar.SetDarkMode(const Value: Boolean);
+begin
+  FDarkMode := Value;
+  if Value then
+    SpeedColorScheme.InitDark
+  else
+    SpeedColorScheme.InitLight;
+end;
+
 procedure TActionSpeedBar.SpeedButtonClick(Sender: TObject);
 begin
   { virgual }
@@ -248,6 +425,7 @@ begin
   { Test Buttons }
 
   BtnColor := claTeal;
+  BtnColorValue := clvProp;
 
   sb := AddSpeedBtn('TestBtn');
   TestBtn := sb;

@@ -66,6 +66,7 @@ type
     procedure UpdateLog;
     procedure UpdateReport;
     procedure ShowCurrentReport;
+    procedure UpdateBackgroundColor(AColor: TAlphaColor);
     property WantButtonFrameReport: Boolean read FWantButtonFrameReport;
   public
     OpenDialog: TOpenDialog;
@@ -78,13 +79,10 @@ type
     TrimmText: TText;
     ReportMemo: TMemo;
     LogMemo: TMemo;
-  protected
+  private
     procedure CreateComponents;
-    procedure LayoutComponents;
     procedure SetupMemo(MM: TMemo);
     procedure SetupText(T: TText);
-    procedure SetupComboBox(CB: TComboBox);
-    procedure SetupListbox(LB: TListBox);
   private
     Raster: Integer;
     Margin: Integer;
@@ -94,6 +92,8 @@ type
     procedure UpdateSpeedButtonDown;
     procedure UpdateSpeedButtonEnabled;
   public
+    procedure UpdateColorScheme;
+    procedure LayoutComponents;
     procedure HandleAction(fa: Integer);
   public
     Rigg: TRigg;
@@ -138,11 +138,10 @@ begin
   FormMain := self;
   Caption := ApplicationTitleText;
   Top := 20;
-  Width := 1200;
+  Width := 1600;
   Height := 800;
   Margin := 10;
   Raster := 70;
-  SpeedPanelHeight := 40;
 
   CreateComponents;
 
@@ -164,29 +163,21 @@ begin
   ReportManager.CurrentReport := rgJson;
 
   HintText.BringToFront;
-  HintText.TextSettings.FontColor := claYellow;
-
   ReportLabel.BringToFront;
-  ReportLabel.TextSettings.FontColor := claOrange;
-
   TrimmText.BringToFront;
-  TrimmText.TextSettings.FontColor := claChartreuse;
-  TrimmText.Visible := True;
 
   Main.IsUp := True;
   Main.Trimm := 1;
   Main.UpdateTrimm0;
   ShowTrimm;
 
-  { Background }
-  BackgroundColor := claGray;
   Fill.Kind := TBrushKind.Solid;
-  Fill.Color := BackgroundColor;
 
   Application.OnHint := HandleShowHint;
   InitSpeedButtons;
   UpdateSpeedButtonDown;
   UpdateSpeedButtonEnabled;
+  UpdateColorScheme;
 end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
@@ -243,6 +234,11 @@ begin
   begin
     Inc(Main.ResizeCounter);
   end;
+end;
+
+procedure TFormMain.UpdateBackgroundColor(AColor: TAlphaColor);
+begin
+  Self.Fill.Color := AColor;
 end;
 
 procedure TFormMain.HandleShowHint(Sender: TObject);
@@ -310,32 +306,6 @@ begin
   T.Font.Size := 18;
   T.AutoSize := True;
   T.HitTest := False;
-end;
-
-procedure TFormMain.SetupComboBox(CB: TComboBox);
-begin
-  if CB = nil then
-    Exit;
-
-{$ifdef Vcl}
-  CB.Style := csDropDownList;
-  CB.DropDownCount := Integer(High(TFederParam));
-  CB.Font.Name := 'Consolas';
-  CB.Font.Size := 11;
-  CB.Font.Color := clRed;
-{$endif}
-end;
-
-procedure TFormMain.SetupListBox(LB: TListBox);
-begin
-  if LB = nil then
-    Exit;
-
-{$ifdef Vcl}
-  LB.Font.Name := 'Consolas';
-  LB.Font.Size := 11;
-  LB.Font.Color := clBlue;
-{$endif}
 end;
 
 procedure TFormMain.SetupMemo(MM: TMemo);
@@ -452,33 +422,40 @@ begin
 end;
 
 procedure TFormMain.LayoutComponents;
+var
+  th: Integer;
 begin
+  th := 30;
+  SpeedPanelHeight := SpeedPanel.PanelHeight;
+
   SpeedPanel.Align := TAlignLayout.Top;
   SpeedPanel.Height := SpeedPanelHeight;
 
   HintText.Position.X := 20;
   HintText.Position.Y := SpeedPanelHeight + Margin;
-  HintText.Height := 30;
+  HintText.Height := th;
 
   ReportLabel.Position.X := 400;
   ReportLabel.Position.Y := SpeedPanelHeight + Margin;
-  ReportLabel.Height := 30;
+  ReportLabel.Height := th;
 
   TrimmText.Position.X := 700;
   TrimmText.Position.Y := SpeedPanelHeight + Margin;
-  TrimmText.Height := 30;
+  TrimmText.Height := th;
 
+  LogMemo.Anchors := [];
   LogMemo.Position.X := Margin;
-  LogMemo.Position.Y := SpeedPanel.Height + HintText.Height + Margin;;
+  LogMemo.Position.Y := SpeedPanel.Height + th + Margin;
   LogMemo.Height := ClientHeight - LogMemo.Position.Y - Margin;
   LogMemo.Width := 400;
-  LogMemo.Anchors := LogMemo.Anchors + [TAnchorKind.akBottom];
+  LogMemo.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akBottom];
 
+  ReportMemo.Anchors := [];
   ReportMemo.Position.X := LogMemo.Position.X + LogMemo.Width + Margin;
   ReportMemo.Position.Y := LogMemo.Position.Y;
   ReportMemo.Height := ClientHeight - ReportMemo.Position.Y - Margin;
   ReportMemo.Width := ClientWidth - ReportMemo.Position.X - Margin;
-  ReportMemo.Anchors := ReportMemo.Anchors + [TAnchorKind.akRight, TAnchorKind.akBottom];
+  ReportMemo.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];
 end;
 
 procedure TFormMain.InitSpeedButtons;
@@ -497,6 +474,14 @@ procedure TFormMain.UpdateSpeedButtonEnabled;
 begin
   if SpeedPanel <> nil then
     SpeedPanel.UpdateSpeedButtonEnabled;
+end;
+
+procedure TFormMain.UpdateColorScheme;
+begin
+  UpdateBackgroundColor(SpeedPanel.SpeedColorScheme.claBack);
+  HintText.TextSettings.FontColor := SpeedPanel.SpeedColorScheme.claLog;
+  ReportLabel.TextSettings.FontColor := SpeedPanel.SpeedColorScheme.claReport;
+  TrimmText.TextSettings.FontColor := SpeedPanel.SpeedColorScheme.claTrimm;
 end;
 
 end.
