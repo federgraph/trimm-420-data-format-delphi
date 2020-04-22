@@ -40,10 +40,10 @@ type
     SpeedPanelHeight: Integer;
     SpeedPanelFontSize: Integer;
     TempGroupSpace: Integer;
-    function AddSpeedBtn(N: string; AGroupSpace: Integer = 0): TSpeedButton;
+    function AddSpeedBtn(N: string; AGroupSpace: Integer = 0): TSpeedBtn;
     function RefSpeedBtn(B: TSpeedButton; AGroupSpace: Integer = 0): TSpeedButton;
     procedure UpdateLayoutForBtn(B: TSpeedButton; AGroupSpace: Integer);
-    procedure InitSpeedButton(SB: TSpeedButton);
+    procedure InitSpeedButton(SB: TSpeedBtn);
     procedure UpdateSpeedButtonFontColor(SB: TSpeedButton);
     procedure UpdateSpeedButtonFontSize(SB: TSpeedButton);
     procedure SpeedButtonClick(Sender: TObject); virtual;
@@ -54,7 +54,6 @@ type
     procedure UpdateFontSize;
   public
     SpeedColorScheme: TSpeedColorScheme;
-    SpeedProps: ISpeedProps;
 
     constructor Create(AOwner: TComponent); override;
 
@@ -92,7 +91,6 @@ begin
 //  InitSpeedButtons; // Main is still nil (by design)
   DarkMode := True;
   BigMode := True;
-  SpeedProps := TSpeedProps.Create;
 end;
 
 procedure TActionSpeedBar.InitLayoutProps;
@@ -110,9 +108,9 @@ begin
   SpeedPanelHeight := BtnHeight + 2 * BtnTop;
 end;
 
-function TActionSpeedBar.AddSpeedBtn(N: string; AGroupSpace: Integer): TSpeedButton;
+function TActionSpeedBar.AddSpeedBtn(N: string; AGroupSpace: Integer): TSpeedBtn;
 begin
-  result := TSpeedButton.Create(Self);
+  result := TSpeedBtn.Create(Self);
   result.Parent := Self;
   result.Name := N;
   RefSpeedBtn(result, AGroupSpace);
@@ -165,19 +163,17 @@ end;
 procedure TActionSpeedBar.UpdateLayout;
 var
   cr: TFmxObject;
-  sb: TSpeedButton;
-  cp: TSpeedButtonProps;
+  sb: TSpeedBtn;
   gs: Integer;
 begin
   InitLayoutProps;
   BigMode := BigMode;
   for cr in Children do
   begin
-    if cr is TSpeedButton then
+    if cr is TSpeedBtn then
     begin
-      sb := cr as TSpeedButton;
-      cp := SpeedProps.GetSpeedButtonProps(sb);
-      if cp.IsFirstInGroup then
+      sb := cr as TSpeedBtn;
+      if sb.IsFirstInGroup then
         gs := BtnGroupSpace
       else
         gs := 0;
@@ -219,8 +215,7 @@ end;
 procedure TActionSpeedBar.UpdateColor;
 var
   cr: TFmxObject;
-  sb: TSpeedButton;
-  cp: TSpeedButtonProps;
+  sb: TSpeedBtn;
 begin
   DarkMode := not DarkMode;
 
@@ -228,11 +223,10 @@ begin
 
   for cr in Children do
   begin
-    if cr is TSpeedButton then
+    if cr is TSpeedBtn then
     begin
-      sb := cr as TSpeedButton;
-      cp := SpeedProps.GetSpeedButtonProps(sb);
-      BtnColorValue := cp.ColorValue;
+      sb := cr as TSpeedBtn;
+      BtnColorValue := sb.ColorValue;
       UpdateSpeedButtonFontColor(sb);
     end;
   end;
@@ -257,10 +251,9 @@ begin
   end;
 end;
 
-procedure TActionSpeedBar.InitSpeedButton(SB: TSpeedButton);
+procedure TActionSpeedBar.InitSpeedButton(SB: TSpeedBtn);
 var
   cr: TButtonStyleTextObject;
-  cp: TSpeedButtonProps;
   cla: TAlphaColor;
 begin
   cla := SpeedColorScheme.GetColor(BtnColorValue);
@@ -283,13 +276,11 @@ begin
     cr.Font.Size := SpeedPanelFontSize;
   end;
 
-  cp.ColorValue := BtnColorValue;
+  SB.ColorValue := BtnColorValue;
   if TempGroupSpace = BtnGroupSpace then
-    cp.IsFirstInGroup := True
+    SB.IsFirstInGroup := True
   else
-    cp.IsFirstInGroup := False;
-
-  SpeedProps.SetSpeedButtonProps(SB, cp);
+    SB.IsFirstInGroup := False;
 end;
 
 procedure TActionSpeedBar.UpdateSpeedButtonFontColor(SB: TSpeedButton);
@@ -420,7 +411,7 @@ end;
 
 procedure TActionSpeedBarExample.InitSpeedButtons;
 var
-  sb: TSpeedButton;
+  sb: TSpeedBtn;
 begin
   { Test Buttons }
 

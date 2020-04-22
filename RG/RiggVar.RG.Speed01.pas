@@ -35,8 +35,9 @@ type
     P10Btn: TSpeedButton;
 
     SandboxedBtn: TSpeedButton;
-//    AllPropsBtn: TSpeedButton;
-//    AllTagsBtn: TSpeedButton;
+
+    ColorModeBtn: TSpeedButton;
+    FontSizeBtn: TSpeedButton;
 
     T1Btn: TSpeedButton;
     T2Btn: TSpeedButton;
@@ -46,9 +47,6 @@ type
     T6Btn: TSpeedButton;
     T7Btn: TSpeedButton;
     T8Btn: TSpeedButton;
-
-    ColorModeBtn: TSpeedButton;
-    FontSizeBtn: TSpeedButton;
 
     procedure M10BtnClick(Sender: TObject);
     procedure M1BtnClick(Sender: TObject);
@@ -75,6 +73,7 @@ type
     procedure JsonBtnClick(Sender: TObject);
 
     procedure TrimmBtnClick(Sender: TObject);
+
     procedure ToggleColorModeBtnClick(Sender: TObject);
     procedure ToggleFontSizeBtnClick(Sender: TObject);
   protected
@@ -96,9 +95,9 @@ uses
 
 procedure TActionSpeedBarRG01.InitSpeedButtons;
 var
-  sb: TSpeedButton;
+  sb: TSpeedBtn;
 begin
-  { SpeedPane update buttons }
+  { SpeedPanel Update Buttons }
 
   BtnColor := SpeedColorScheme.claProp;
   BtnColorValue := clvData;
@@ -173,6 +172,7 @@ begin
 
   { Check Box Buttons }
 
+  BtnColor := claCrimson;
   BtnColor := SpeedColorScheme.claOption;
   BtnColorValue := clvOption;
 
@@ -186,8 +186,10 @@ begin
   sb.Tag := faToggleSandboxed;
   InitSpeedButton(sb);
 
-//  BtnColor := claPro;
-//
+//  BtnColor := claGoldenrod;
+//  BtnColor := SpeedColorScheme.claProp;
+//  BtnColorValue := clvProp;
+
 //  sb := AddSpeedBtn('AllPropsBtn');
 //  AllPropsBtn := sb;
 //  sb.Text := 'ATP';
@@ -195,7 +197,7 @@ begin
 //  sb.StaysPressed := True;
 //  sb.IsPressed := False;
 //  InitSpeedButton(sb);
-//
+
 //  sb := AddSpeedBtn('AllTagsBtn');
 //  AllTagsBtn := sb;
 //  sb.Text := 'AXT';
@@ -208,6 +210,7 @@ begin
 
   { Data Buttons }
 
+  BtnColor := claChartreuse;
   BtnColor := SpeedColorScheme.claData;
   BtnColorValue := clvData;
 
@@ -283,6 +286,7 @@ begin
 
   { Param Value Buttons }
 
+  BtnColor := claCornflowerBlue;
   BtnColor := SpeedColorScheme.claWheel;
   BtnColorValue := clvWheel;
 
@@ -328,6 +332,7 @@ begin
 
   { Trimm Buttons }
 
+  BtnColor := claTeal;
   BtnColor := SpeedColorScheme.claTrimm;
   BtnColorValue := clvTrimm;
 
@@ -451,14 +456,12 @@ end;
 
 procedure TActionSpeedBarRG01.SandboxedBtnClick(Sender: TObject);
 begin
-//  Main.ActionHandler.Execute(faToggleSandboxed);
   IsSandboxed := not IsSandboxed;
 end;
 
 procedure TActionSpeedBarRG01.AllTagsBtnClick(Sender: TObject);
 begin
 //  Main.ActionHandler.Execute(faToggleAllTags);
-//  FormMain.ReportManager.XMLAllTags := AllTagsBtn.IsPressed;
 end;
 
 procedure TActionSpeedBarRG01.M10BtnClick(Sender: TObject);

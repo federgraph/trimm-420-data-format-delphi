@@ -36,15 +36,15 @@ SB = Scroll-Bars
 SB: I happend to use scroll bars in 1995. It was the best thing available. We got new Trackbar controls later.
 Today we have sliders. But all these things can be used to change the value of the current parameter.
 
-The old scroll bar control used Integer values. The track bar and slider use single precision floating point values.
+The old scroll bar control used Integer values.
+The track bar and slider use single precision floating point values.
+But the serialized data still uses Integer values.
+
 When you set up a modern slider you should perhaps allow input values from -1000 to +1000
 and then map the value to the actual range of the currently selected parameter.
-Take that as a suggestion from the original dev.
 It has the advantage that it will be easier if you use only one or even none of these controls to change the value of the current parameter.
-
 Sometimes it is enough to swipe across the screen in a certain way,
 you do not need a control any more these days.
-But I think one control, perhaps a slider, would be great.
 
 ## Trimm-Item Report
 

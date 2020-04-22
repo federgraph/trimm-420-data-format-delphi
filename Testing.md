@@ -135,10 +135,7 @@ Of course you could use it as a starting point for rewriting the app from scratc
 - allow the user to select the current parameter
 - allow the user to change the current parameter value
 
-The real application does all that, and it updates computed values for some of the coordinates on the fly,
-according to the latest change to the value of the current parameter.
+The real application does it, and it updates computed values on the fly.
 
-If you, as a developer, come up with a new implementation of the application shell,
-I may be able to help with the completion of the new app, with some code from the original.
-
-Until then you could use the published app (see Store) and provide data in the format expected.
+If you can come up with a new implementation of the application shell
+I may be able to help with the completion of the app.

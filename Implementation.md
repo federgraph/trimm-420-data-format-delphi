@@ -1,4 +1,4 @@
-# Implementation
+﻿# Implementation
 
 My implementation is in the TRggData class, which is given in full, see code.
 
@@ -105,7 +105,7 @@ What the default mode of operation is for saving data is likely to be platform d
 You better check that out by reading the code.
 I have published this test app so that you can.
 Treat it as a good thing that there is no database, not at this time, not here in this code base.
-Working with files is a challenge I have taken up here.
+Working with files is a challenge I have taken up.
 It is hard but doable. At least this is the assumption.
 
 RggData is the instance of TRggData in TMain1 which is used as a temp object.
@@ -117,7 +117,7 @@ So it appears as if those reports are pretty useless, perhaps only relevant whil
 You can watch the state within Rigg through the reports and graphics if implemented.
 Here in the data format test project you can use the live reports DataText and JsonText to show the current Rigg state.
 
-Here in the test app you can use Shift-Wheel or Ctrl-Wheel to change VOPos,
+In the test app you can use Shift-Wheel or Ctrl-Wheel to change VOPos,
 just so that you can see some change in the reports and identify the piece of data after saving.
 
 Under normal circumstances any change to Rigg will immediately produce feedback through the graphics, which will change.
@@ -162,17 +162,35 @@ The short captions of actions, shown on buttons, should be unique across the who
 
 Log: It clears the log, at least almost. Actually, it replaces the current log output in the LogMemo control with some status information.
 
-dat: This is not normally used. The program will always use the long, explicit form when copying data to the clipboard. The short form is used by humans, when providing input. This is not even a regular report. Maybe it should be.
+dat: This is not normally used.
+The program will always use the long, explicit form when copying data to the clipboard.
+The short form is used by humans, when providing input.
+This is not even a regular report. Maybe it should be.
 
-Dat: This also is not currently a regular report, and as such part of the enumeration of available reports, managed by the ReportManager. Maybe it should be. I have provided this here in the test application because I think it makes sense.
+Dat: This also is not currently a regular report, and as such part of the enumeration of available reports, managed by the ReportManager.
+Maybe it should be.
+I have provided this in the test application because I think it makes sense.
 
-Sta: Status. The DataText report. This is a regular report. It takes the data from the Model via RggData. I am in need of a good caption, already used Dat for something else.
+Sta: Status. The DataText report. This is a regular report.
+It takes the data from the Model via RggData.
+I am in need of a good caption, already used Dat for something else.
 
-Jsn: This is also a regular report, it will show the current data from the Model, formatted as Json. Actually, it is a subset of the data, containing mostly the info which is surfaced as Trimm-Item. The older original application still has features that are not currently surfaced in the published app. Here we are dealing with the basics only, the kinematics of the abstraction, with no forces and material properties involved. But at least the report shows actual data from Rigg, the current state of the model used by the app, not just what happens to be in the temp data transfer object - RggData - from whatever the latest IO operation was.
-I think I am using too many words here. And that is because the test app does not have a real implementation of TRigg. I needed to put an instance of TRggData into the dummy Rigg to keep some state. Before I did that there was nothing, and my test application showed the content of RggData in TMain1 instead, which did not change at all. It turned out that I need to be able to apply some changes to Rigg in order to test TRggData, together with the IO code that uses it.
+Jsn: This is also a regular report, it will show the current data from the Model, formatted as Json.
+Actually, it is a subset of the data, containing mostly the info which is surfaced as Trimm-Item.
+The older original application still has features that are not currently surfaced in the published app.
+Here we are dealing with the basics only, the kinematics of the abstraction, with no forces and material properties involved.
+But at least the report shows actual data from Rigg,
+the current state of the model used by the app,
+not just what happens to be in the temp data transfer object - RggData - from whatever the latest IO operation was.
 
-MT0: Has been used in the previously published app. This is one of the operations that effect RggData instances. I think it should better be named ct0. MT0 is the Memory button which saves the current state to Trimm slot T0. It copies to T0.
+MT0 alias *ct0*: MT0 has been used as a caption in the previously published app.
+This is one of the operations that effect RggData instances.
+It is the button which saves the current state to Trimm slot T0.
+It copies to T0.
 
-M: Has been used in the previously published app. The problem with M is that it is already used by another action, in the app that has more features. So I may use the new caption for the button - cap - in the future, which fits in nicely with the other three lower case character short captions for the IO operations.
+M alias *cap*: M has been used in the previously published app.
+The problem with M is that it is already used by another action, in the app that has more features.
+I will use the new caption for the button - cap - in the future,
+which fits in nicely with the other three lower case character short captions for the IO operations.
 
-We need to get the short captions right, before some people will come up with the idea of introducing icons. Here in the test app I have hardcoded the short captions and hints. Once this naming process has concluded I will source them from from defined string constants. That will be the next step. Internationalizing and Localizing is even further away. I will keep this test project in sync with the full app, which is in the other repo.
+We need to get the short captions right, before someone will come up with the idea of introducing icons.
