@@ -12,12 +12,17 @@ uses
   FMX.StdCtrls,
   FMX.Styles.Objects,
   FMX.Controls.Presentation,
-  RiggVar.FB.SpeedColor,
-  RiggVar.FB.SpeedProps;
+  RiggVar.FB.SpeedColor;
 
 {$define FMX}
 
 type
+  TSpeedBtn = class(TSpeedButton)
+  public
+    ColorValue: TSpeedColorValue;
+    IsFirstInGroup: Boolean;
+  end;
+
   TActionSpeedBar = class(TLayout)
   private
     FDarkMode: Boolean;
@@ -394,7 +399,7 @@ end;
 
 procedure TActionSpeedBar.SpeedButtonClick(Sender: TObject);
 begin
-  { virgual }
+  { virtual }
 end;
 
 procedure TActionSpeedBar.UpdateSpeedButtonDown;

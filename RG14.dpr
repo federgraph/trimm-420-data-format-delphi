@@ -20,7 +20,6 @@ uses
   RiggVar.FB.ActionShort in 'FB\RiggVar.FB.ActionShort.pas',
   RiggVar.FB.SpeedBar in 'FB\RiggVar.FB.SpeedBar.pas',
   RiggVar.RG.Speed01 in 'RG\RiggVar.RG.Speed01.pas',
-  RiggVar.FB.SpeedProps in 'FB\RiggVar.FB.SpeedProps.pas',
   RiggVar.FB.SpeedColor in 'FB\RiggVar.FB.SpeedColor.pas';
 
 {$R *.res}

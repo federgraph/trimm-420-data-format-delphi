@@ -80,6 +80,7 @@ type
     ReportMemo: TMemo;
     LogMemo: TMemo;
   private
+    ComponentsCreated: Boolean;
     procedure CreateComponents;
     procedure SetupMemo(MM: TMemo);
     procedure SetupText(T: TText);
@@ -98,8 +99,9 @@ type
   public
     Rigg: TRigg;
     ReportManager: TRggReportManager;
+    procedure SetIsUp(const Value: Boolean);
     function GetIsUp: Boolean;
-    property IsUp: Boolean read GetIsUp;
+    property IsUp: Boolean read GetIsUp write SetIsUp;
   end;
 
 var
@@ -253,7 +255,15 @@ end;
 
 function TFormMain.GetIsUp: Boolean;
 begin
-  result := (Main <> nil) and Main.IsUp;
+  if not MainVar.AppIsClosing and Assigned(Main) then
+    result := Main.IsUp
+  else
+    result := False;
+end;
+
+procedure TFormMain.SetIsUp(const Value: Boolean);
+begin
+  Main.IsUp := Value;
 end;
 
 function TFormMain.GetOpenFileName(dn, fn: string): string;
@@ -407,6 +417,8 @@ begin
   SpeedPanel.Parent := Self;
   SpeedPanel.ShowHint := True;
   SpeedPanel.Opacity := OpacityValue;
+  SpeedPanel.DarkMode := False;
+  SpeedPanel.BigMode := False;
 
   LogMemo := TMemo.Create(Self);
   LogMemo.Parent := Self;
@@ -419,6 +431,8 @@ begin
   ReportMemo.ReadOnly := True;
   ReportMemo.CanFocus := False;
   ReportMemo.Opacity := OpacityValue;
+
+  ComponentsCreated := True;
 end;
 
 procedure TFormMain.LayoutComponents;
@@ -478,10 +492,16 @@ end;
 
 procedure TFormMain.UpdateColorScheme;
 begin
+  if not ComponentsCreated then
+    Exit;
+
   UpdateBackgroundColor(SpeedPanel.SpeedColorScheme.claBack);
-  HintText.TextSettings.FontColor := SpeedPanel.SpeedColorScheme.claLog;
+
+  if ReportLabel <> nil then
   ReportLabel.TextSettings.FontColor := SpeedPanel.SpeedColorScheme.claReport;
-  TrimmText.TextSettings.FontColor := SpeedPanel.SpeedColorScheme.claTrimm;
+
+  HintText.TextSettings.FontColor := SpeedPanel.SpeedColorScheme.claHintText;
+  TrimmText.TextSettings.FontColor := SpeedPanel.SpeedColorScheme.claTrimmText;
 end;
 
 end.

@@ -5,7 +5,6 @@ interface
 uses
   RiggVar.FB.SpeedBar,
   RiggVar.FB.SpeedColor,
-  RiggVar.FB.SpeedProps,
   System.UIConsts,
   System.Classes,
   FMX.Types,
