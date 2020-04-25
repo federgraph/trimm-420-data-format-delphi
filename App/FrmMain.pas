@@ -40,8 +40,6 @@ uses
   FMX.Listbox,
   FMX.Dialogs;
 
-{$define FMX}
-
 type
   TFormMain = class(TForm)
     procedure FormCreate(Sender: TObject);
@@ -51,6 +49,7 @@ type
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
   private
+    FScale: single;
     FormShown: Boolean;
     procedure ApplicationEventsException(Sender: TObject; E: Exception);
     procedure HandleShowHint(Sender: TObject);
@@ -61,13 +60,10 @@ type
     procedure ShowTrimm;
     procedure ShowTrimmData;
   public
-    FWantButtonFrameReport: Boolean;
-    BackgroundColor: TAlphaColor;
     procedure UpdateLog;
     procedure UpdateReport;
     procedure ShowCurrentReport;
     procedure UpdateBackgroundColor(AColor: TAlphaColor);
-    property WantButtonFrameReport: Boolean read FWantButtonFrameReport;
   public
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
@@ -79,11 +75,22 @@ type
     TrimmText: TText;
     ReportMemo: TMemo;
     LogMemo: TMemo;
+  public
+    procedure ShowReport(const Value: TRggReport);
+    function GetShowDataText: Boolean;
+    function GetShowDiffText: Boolean;
+    function GetShowTrimmText: Boolean;
+    procedure SetShowDataText(const Value: Boolean);
+    procedure SetShowDiffText(const Value: Boolean);
+    procedure SetShowTrimmText(const Value: Boolean);
+    property ShowTrimmText: Boolean read GetShowTrimmText write SetShowTrimmText;
+    property ShowDiffText: Boolean read GetShowDiffText write SetShowDiffText;
+    property ShowDataText: Boolean read GetShowDataText write SetShowDataText;
   private
     ComponentsCreated: Boolean;
     procedure CreateComponents;
     procedure SetupMemo(MM: TMemo);
-    procedure SetupText(T: TText);
+    procedure SetupText(T: TText; fs: single = 16);
   private
     Raster: Integer;
     Margin: Integer;
@@ -135,6 +142,15 @@ begin
 {$endif}
   FormatSettings.DecimalSeparator := '.';
 
+  FScale := 1.0;
+{$ifdef MSWINDOWS}
+  { On MACOS Screen.WorkAreaHeight is not scaled,
+    so it would be wrong to div by scale.
+
+    On Windows Screen.WorkAreaHeight is scaled and should be divved. }
+  FScale := Handle.Scale;
+{$endif}
+
   Application.OnException := ApplicationEventsException;
 
   FormMain := self;
@@ -144,6 +160,9 @@ begin
   Height := 800;
   Margin := 10;
   Raster := 70;
+
+  { RSP-20787 when TFormPosition.ScreenCenter}
+//  Self.Position := TFormPosition.ScreenCenter;
 
   CreateComponents;
 
@@ -174,6 +193,13 @@ begin
   ShowTrimm;
 
   Fill.Kind := TBrushKind.Solid;
+
+{$ifdef MACOS}
+  { OnKeyUp does not work well on Mac, RSP-2766 }
+  OnKeyUp := nil;
+  { we will use OnKeyDown instead }
+  OnKeyDown := FormKeyUp;
+{$endif}
 
   Application.OnHint := HandleShowHint;
   InitSpeedButtons;
@@ -235,6 +261,8 @@ begin
   if (Main <> nil) and Main.IsUp then
   begin
     Inc(Main.ResizeCounter);
+    if FormShown then
+      SpeedPanel.UpdateLayout;
   end;
 end;
 
@@ -307,13 +335,70 @@ begin
     result := '';
 end;
 
-procedure TFormMain.SetupText(T: TText);
+function TFormMain.GetShowDataText: Boolean;
+begin
+  result := ReportMemo.Visible and (ReportManager.CurrentReport = TRggReport.rgDataText);
+end;
+
+function TFormMain.GetShowDiffText: Boolean;
+begin
+  result := ReportMemo.Visible and (ReportManager.CurrentReport = TRggReport.rgDiffText);
+end;
+
+function TFormMain.GetShowTrimmText: Boolean;
+begin
+  result := ReportMemo.Visible and (ReportManager.CurrentReport = TRggReport.rgTrimmText);
+end;
+
+procedure TFormMain.ShowReport(const Value: TRggReport);
+begin
+  ReportManager.CurrentReport := Value;
+  UpdateReport;
+end;
+
+procedure TFormMain.SetShowDataText(const Value: Boolean);
+begin
+  if Value then
+  begin
+    ShowReport(TRggReport.rgDataText);
+  end
+  else
+  begin
+    ReportMemo.Visible := False;
+  end;
+end;
+
+procedure TFormMain.SetShowDiffText(const Value: Boolean);
+begin
+  if Value then
+  begin
+    ShowReport(TRggReport.rgDiffText);
+  end
+  else
+  begin
+    ReportMemo.Visible := False;
+  end;
+end;
+
+procedure TFormMain.SetShowTrimmText(const Value: Boolean);
+begin
+  if Value then
+  begin
+    ShowReport(TRggReport.rgTrimmText);
+  end
+  else
+  begin
+    ReportMemo.Visible := False;
+  end;
+end;
+
+procedure TFormMain.SetupText(T: TText; fs: single);
 begin
   T.Parent := Self;
   T.WordWrap := False;
   T.HorzTextAlign := TTextAlign.Leading;
   T.Font.Family := 'Consolas';
-  T.Font.Size := 18;
+  T.Font.Size := fs;
   T.AutoSize := True;
   T.HitTest := False;
 end;
@@ -323,21 +408,12 @@ begin
   if MM = nil then
     Exit;
 
-{$ifdef FMX}
   MM.ControlType := TControlType.Styled;
   MM.StyledSettings := [];
   MM.ShowScrollBars := True;
   MM.TextSettings.Font.Family := 'Consolas';
   MM.TextSettings.Font.Size := 14;
   MM.TextSettings.FontColor := claBlue;
-{$endif}
-
-{$ifdef Vcl}
-  MM.Font.Name := 'Consolas';
-  MM.Font.Size := 11;
-  MM.Font.Color := clTeal;
-  MM.ScrollBars := ssBoth;
-{$endif}
 end;
 
 procedure TFormMain.UpdateLog;
@@ -357,16 +433,7 @@ begin
     Exit;
 
   RL.Clear;
-
-  if WantButtonFrameReport then
-  begin
-//    Main.FederText.Report(RL);
-  end
-  else
-  begin
-    ReportManager.ShowCurrentReport;
-  end;
-
+  ReportManager.ShowCurrentReport;
   ReportMemo.Text := RL.Text;
 end;
 

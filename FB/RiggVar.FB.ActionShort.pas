@@ -74,7 +74,7 @@ begin
     faSalingTypFest: result := 'fs';
 
     fa420: result := '420';
-    faLogo: result := 'logo';
+    faLogo: result := 'T8';
     faHull: result := 'hull';
     faDemo: result := 'mod';
 

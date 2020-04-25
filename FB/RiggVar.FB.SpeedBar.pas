@@ -54,15 +54,14 @@ type
     procedure SpeedButtonClick(Sender: TObject); virtual;
     procedure UpdateCaptions;
     procedure UpdateHints;
-    procedure UpdateLayout;
-    procedure UpdateColor;
-    procedure UpdateFontSize;
+    procedure ToggleBigMode;
   public
     SpeedColorScheme: TSpeedColorScheme;
 
     constructor Create(AOwner: TComponent); override;
 
-    procedure ToggleSpeedButtonText;
+    procedure UpdateLayout;
+    procedure UpdateColor;
 
     procedure InitSpeedButtons; virtual;
     procedure UpdateSpeedButtonDown; virtual;
@@ -84,7 +83,6 @@ type
 implementation
 
 uses
-  RiggVar.App.Main,
   RiggVar.FB.ActionConst,
   RiggVar.FB.ActionShort,
   RiggVar.FB.ActionLong;
@@ -183,6 +181,7 @@ begin
       else
         gs := 0;
       UpdateLayoutForBtn(sb, gs);
+      sb.Visible := sb.Position.X < self.Width - sb.Width;
     end;
   end;
 end;
@@ -222,10 +221,6 @@ var
   cr: TFmxObject;
   sb: TSpeedBtn;
 begin
-  DarkMode := not DarkMode;
-
-  BtnColor := SpeedColorScheme.claLog;
-
   for cr in Children do
   begin
     if cr is TSpeedBtn then
@@ -237,7 +232,7 @@ begin
   end;
 end;
 
-procedure TActionSpeedBar.UpdateFontSize;
+procedure TActionSpeedBar.ToggleBigMode;
 var
   cr: TFmxObject;
   sb: TSpeedButton;
@@ -315,34 +310,6 @@ begin
 //    cr.NormalColor := cla;
 //    cr.PressedColor := cla;
     cr.Font.Size := SpeedPanelFontSize;
-  end;
-end;
-
-procedure TActionSpeedBar.ToggleSpeedButtonText;
-var
-  Settings: ITextSettings;
-  Instance: TComponent;
-  I: Integer;
-begin
-  { http://docwiki.embarcadero.com/RADStudio/Rio/en/Setting_Text_Parameters_in_FireMonkey }
-
-  { This will toggle Font.Size for all Buttons on the SpeedBar. }
-  for I := 0 to ChildrenCount - 1 do
-  begin
-    Instance := Children[I];
-    if IInterface(Instance).QueryInterface(ITextSettings, Settings) = S_OK then
-    begin
-      Settings.TextSettings.BeginUpdate;
-      try
-        Settings.TextSettings.Font.Size := 32;
-        if TStyledSetting.Size in Settings.StyledSettings then
-          Settings.StyledSettings := Settings.StyledSettings - [TStyledSetting.Size]
-        else
-          Settings.StyledSettings := Settings.StyledSettings + [TStyledSetting.Size];
-      finally
-        Settings.TextSettings.EndUpdate;
-      end;
-    end;
   end;
 end;
 
