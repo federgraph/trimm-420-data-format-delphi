@@ -19,7 +19,6 @@
 interface
 
 uses
-//  RiggVar.FB.Scheme,
   RiggVar.App.Main1;
 
 type
@@ -42,7 +41,6 @@ type
     AppIsClosing: Boolean;
     ShowDebugData: Boolean;
     WantOnResize: Boolean;
-//    ColorScheme: TColorScheme;
     Raster: Integer;
     ClientWidth: Integer;
     ClientHeight: Integer;
@@ -64,7 +62,6 @@ implementation
 
 class constructor MainVar.Create;
 begin
-//  ColorScheme := TColorScheme.Create(5);
   Raster := 70;
 end;
 

@@ -134,9 +134,10 @@ begin
   B.Width := BtnWidth;
   B.Height := BtnHeight;
 {$ifdef FMX}
-  { Does not work.
-    Because B not assigned yet to actual SpeedButton instance ? }
+  { Does not work. }
+  { Because B not assigned yet to actual SpeedButton instance ? }
 //  InitSpeedButton(B);
+  { also maybe not wanted to do this here }
 {$endif}
 {$ifdef Vcl}
   B.Font.Name := 'Consolas';
@@ -313,11 +314,6 @@ begin
   end;
 end;
 
-procedure TActionSpeedBar.InitSpeedButtons;
-begin
-  { virtual }
-end;
-
 function TActionSpeedBar.FindStyleByName(AParent: TFMXObject; AName: string): TFMXObject;
 var
   i: Integer;
@@ -362,6 +358,11 @@ begin
     SpeedColorScheme.InitDark
   else
     SpeedColorScheme.InitLight;
+end;
+
+procedure TActionSpeedBar.InitSpeedButtons;
+begin
+  { virtual }
 end;
 
 procedure TActionSpeedBar.SpeedButtonClick(Sender: TObject);

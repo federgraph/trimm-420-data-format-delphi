@@ -58,7 +58,6 @@ type
   public
     AllProps: Boolean;
     procedure ShowTrimm;
-    procedure ShowTrimmData;
   public
     procedure UpdateLog;
     procedure UpdateReport;
@@ -449,20 +448,6 @@ procedure TFormMain.ShowTrimm;
 begin
   ShowCurrentReport;
   UpdateLog;
-end;
-
-procedure TFormMain.ShowTrimmData;
-begin
-  RL.BeginUpdate;
-  try
-    RL.Clear;
-    Main.CurrentTrimm.WantAll := AllProps;
-    Main.CurrentTrimm.SaveTrimmItem(RL);
-    Main.CurrentTrimm.WantAll := False;
-  finally
-    RL.EndUpdate;
-  end;
-  ReportMemo.Text := RL.Text;
 end;
 
 procedure TFormMain.CreateComponents;

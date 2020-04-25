@@ -424,6 +424,7 @@ end;
 
 procedure TActionSpeedBarRG01.AllTagsBtnClick(Sender: TObject);
 begin
+  { All XML Tags or not }
 //  Main.ActionHandler.Execute(faToggleAllTags);
 end;
 
@@ -497,16 +498,14 @@ end;
 procedure TActionSpeedBarRG01.ShortBtnClick(Sender: TObject);
 begin
   FormMain.ReportManager.CurrentReport := rgShort;
-  FormMain.AllProps := False;
-  FormMain.ShowTrimmData;
+  FormMain.ShowCurrentReport;
   FormMain.ReportLabel.Text := 'Short Data';
 end;
 
 procedure TActionSpeedBarRG01.LongBtnClick(Sender: TObject);
 begin
   FormMain.ReportManager.CurrentReport := rgLong;
-  FormMain.AllProps := True;
-  FormMain.ShowTrimmData;
+  FormMain.ShowCurrentReport;
   FormMain.ReportLabel.Text := 'Long Data';
 end;
 
@@ -527,15 +526,13 @@ var
   fa: Integer;
 begin
   fa := (Sender as TComponent).Tag;
-  begin
-    Main.HandleAction(fa);
-    FormMain.ShowTrimm;
-  end;
+  Main.HandleAction(fa);
+  FormMain.ShowTrimm;
 end;
 
 procedure TActionSpeedBarRG01.ToggleColorModeBtnClick(Sender: TObject);
 begin
-  DarkMode :=  not DarkMode;
+  DarkMode := not DarkMode;
   UpdateColor;
   FormMain.UpdateColorScheme;
 end;
