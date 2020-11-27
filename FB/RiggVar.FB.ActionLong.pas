@@ -78,10 +78,14 @@ begin
     faCopyTrimmFile: result := 'Copy Trimm File';
     faSaveTrimmFile: result := 'Save Trimm File';
 
-    faSalingTypOhneStarr: result := 'Ohne Salinge Starr';
-    faSalingTypOhne: result := 'Ohne Salinge';
-    faSalingTypDrehbar: result := 'Drehbare Salinge';
     faSalingTypFest: result := 'Feste Salinge';
+    faSalingTypDrehbar: result := 'Drehbare Salinge';
+    faSalingTypOhne: result := 'Ohne Salinge';
+    faSalingTypOhneStarr: result := 'Ohne Salinge Starr';
+
+    faCalcTypQuer: result := 'Querkraftbiegung';
+    faCalcTypKnick: result := 'Biegeknicken';
+    faCalcTypGemessen: result := 'Kraft gemessen';
 
     faWantRenderH: result := 'Want render H (Hull-Tetraeder)';
     faWantRenderP: result := 'Want render P (Fachwerk)';
@@ -100,13 +104,34 @@ begin
     faToggleDebugText: result := 'Toggle debug text';
     faUpdateReportText: result := 'Update report text';
 
-    faHull: result := 'Toggle visibility of hull';
+    faRggHull: result := 'Toggle visibility of hull';
     faDemo: result := 'Toggle Demo / Pro mode';
     faCopyTrimmItem: result := 'Copy Trimm-Item';
     faPasteTrimmItem: result := 'Paste Trimm-Item or Trimm-File';
 
     faShowMemo: result := 'Form Memo';
-    faShowActi: result := 'Form Actions';
+    faShowActions: result := 'Form Actions';
+    faShowOptions: result := 'Form Options';
+    faShowDrawings: result := 'Form Drawings';
+    faShowConfig: result := 'Form Config';
+    faShowTrimmTab: result := 'Form Trimm Tab';
+    faShowKreis: result := 'Form Kreis';
+    faShowInfo: result := 'Form Info';
+    faShowSplash: result := 'Form Splash';
+
+    faShowDiagA: result := 'Form Diagramm';
+    faShowDiagC: result := 'Form Live Diagramm Controls';
+    faShowDiagE: result := 'Form Diagramm Edits';
+    faShowDiagQ: result := 'Form Diagramm Quick';
+
+    faShowChart: result := 'Form Chart';
+    faShowText: result := 'Form Text-Ausgabe';
+
+    faShowForce: result := 'Form Force';
+    faShowDetail: result := 'Form Detail';
+    faShowTabelle: result := 'Form Tabelle';
+    faShowSaling: result := 'Form Saling';
+    faShowController: result := 'Form Controller';
 
     faWheelLeft: result := 'Wheel -1';
     faWheelRight: result := 'Wheel +1';
@@ -126,24 +151,25 @@ begin
     faActionPageX: result := 'Action Page X';
 
     faToggleAllText: result := 'Toggle all text';
-    faToggleTouchFrame: result := 'Touch frame';
+    faToggleTouchFrame: result := 'Toggle Touch Frame';
+    faToggleSpeedPanel: result := 'Toggle Speed Panel';
 
-    faCycleColorSchemeM: result := 'cycle 3D color scheme -';
-    faCycleColorSchemeP: result := 'cycle 3D color scheme +';
+    faCycleColorSchemeM: result := 'cycle color scheme -';
+    faCycleColorSchemeP: result := 'cycle color scheme +';
 
     faTouchDesk: result := 'Touch Desk';
     faTouchTablet: result := 'Touch Tablet';
     faTouchPhone: result := 'Touch Phone';
 
-    faButtonFrameReport: result := 'Button Frame Report';
+    faToggleButtonReport: result := 'Button Frame Report';
 
     faParamValuePlus1: result := 'Param Value + 1';
     faParamValueMinus1: result := 'Param Value - 1';
     faParamValuePlus10: result := 'Param Value + 10';
     faParamValueMinus10: result := 'Param Value - 10';
 
-    faMemeToggleHelp: result := 'Toggle Help Text';
-    faMemeToggleReport: result := 'Toggle Report';
+    faToggleHelp: result := 'Toggle Help Text';
+    faToggleReport: result := 'Toggle Report';
 
     faMemeGotoLandscape: result := 'Goto Landscape';
     faMemeGotoSquare: result := 'Goto Square';
@@ -193,6 +219,7 @@ begin
     faReportJsonText: result := 'Json Text Report';
     faReportDataText: result := 'Data Text Report';
     faReportDiffText: result := 'Diff Text Report';
+    faReportAusgabeDetail: result := 'Ausgabe Rigg Detail';
     faReportAusgabeRL: result := 'Ausgabe Rigg Längen';
     faReportAusgabeRP: result := 'Ausgabe Rigg Koordinaten';
     faReportAusgabeRLE: result := 'Ausgabe Rigg Längen Entspannt';
@@ -224,21 +251,32 @@ begin
     faToggleUseDisplayList: result := 'Toggle Use DisplayList';
     faToggleUseQuickSort: result := 'Toggle Use Quicksort';
     faToggleShowLegend: result := 'Toggle Show DL Legend';
-    faRggBogen: result := 'Show Mast Bogen';
+
+    faRggBogen: result := 'Show Mast-Bogen';
+    faRggKoppel: result := 'Show Koppel-Kurve';
 
     faToggleSalingGraph: result := 'Toggle Saling Graph';
     faToggleControllerGraph: result := 'Toggle Controller Graph';
     faToggleChartGraph: result := 'Toggle Chart Graph';
+    faToggleKraftGraph: result := 'Toggle Kraft Graph';
     faToggleMatrixText: result := 'Toggle Matrix Text';
 
     faMemoryBtn: result := 'Memory Btn';
     faMemoryRecallBtn: result := 'Memory Recall Btn';
 
-    faSofortBtn: result := 'Sofort Btn';
+    faKorrigiertItem: result := 'Korrigiert Item';
+    faSofortBtn: result := 'Sofort Berechnen Btn';
     faGrauBtn: result := 'Grau Btn';
     faBlauBtn: result := 'Blau Btn';
     faMultiBtn: result := 'Multi Btn';
-    faKoppelBtn: result := 'Koppel Btn';
+
+    faSuperSimple: result := 'Super Simple';
+    faSuperNormal: result := 'Super Normal';
+    faSuperGrau: result := 'Super Grau';
+    faSuperBlau: result := 'Super Blau';
+    faSuperMulti: result := 'Super Multi';
+    faSuperDisplay: result := 'Super Disp';
+    faSuperQuick: result := 'Super Quick';
 
     faTL01: result := 'Top Left 1';
     faTL02: result := 'Top Left 2';
@@ -301,10 +339,6 @@ begin
     faPlusOne: result := 'Plus One';
     faPlusTen: result := 'Plus Ten';
 
-    faBlackText: result := 'Black Text';
-    faGrayText: result := 'Gray Text';
-    faWhiteText: result := 'White Text';
-
     faPan: result := 'Pan';
 
     faParamORX: result := 'Param OrthoRot X';
@@ -314,6 +348,55 @@ begin
     faParamRY: result := 'Model Rotation Y';
     faParamRZ: result := 'Model Rotation Z';
     faParamCZ: result := 'Camera Position Z';
+
+    faParamAPW: result := 'Param AP Width';
+    faParamEAH: result := 'Param EA Hull';
+    faParamEAR: result := 'Param EA Rigg';
+    faParamEI: result := 'Param EI Mast';
+
+    faRotaForm1: result := 'Use RotaForm 1';
+    faRotaForm2: result := 'Use RotaForm 2';
+    faRotaForm3: result := 'Use RotaForm 3';
+
+    faReset: result := 'Reset';
+    faResetPosition: result := 'Reset Position';
+    faResetRotation: result := 'Reset Rotation';
+    faResetZoom: result := 'Reset Zoom';
+
+    faToggleLanguage: result := 'Toggle Language';
+
+    faToggleDropTarget: result := 'Drop target';
+
+    faSave: result := 'Save';
+    faLoad: result := 'Load';
+    faOpen: result := 'Open';
+    faCopy: result := 'Copy';
+    faPaste: result := 'Paste';
+    faShare: result := 'Share';
+
+    faToggleViewType: result := 'Toggle view type';
+    faViewTypeOrtho: result := 'Set view type to orthographic';
+    faViewTypePerspective: result := 'Set view type to perspective';
+
+    faHullMesh :result := 'toggle hull mesh';
+    faHullMeshOn :result := 'hull mesh on';
+    faHullMeshOff :result := 'hull mesh off';
+
+    faToggleMoveMode: result := 'Toggle move mode';
+    faLinearMove: result := 'Linear move';
+    faExpoMove: result := 'Exponential move';
+
+    faShowHelpText: result := 'Show Help Text';
+    faShowInfoText: result := 'Show Info Text';
+    faShowNormalKeyInfo: result := 'Show normal key info';
+    faShowSpecialKeyInfo: result := 'Show special key info';
+    faShowDebugInfo: result := 'Show Debug Info';
+    faShowZOrderInfo: result := 'Show Z-Order';
+
+    faTouchBarTop: result := 'TouchBar Top: Rotation Z';
+    faTouchBarBottom: result := 'TouchBar Bottom: Zoom';
+    faTouchBarLeft: result := 'TouchBar Left: Big Step';
+    faTouchBarRight: result := 'TouchBar Right: Small Step ';
 
   end;
 end;

@@ -64,7 +64,7 @@ type
 
     l3: Integer;
     w3: Integer;
-    h3: double;
+    h3: single;
 
     { computed value cache - initialized later, when loaded }
     F0C: Integer;
@@ -186,6 +186,10 @@ implementation
 
 uses
   RiggVar.App.Main;
+
+{ ML - Memo Lines, often used as a name for a parameter of type TStrings }
+{ AML - needed to avoid naming conflict with field ML! }
+{ Maybe a better Name for AML would be TL - Text Lines }
 
 { TRggData }
 
@@ -344,7 +348,7 @@ begin
   SLMax := 600;
 
   SWMin := 0;
-  SWPos := Round(ArcTan2(SHPos, SAPos / 2) * 180 / Pi);
+  SWPos := Round(RadToDeg(ArcTan2(SHPos, SAPos / 2)));
   SWMax := 89;
 
   { Vorstag (C0C), or forestay, headstay }
@@ -416,7 +420,7 @@ begin
 //  SB.SH.Max = 300;
 //
 //  SB.SWMin := 0;
-//  SB.SWPos := Round(ArcTan2(SHPos, SAPos / 2) * 180 / Pi);
+//  SB.SWPos := Round(RadToDeg(ArcTan2(SHPos, SAPos / 2)));
 //  SB.SWMax := 89;
 //
 //  SB.SL.Min = 450;
@@ -962,9 +966,9 @@ procedure TRggData.ProcessW;
 begin
   if (l3 > 0) and (w3 > 0) then
   begin
-    h3 := l3 * sin(w3 * pi / 180);
+    h3 := l3 * sin(DegToRad(w3));
     SHPos := Round(h2 + h3);
-    SAPos := Round(2 * (l3 * cos(w3 * pi / 180) + l2));
+    SAPos := Round(2 * (l3 * cos(DegToRad(w3)) + l2));
   end;
 end;
 
@@ -1097,7 +1101,7 @@ begin
         else if c > 1 then
         begin
           { Trimm 1 - 6 }
-          fd := Main.GetTrimmItem(c-1);
+          fd := Main.GetTrimmItem(c - 1);
           fd.Reset;
           fd.Assign(Main.Trimm0);
           fd.LoadTrimmItem(SL);

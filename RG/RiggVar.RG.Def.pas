@@ -21,6 +21,7 @@ interface
 uses
   System.UITypes,
   System.UIConsts,
+  System.Classes,
   FMX.Graphics;
 
 type
@@ -60,10 +61,22 @@ type
     fpMastfallF0F,
     fpMastfallVorlauf,
     fpBiegung,
-    fpD0X,
-    fpT1,
-    fpT2
+    fpD0X
     );
+
+  TFederMessageKind = (
+    fmkNoop,
+    fmkAction,
+    fmkParam,
+    fmkParamValue,
+
+    fmkTX,
+    fmkTY,
+    fmkRX,
+    fmkRY,
+    fmkRZ,
+    fmkCZ
+  );
 
 const
   cFaktor = 'Faktor';

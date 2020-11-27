@@ -36,8 +36,6 @@ type
   private
     ML: TStrings; // not owned
     FCurrentReport: TRggReport;
-    FXmlAllTags: Boolean;
-    procedure SetXmlAllTags(const Value: Boolean);
     procedure SetCurrentReport(const Value: TRggReport);
   public
     Counter: Integer;
@@ -45,7 +43,6 @@ type
     procedure ShowCurrentReport;
     function GetReportCaption(r: TRggReport): string;
     property CurrentReport: TRggReport read FCurrentReport write SetCurrentReport;
-    property XmlAllTags: Boolean read FXmlAllTags write SetXmlAllTags;
   end;
 
 implementation
@@ -64,11 +61,6 @@ end;
 procedure TRggReportManager.SetCurrentReport(const Value: TRggReport);
 begin
   FCurrentReport := Value;
-end;
-
-procedure TRggReportManager.SetXmlAllTags(const Value: Boolean);
-begin
-  FXmlAllTags := Value;
 end;
 
 function TRggReportManager.GetReportCaption(r: TRggReport): string;
@@ -98,7 +90,7 @@ procedure TRggReportManager.ShowCurrentReport;
 var
   cr: TRggData;
 begin
-  cr := Main.RggMain.Rigg.Data;
+  cr := Main.Rigg.Data;
   ML.BeginUpdate;
   try
     ML.Clear;

@@ -22,6 +22,7 @@ uses
   RiggVar.RG.Def,
   RiggVar.RG.Report,
   RiggVar.FB.SpeedBar,
+  RiggVar.FB.SpeedColor,
   RggUnit4,
   System.SysUtils,
   System.Classes,
@@ -37,7 +38,6 @@ uses
   FMX.Objects,
   FMX.ScrollBox,
   FMX.Memo,
-  FMX.Listbox,
   FMX.Dialogs;
 
 type
@@ -56,13 +56,11 @@ type
   protected
     RL: TStrings;
   public
-    AllProps: Boolean;
     procedure ShowTrimm;
   public
     procedure UpdateLog;
     procedure UpdateReport;
     procedure ShowCurrentReport;
-    procedure UpdateBackgroundColor(AColor: TAlphaColor);
   public
     OpenDialog: TOpenDialog;
     SaveDialog: TSaveDialog;
@@ -90,14 +88,16 @@ type
     procedure CreateComponents;
     procedure SetupMemo(MM: TMemo);
     procedure SetupText(T: TText; fs: single = 16);
-  private
+  public
     Raster: Integer;
     Margin: Integer;
     SpeedPanelHeight: Integer;
     SpeedPanel: TActionSpeedBar;
+    SpeedColorScheme: TSpeedColorScheme;
     procedure InitSpeedButtons;
     procedure UpdateSpeedButtonDown;
     procedure UpdateSpeedButtonEnabled;
+    procedure ToggleSpeedPanelFontSize;
   public
     procedure UpdateColorScheme;
     procedure LayoutComponents;
@@ -105,6 +105,7 @@ type
   public
     Rigg: TRigg;
     ReportManager: TRggReportManager;
+    procedure UpdateOnParamValueChanged;
     procedure SetIsUp(const Value: Boolean);
     function GetIsUp: Boolean;
     property IsUp: Boolean read GetIsUp write SetIsUp;
@@ -133,13 +134,12 @@ begin
 end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
-var
-  rggm: TRggMain;
 begin
-{$ifdef Debug}
+  FormatSettings.DecimalSeparator := '.';
+
+{$if defined(Debug)}
   ReportMemoryLeaksOnShutdown := True;
 {$endif}
-  FormatSettings.DecimalSeparator := '.';
 
   FScale := 1.0;
 {$ifdef MSWINDOWS}
@@ -153,15 +153,17 @@ begin
   Application.OnException := ApplicationEventsException;
 
   FormMain := self;
+
+  SpeedColorScheme := TSpeedColorScheme.Create;
+  SpeedColorScheme.InitDark;
+  TActionSpeedBar.SpeedColorScheme := SpeedColorScheme;
+
   Caption := ApplicationTitleText;
   Top := 20;
   Width := 1600;
   Height := 800;
   Margin := 10;
   Raster := 70;
-
-  { RSP-20787 when TFormPosition.ScreenCenter}
-//  Self.Position := TFormPosition.ScreenCenter;
 
   CreateComponents;
 
@@ -171,11 +173,9 @@ begin
 
   Rigg := TRigg.Create;
 
-  rggm := TRggMain.Create(Rigg); // rggm owns Rigg
-  Main := TMain.Create(rggm); // Main owns rggm
+  Main := TRggMain.Create(Rigg);
   Main.Logger.Verbose := True;
-  rggm.InitLogo; // sets WantLogoData to true
-  rggm.Init420; // resets WantLogoData to false
+  Main.IsUp := True;
 
   { Reports }
   RL := TStringList.Create;
@@ -186,25 +186,26 @@ begin
   ReportLabel.BringToFront;
   TrimmText.BringToFront;
 
-  Main.IsUp := True;
-  Main.Trimm := 1;
-  Main.UpdateTrimm0;
-  ShowTrimm;
-
   Fill.Kind := TBrushKind.Solid;
-
-{$ifdef MACOS}
-  { OnKeyUp does not work well on Mac, RSP-2766 }
-  OnKeyUp := nil;
-  { we will use OnKeyDown instead }
-  OnKeyDown := FormKeyUp;
-{$endif}
 
   Application.OnHint := HandleShowHint;
   InitSpeedButtons;
   UpdateSpeedButtonDown;
   UpdateSpeedButtonEnabled;
   UpdateColorScheme;
+
+  Main.InitDefaultData;
+  Main.UpdateTrimm0;
+
+  Main.ToggleDarkMode;
+
+{$if defined(MACOS) and (CompilerVersion < 34.0) }
+  { OnKeyUp does not work well on Mac, RSP-2766 }
+  { fixed in Sidney 10.4 }
+  OnKeyUp := nil;
+  { we will use OnKeyDown instead, in Tokyo 10.2 and Rio 10.3 }
+  OnKeyDown := FormKeyUp;
+{$endif}
 end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
@@ -213,12 +214,17 @@ begin
   ReportManager.Free;
   Main.Free;
   Main := nil;
+  SpeedColorScheme.Free;
 end;
 
-procedure TFormMain.FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
-  Shift: TShiftState);
+procedure TFormMain.FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
 begin
   //
+end;
+
+procedure TFormMain.UpdateOnParamValueChanged;
+begin
+  ShowTrimm;
 end;
 
 procedure TFormMain.FormMouseWheel(Sender: TObject; Shift: TShiftState;
@@ -226,12 +232,12 @@ procedure TFormMain.FormMouseWheel(Sender: TObject; Shift: TShiftState;
 begin
   if ssShift in Shift then
   begin
-    Main.RggMain.DoSmallWheel(WheelDelta);
+    Main.DoSmallWheel(WheelDelta);
     Handled := True;
   end
   else if ssCtrl in Shift then
   begin
-    Main.RggMain.DoBigWheel(WheelDelta);
+    Main.DoBigWheel(WheelDelta);
     Handled := True;
   end;
 
@@ -263,11 +269,6 @@ begin
     if FormShown then
       SpeedPanel.UpdateLayout;
   end;
-end;
-
-procedure TFormMain.UpdateBackgroundColor(AColor: TAlphaColor);
-begin
-  Self.Fill.Color := AColor;
 end;
 
 procedure TFormMain.HandleShowHint(Sender: TObject);
@@ -450,6 +451,12 @@ begin
   UpdateLog;
 end;
 
+procedure TFormMain.ToggleSpeedPanelFontSize;
+begin
+  SpeedPanel.ToggleBigMode;
+  LayoutComponents;
+end;
+
 procedure TFormMain.CreateComponents;
 var
   OpacityValue: single;
@@ -547,13 +554,21 @@ begin
   if not ComponentsCreated then
     Exit;
 
-  UpdateBackgroundColor(SpeedPanel.SpeedColorScheme.claBack);
+  Self.Fill.Color := MainVar.ColorScheme.claBackground;
+
+  if MainVar.ColorScheme.IsDark then
+    SpeedColorScheme.InitDark
+  else
+    SpeedColorScheme.InitLight;
+
+  SpeedPanel.DarkMode := MainVar.ColorScheme.IsDark;
+  SpeedPanel.UpdateColor;
 
   if ReportLabel <> nil then
-  ReportLabel.TextSettings.FontColor := SpeedPanel.SpeedColorScheme.claReport;
+  ReportLabel.TextSettings.FontColor := SpeedColorScheme.claReport;
 
-  HintText.TextSettings.FontColor := SpeedPanel.SpeedColorScheme.claHintText;
-  TrimmText.TextSettings.FontColor := SpeedPanel.SpeedColorScheme.claTrimmText;
+  HintText.TextSettings.FontColor := SpeedColorScheme.claHintText;
+  TrimmText.TextSettings.FontColor := SpeedColorScheme.claTrimmText;
 end;
 
 end.

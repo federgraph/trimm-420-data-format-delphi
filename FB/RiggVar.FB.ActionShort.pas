@@ -68,14 +68,17 @@ begin
     faTrimm5: result := 'T5';
     faTrimm6: result := 'T6';
 
-    faSalingTypOhneStarr: result := 'oss';
-    faSalingTypOhne: result := 'os';
-    faSalingTypDrehbar: result := 'ds';
     faSalingTypFest: result := 'fs';
+    faSalingTypDrehbar: result := 'ds';
+    faSalingTypOhne: result := 'os';
+    faSalingTypOhneStarr: result := 'oss';
+
+    faCalcTypQuer: result := 'cQ';
+    faCalcTypKnick: result := 'cK';
+    faCalcTypGemessen: result := 'cM';
 
     fa420: result := '420';
-    faLogo: result := 'T8';
-    faHull: result := 'hull';
+    faLogo: result := 'logo';
     faDemo: result := 'mod';
 
     faUpdateTrimm0: result := 'ct0';
@@ -104,7 +107,28 @@ begin
     faViewpoint3: result := 'vp3';
 
     faShowMemo: result := 'FM';
-    faShowActi: result := 'FA';
+    faShowActions: result := 'FA';
+    faShowOptions: result := 'FO';
+    faShowDrawings: result := 'FD';
+    faShowConfig: result := 'FC';
+    faShowTrimmTab: result := 'TT';
+    faShowKreis: result := 'FK';
+    faShowInfo: result := 'FI';
+    faShowSplash: result := 'FS';
+
+    faShowForce: result := 'sF';
+    faShowDetail: result := 'sD';
+    faShowTabelle: result := 'sT';
+    faShowSaling: result := 'sS';
+    faShowController: result := 'sC';
+
+    faShowDiagA: result := 'DA';
+    faShowDiagC: result := 'DC';
+    faShowDiagE: result := 'DE';
+    faShowDiagQ: result := 'DQ';
+
+    faShowChart: result := 'CF';
+    faShowText: result := 'TA';
 
     faWheelLeft: result := 'wl';
     faWheelRight: result := 'wr';
@@ -125,6 +149,7 @@ begin
 
     faToggleAllText: result := 'tat';
     faToggleTouchFrame: result := 'fra';
+    faToggleSpeedPanel: result := 'SP';
 
     faCycleColorSchemeM: result := 'c-';
     faCycleColorSchemeP: result := 'c+';
@@ -138,10 +163,10 @@ begin
     faTouchPhone: result := 'pho';
     faTouchDesk: result := 'dsk';
 
-    faButtonFrameReport: result := 'bfr';
+    faToggleButtonReport: result := 'bfr';
 
-    faMemeToggleHelp: result := 'h';
-    faMemeToggleReport: result := 'r';
+    faToggleHelp: result := 'h';
+    faToggleReport: result := 'r';
 
     faMemeGotoLandscape: result := '[L]';
     faMemeGotoSquare: result := '[S]';
@@ -165,7 +190,7 @@ begin
     faChartAP: result := 'cA';
     faChartBP: result := 'cB';
 
-    faParamCountPlus: result := 'pc+';
+    faParamCountPlus: result := 'pC+';
     faParamCountMinus: result := 'pC-';
 
     faPComboPlus: result := 'cP+';
@@ -191,6 +216,7 @@ begin
     faReportJsonText: result := '~JT';
     faReportDataText: result := '~DT';
     faReportDiffText: result := '~dt';
+    faReportAusgabeDetail: result := 'RD';
     faReportAusgabeRL: result := 'RL';
     faReportAusgabeRP: result := 'RP';
     faReportAusgabeRLE: result := 'RLE';
@@ -201,9 +227,9 @@ begin
     faReportDebugReport: result := '~';
     faReportReadme: result := '~R';
 
-    faToggleSandboxed: result := 'SB';
-    faToggleAllProps: result := 'ATP';
-    faToggleAllTags: result := 'AXT';
+    faToggleSandboxed: result := 'SX';
+    faToggleAllProps: result := 'AP';
+    faToggleAllTags: result := 'AT';
 
     faToggleLineColor: result := 'LC';
 
@@ -222,21 +248,33 @@ begin
     faToggleUseDisplayList: result := 'DL';
     faToggleUseQuickSort: result := 'QS';
     faToggleShowLegend: result := 'LG';
+
     faRggBogen: result := 'B';
+    faRggKoppel: result := 'K';
+    faRggHull: result := 'hull';
 
     faToggleSalingGraph: result := 'SG';
     faToggleControllerGraph: result := 'CG';
     faToggleChartGraph: result := 'DG';
+    faToggleKraftGraph: result := 'KG';
     faToggleMatrixText: result := 'MT';
 
     faMemoryBtn: result := 'M';
     faMemoryRecallBtn: result := 'MR';
 
-    faSofortBtn: result := 'SF';
+    faKorrigiertItem: result := 'KI';
+    faSofortBtn: result := 'SB';
     faGrauBtn: result := 'GB';
     faBlauBtn: result := 'BB';
     faMultiBtn: result := 'MB';
-    faKoppelBtn: result := 'KB';
+
+    faSuperSimple: result := 'gS';
+    faSuperNormal: result := 'gN';
+    faSuperGrau: result := 'gG';
+    faSuperBlau: result := 'gB';
+    faSuperMulti: result := 'gM';
+    faSuperDisplay: result := 'gD';
+    faSuperQuick: result := 'gQ';
 
     faVorstagOS: result := 'vos';
     faWPowerOS: result := 'wos';
@@ -313,9 +351,54 @@ begin
     faParamRZ: result := 'rz';
     faParamCZ: result := 'cz';
 
-    faBlackText: result := 'btx';
-    faGrayText: result := 'gtx';
-    faWhiteText: result := 'wtx';
+    faParamAPW: result := 'apw';
+    faParamEAH: result := 'EAH';
+    faParamEAR: result := 'EAR';
+    faParamEI: result := 'EI';
+
+    faRotaForm1: result := 'RF1';
+    faRotaForm2: result := 'RF2';
+    faRotaForm3: result := 'RF3';
+
+    faReset: result := 'res';
+    faResetPosition: result := 'rpo';
+    faResetRotation: result := 'rro';
+    faResetZoom: result := 'rzo';
+
+    faToggleLanguage: result := 'lan';
+
+    faToggleDropTarget: result := 'tdt';
+
+    faSave: result := 'sav';
+    faLoad: result := 'loa';
+    faOpen: result := 'ope';
+    faCopy: result := '^c';
+    faPaste: result := '^v';
+    faShare: result := 'sha';
+
+    faToggleMoveMode: result := 'mm';
+    faLinearMove: result := 'lmm';
+    faExpoMove: result := 'emm';
+
+    faToggleViewType: result := 'vt';
+    faViewTypeOrtho: result := 'vto';
+    faViewTypePerspective: result := 'vtp';
+
+    faHullMesh: result := 'hm';
+    faHullMeshOn: result := 'hm1';
+    faHullMeshOff: result := 'hm0';
+
+    faShowHelpText: result := 'sh';
+    faShowInfoText: result := 'si';
+    faShowNormalKeyInfo: result := 'nki';
+    faShowSpecialKeyInfo: result := 'ski';
+    faShowDebugInfo: result := 'sdi';
+    faShowZOrderInfo: result := 'zoi';
+
+    faTouchBarTop: result := 'tbT';
+    faTouchBarBottom: result := 'tbB';
+    faTouchBarLeft: result := 'tbL';
+    faTouchBarRight: result := 'tbR';
 
   end;
 end;

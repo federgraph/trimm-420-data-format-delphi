@@ -372,6 +372,7 @@ begin
   sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
   sb.Tag := faLogo;
+  sb.SpecialWidth := 70;
   InitSpeedButton(sb);
 end;
 
@@ -419,7 +420,7 @@ end;
 
 procedure TActionSpeedBarRG01.SandboxedBtnClick(Sender: TObject);
 begin
-  IsSandboxed := not IsSandboxed;
+  MainVar.IsSandboxed := not MainVar.IsSandboxed;
 end;
 
 procedure TActionSpeedBarRG01.AllTagsBtnClick(Sender: TObject);
@@ -454,7 +455,9 @@ end;
 
 procedure TActionSpeedBarRG01.UpdateSpeedButtonDown;
 begin
-  SandboxedBtn.IsPressed := IsSandboxed;
+  SandboxedBtn.IsPressed := MainConst.MustBeSandboxed or MainVar.IsSandboxed;
+//  AllPropsBtn.IsPressed := MainVar.AllProps;
+//  AllTagsBtn.IsPressed := MainVar.AllTags;
 end;
 
 procedure TActionSpeedBarRG01.SpeedButtonClick(Sender: TObject);
@@ -462,6 +465,8 @@ var
   fa: Integer;
 begin
   fa := (Sender as TComponent).Tag;
+//  Main.ActionHandler.Execute(fa);
+
   case fa of
     faUpdateTrimm0: MT0BtnClick(Sender);
 
@@ -479,7 +484,7 @@ begin
     faParamValuePlus10: P10BtnClick(Sender);
 
     faToggleSandboxed: SandboxedBtnClick(Sender);
-    faToggleAllProps: FormMain.AllProps := not FormMain.AllProps;
+    faToggleAllProps: MainVar.AllProps := not MainVar.AllProps;
     faToggleAllTags: AllTagsBtnClick(Sender);
 
     faTrimm1 .. faTrimm6: TrimmBtnClick(Sender);
@@ -532,15 +537,12 @@ end;
 
 procedure TActionSpeedBarRG01.ToggleColorModeBtnClick(Sender: TObject);
 begin
-  DarkMode := not DarkMode;
-  UpdateColor;
-  FormMain.UpdateColorScheme;
+  Main.ToggleDarkMode;
 end;
 
 procedure TActionSpeedBarRG01.ToggleFontSizeBtnClick(Sender: TObject);
 begin
-  ToggleBigMode;
-  FormMain.LayoutComponents;
+  Main.ToggleSpeedPanelFontSize;
 end;
 
 end.

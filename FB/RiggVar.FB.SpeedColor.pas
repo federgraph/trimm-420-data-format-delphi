@@ -37,7 +37,8 @@ type
     clvZoom
   );
 
-  TSpeedColorScheme = record
+  TSpeedColorScheme = class
+  public
     claScheme: TAlphaColor;
 
     claBack: TAlphaColor;
@@ -72,6 +73,8 @@ type
 
     claMemo: TAlphaColor;
 
+    IsDark: Boolean;
+    procedure Init(WantDark: Boolean);
     procedure InitDark;
     procedure InitLight;
     function GetColor(Value: TSpeedColorValue): TAlphaColor;
@@ -118,8 +121,18 @@ begin
   end;
 end;
 
+procedure TSpeedColorScheme.Init(WantDark: Boolean);
+begin
+  if WantDark then
+    InitDark
+  else
+    InitLight;
+end;
+
 procedure TSpeedColorScheme.InitDark;
 begin
+  IsDark := True;
+
   claBack := claSlateGray;
   claHot := claBeige;
 
@@ -129,7 +142,7 @@ begin
   claReport := claOrange;
   claOption := claOrangeRed;
   claProp := claGoldenrod;
-  claData := claLime;
+  claData := claAntiqueWhite;
   claWheel := claAqua;
   claTrimm := claYellow;
 
@@ -159,6 +172,8 @@ end;
 
 procedure TSpeedColorScheme.InitLight;
 begin
+  IsDark := False;
+
   claScheme := claOrange;
 
   claBack := StringToAlphaColor('#FFF0F0F0');

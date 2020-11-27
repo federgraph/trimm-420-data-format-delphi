@@ -21,6 +21,7 @@ type
   public
     ColorValue: TSpeedColorValue;
     IsFirstInGroup: Boolean;
+    SpecialWidth: Integer;
   end;
 
   TActionSpeedBar = class(TLayout)
@@ -54,14 +55,14 @@ type
     procedure SpeedButtonClick(Sender: TObject); virtual;
     procedure UpdateCaptions;
     procedure UpdateHints;
-    procedure ToggleBigMode;
   public
-    SpeedColorScheme: TSpeedColorScheme;
+    class var SpeedColorScheme: TSpeedColorScheme; // injected
 
     constructor Create(AOwner: TComponent); override;
 
     procedure UpdateLayout;
     procedure UpdateColor;
+    procedure ToggleBigMode;
 
     procedure InitSpeedButtons; virtual;
     procedure UpdateSpeedButtonDown; virtual;
@@ -182,6 +183,11 @@ begin
       else
         gs := 0;
       UpdateLayoutForBtn(sb, gs);
+      if sb.SpecialWidth > 0 then
+      begin
+        BtnLeft := BtnLeft + Round(sb.SpecialWidth - sb.Width);
+        sb.Width := sb.SpecialWidth;
+      end;
       sb.Visible := sb.Position.X < self.Width - sb.Width;
     end;
   end;
@@ -282,6 +288,12 @@ begin
     SB.IsFirstInGroup := True
   else
     SB.IsFirstInGroup := False;
+
+  if sb.Width < sb.SpecialWidth then
+  begin
+    BtnLeft := BtnLeft + Round(sb.SpecialWidth - sb.Width);
+    sb.Width := sb.SpecialWidth;
+  end;
 end;
 
 procedure TActionSpeedBar.UpdateSpeedButtonFontColor(SB: TSpeedButton);
