@@ -20,7 +20,7 @@ interface
 
 uses
   RggStrings,
-  RggUnit4,
+  RiggVar.App.Model,
   RiggVar.RG.Def,
   RiggVar.RG.Data,
   System.SysUtils,
@@ -123,7 +123,7 @@ type
     procedure DoTouchbarTop(Delta: single);
 
     procedure ToggleDarkMode;
-    procedure ToggleSpeedPanelFontSize;
+    procedure ToggleButtonSize;
 
     procedure UpdateOnParamValueChanged;
 
@@ -490,14 +490,13 @@ begin
 
   if IsUp then
   begin
-//    FederText.UpdateColorScheme;
     FormMain.UpdateColorScheme;
   end;
 end;
 
-procedure TRggMain.ToggleSpeedPanelFontSize;
+procedure TRggMain.ToggleButtonSize;
 begin
-  FormMain.ToggleSpeedPanelFontSize;
+  FormMain.ToggleButtonSize;
 end;
 
 procedure TRggMain.ToggleDarkMode;
@@ -1068,106 +1067,8 @@ begin
 end;
 
 function TRggMain.GetChecked(fa: TFederAction): Boolean;
-//var
-//  F: TFormMain;
 begin
-//  F := FormMain;
   result := false;
-
-(*
-  if not IsUp then
-    Exit;
-
-  case fa of
-    faController: result := Param = fpController;
-    faWinkel: result := Param = fpWinkel;
-    faVorstag: result := Param = fpVorstag;
-    faWante: result := Param = fpWante;
-    faWoben: result := Param = fpWoben;
-    faSalingH: result := Param = fpSalingH;
-    faSalingA: result := Param = fpSalingA;
-    faSalingL: result := Param = fpSalingL;
-    faSalingW: result := Param = fpSalingW;
-    faMastfallF0C: result := Param = fpMastfallF0C;
-    faMastfallF0F: result := Param = fpMastfallF0F;
-    faMastfallVorlauf: result := Param = fpMastfallVorlauf;
-    faBiegung: result := Param = fpBiegung;
-    faMastfussD0X: result := Param = fpD0X;
-
-    faParamAPW: result := Param = fpAPW;
-    faParamEAH: result := Param = fpEAH;
-    faParamEAR: result := Param = fpEAR;
-    faParamEI: result := Param = fpEI;
-
-    faPan: result := Action = faPan;
-
-    faFixpointA0: result := FixPoint = ooA0;
-    faFixpointA: result := FixPoint = ooA;
-    faFixpointB0: result := FixPoint = ooB0;
-    faFixpointB: result := FixPoint = ooB;
-    faFixpointC0: result := FixPoint = ooC0;
-    faFixpointC: result := FixPoint = ooC;
-    faFixpointD0: result := FixPoint = ooD0;
-    faFixpointD: result := FixPoint = ooD;
-    faFixpointE0: result := FixPoint = ooE0;
-    faFixpointE: result := FixPoint = ooE;
-    faFixpointF0: result := FixPoint = ooF0;
-    faFixpointF: result := FixPoint = ooF;
-
-    faSalingTypFest: result := Rigg.SalingTyp = stFest;
-    faSalingTypDrehbar: result := Rigg.SalingTyp = stDrehbar;
-    faSalingTypOhne: result := Rigg.SalingTyp = stOhneBiegt;
-    faSalingTypOhneStarr: result := Rigg.SalingTyp = stOhneStarr;
-
-    faTrimm0: result := Trimm = 0;
-    faTrimm1: result := Trimm = 1;
-    faTrimm2: result := Trimm = 2;
-    faTrimm3: result := Trimm = 3;
-    faTrimm4: result := Trimm = 4;
-    faTrimm5: result := Trimm = 5;
-    faTrimm6: result := Trimm = 6;
-    fa420: result := Trimm = 7;
-    faLogo: result := Trimm = 8;
-
-    faRggBogen,
-    faRggKoppel,
-    faWantRenderH,
-    faWantRenderP,
-    faWantRenderF,
-    faWantRenderE,
-    faWantRenderS: result := StrokeRigg.QueryRenderOption(fa);
-
-    faRggHull: result := HullVisible;
-    faDemo: result := Demo;
-
-    faSofortBtn: result := SofortBerechnen;
-    faGrauBtn: result := BtnGrauDown;
-    faBlauBtn: result := BtnBlauDown;
-    faMemoryBtn: result := False;
-
-    faSuperSimple: result := GraphRadio = gSimple;
-    faSuperNormal: result := GraphRadio = gNormal;
-    faSuperGrau: result := GraphRadio = gGrau;
-    faSuperBlau: result := GraphRadio = gBlau;
-    faSuperMulti: result := GraphRadio = gMulti;
-    faSuperDisplay: result := GraphRadio = gDisplay;
-    faSuperQuick: result := GraphRadio = gQuick;
-
-    faToggleHelp: result := F.HelpText.Visible;
-    faToggleReport: result := F.ReportText.Visible;
-    faToggleButtonReport: result := F.WantButtonReport;
-    faReportNone..faReportReadme: result := F.ReportManager.GetChecked(fa);
-
-    faToggleDataText: result := F.ShowDataText;
-    faToggleDiffText: result := F.ShowDiffText;
-    faToggleTrimmText: result := F.ShowTrimmText;
-
-    faToggleFontColor: result := MainVar.ColorScheme.IsDark;
-
-    else
-      result := F.GetChecked(fa);
-  end;
-*)
 end;
 
 procedure TRggMain.InitDefaultData;
@@ -1175,10 +1076,9 @@ begin
   if not InitDataOK then
   begin
     InitDataOK := True;
-    InitLogo; // sets WantLogoData to true
-    Init420; // resets WantLogoData to false
+    InitLogo;
+    Init420;
     Trimm := 1;
-//    FixPoint := InitialFixPoint;
   end;
 end;
 

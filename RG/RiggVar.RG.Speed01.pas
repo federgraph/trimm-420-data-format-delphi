@@ -34,8 +34,8 @@ type
 
     SandboxedBtn: TSpeedButton;
 
-    ColorModeBtn: TSpeedButton;
-    FontSizeBtn: TSpeedButton;
+    ToggleDarkModeBtn: TSpeedButton;
+    ToggleButtonSizeBtn: TSpeedButton;
 
     T1Btn: TSpeedButton;
     T2Btn: TSpeedButton;
@@ -52,7 +52,6 @@ type
     procedure P10BtnClick(Sender: TObject);
 
     procedure SandboxedBtnClick(Sender: TObject);
-    procedure AllTagsBtnClick(Sender: TObject);
 
     procedure MT0BtnClick(Sender: TObject);
 
@@ -71,14 +70,8 @@ type
     procedure JsonBtnClick(Sender: TObject);
 
     procedure TrimmBtnClick(Sender: TObject);
-
-    procedure ToggleColorModeBtnClick(Sender: TObject);
-    procedure ToggleFontSizeBtnClick(Sender: TObject);
-  protected
-    procedure SpeedButtonClick(Sender: TObject); override;
   public
     procedure InitSpeedButtons; override;
-    procedure UpdateSpeedButtonDown; override;
   end;
 
 implementation
@@ -99,20 +92,24 @@ begin
 
   BtnColorValue := clvData;
 
-  sb := AddSpeedBtn('FontSizeBtn', BtnGroupSpace);
-  FontSizeBtn := sb;
-  sb.Text := 'FS';
-  sb.Hint := 'Toggle FontSize';
-  sb.OnClick := ToggleFontSizeBtnClick;
-  sb.Tag := faNoop;
+  sb := AddSpeedBtn('ToggleButtonSizeBtn', BtnGroupSpace);
+  ToggleButtonSizeBtn := sb;
+  sb.Text := 'BS';
+  sb.Hint := 'Toggle Button Size';
+  sb.StaysPressed := True;
+  sb.IsPressed := False;
+  sb.Tag := faToggleButtonSize;
+  sb.OnClick := ToggleButtonSizeBtnClick;
   InitSpeedButton(sb);
 
-  sb := AddSpeedBtn('ColorModeBtn');
-  ColorModeBtn := sb;
-  sb.Text := 'CM';
-  sb.Hint := 'Toggle ColorMode';
-  sb.OnClick := ToggleColorModeBtnClick;
-  sb.Tag := faNoop;
+  sb := AddSpeedBtn('ToggleDarkModeBtn');
+  ToggleDarkModeBtn := sb;
+  sb.Text := 'DM';
+  sb.Hint := 'Toggle Dark Mode';
+  sb.StaysPressed := True;
+  sb.IsPressed := False;
+  sb.Tag := faToggleDarkMode;
+  sb.OnClick := ToggleDarkModeBtnClick;
   InitSpeedButton(sb);
 
   { Log Button }
@@ -123,8 +120,6 @@ begin
   LogBtn := sb;
   sb.Text := 'Log';
   sb.Hint := 'Log Btn';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := LogBtnClick;
   InitSpeedButton(sb);
 
@@ -136,8 +131,6 @@ begin
   ShortBtn := sb;
   sb.Text := 'dat';
   sb.Hint := 'Data (Short)';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := ShortBtnClick;
   InitSpeedButton(sb);
 
@@ -145,7 +138,6 @@ begin
   LongBtn := sb;
   sb.Text := 'DAT';
   sb.Hint := 'Data (Long)';
-  sb.StaysPressed := False;
   sb.OnClick := LongBtnClick;
   InitSpeedButton(sb);
 
@@ -153,7 +145,6 @@ begin
   StateBtn := sb;
   sb.Text := 'Sta';
   sb.Hint := 'State Btn';
-  sb.StaysPressed := False;
   sb.OnClick := StateBtnClick;
   InitSpeedButton(sb);
 
@@ -161,7 +152,6 @@ begin
   JsonBtn := sb;
   sb.Text := 'Jsn';
   sb.Hint := 'Json Btn';
-  sb.StaysPressed := False;
   sb.OnClick := JsonBtnClick;
   InitSpeedButton(sb);
 
@@ -187,8 +177,6 @@ begin
   MT0Btn := sb;
   sb.Text := 'MT0';
   sb.Hint := 'Update Trimm 0';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := MT0BtnClick;
   sb.Tag := faUpdateTrimm0;
   InitSpeedButton(sb);
@@ -197,8 +185,6 @@ begin
   ReadTrimmFileBtn := sb;
   sb.Text := 'rtf';
   sb.Hint := 'Read Trimm File';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := ReadTrimmFileBtnClick;
   sb.Tag := faReadTrimmFile;
   InitSpeedButton(sb);
@@ -207,8 +193,6 @@ begin
   SaveTrimmFileBtn := sb;
   sb.Text := 'stf';
   sb.Hint := 'Save Trimm File';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := SaveTrimmFileBtnClick;
   sb.Tag := faSaveTrimmFile;
   InitSpeedButton(sb);
@@ -217,8 +201,6 @@ begin
   CopyTrimmFileBtn := sb;
   sb.Text := 'ctf';
   sb.Hint := 'Copy Trimm File';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := CopyTrimmFileBtnClick;
   sb.Tag := faCopyTrimmFile;
   InitSpeedButton(sb);
@@ -227,8 +209,6 @@ begin
   CopyTrimmItemBtn := sb;
   sb.Text := 'cti';
   sb.Hint := 'Copy Trimm Item';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := CopyTrimmItemBtnClick;
   sb.Tag := faCopyTrimmItem;
   InitSpeedButton(sb);
@@ -237,8 +217,6 @@ begin
   PasteTrimmItemBtn := sb;
   sb.Text := 'pti';
   sb.Hint := 'Paste Trimm Item';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := PasteTrimmItemBtnClick;
   sb.Tag := faPasteTrimmItem;
   InitSpeedButton(sb);
@@ -247,8 +225,6 @@ begin
   CopyAndPasteBtn := sb;
   sb.Text := 'M';
   sb.Hint := 'Copy And Paste';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := CopyAndPasteBtnClick;
   sb.Tag := faCopyAndPaste;
   InitSpeedButton(sb);
@@ -261,8 +237,6 @@ begin
   M10Btn := sb;
   sb.Text := '-10';
   sb.Hint := 'Param Value Minus 10';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := M10BtnClick;
   sb.Tag := faParamValueMinus10;
   InitSpeedButton(sb);
@@ -271,8 +245,6 @@ begin
   M1Btn := sb;
   sb.Text := '-1';
   sb.Hint := 'Param Value Minus 1';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := M1BtnClick;
   sb.Tag := faParamValueMinus1;
   InitSpeedButton(sb);
@@ -281,8 +253,6 @@ begin
   P1Btn := sb;
   sb.Text := '+1';
   sb.Hint := 'Param Value Plus 1';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := P1BtnClick;
   sb.Tag := faParamValuePlus1;
   InitSpeedButton(sb);
@@ -291,8 +261,6 @@ begin
   P10Btn := sb;
   sb.Text := '+10';
   sb.Hint := 'Param Value Plus 10';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := P10BtnClick;
   sb.Tag := faParamValuePlus10;
   InitSpeedButton(sb);
@@ -305,7 +273,6 @@ begin
   T1Btn := sb;
   sb.Text := 'T1';
   sb.Hint := 'Trimm 1 Btn';
-  sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
   sb.Tag := faTrimm1;
   InitSpeedButton(sb);
@@ -314,7 +281,6 @@ begin
   T2Btn := sb;
   sb.Text := 'T2';
   sb.Hint := 'Trimm 2 Btn';
-  sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
   sb.Tag := faTrimm2;
   InitSpeedButton(sb);
@@ -323,7 +289,6 @@ begin
   T3Btn := sb;
   sb.Text := 'T3';
   sb.Hint := 'Trimm 3 Btn';
-  sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
   sb.Tag := faTrimm3;
   InitSpeedButton(sb);
@@ -332,7 +297,6 @@ begin
   T4Btn := sb;
   sb.Text := 'T4';
   sb.Hint := 'Trimm 4 Btn';
-  sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
   sb.Tag := faTrimm4;
   InitSpeedButton(sb);
@@ -341,8 +305,6 @@ begin
   T5Btn := sb;
   sb.Text := 'T5';
   sb.Hint := 'Trimm 5 Btn';
-  sb.StaysPressed := False;
-  sb.IsPressed := False;
   sb.OnClick := TrimmBtnClick;
   sb.Tag := faTrimm5;
   InitSpeedButton(sb);
@@ -351,7 +313,6 @@ begin
   T6Btn := sb;
   sb.Text := 'T6';
   sb.Hint := 'Trimm 6 Btn';
-  sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
   sb.Tag := faTrimm6;
   InitSpeedButton(sb);
@@ -360,7 +321,6 @@ begin
   T7Btn := sb;
   sb.Text := 'T7';
   sb.Hint := 'Trimm 7 Btn (420)';
-  sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
   sb.Tag := fa420;
   InitSpeedButton(sb);
@@ -369,7 +329,6 @@ begin
   T8Btn := sb;
   sb.Text := 'T8';
   sb.Hint := 'Trimm 8 Btn (Logo)';
-  sb.StaysPressed := False;
   sb.OnClick := TrimmBtnClick;
   sb.Tag := faLogo;
   sb.SpecialWidth := 70;
@@ -423,12 +382,6 @@ begin
   MainVar.IsSandboxed := not MainVar.IsSandboxed;
 end;
 
-procedure TActionSpeedBarRG01.AllTagsBtnClick(Sender: TObject);
-begin
-  { All XML Tags or not }
-//  Main.ActionHandler.Execute(faToggleAllTags);
-end;
-
 procedure TActionSpeedBarRG01.M10BtnClick(Sender: TObject);
 begin
   Main.HandleAction(faParamValueMinus10);
@@ -451,47 +404,6 @@ procedure TActionSpeedBarRG01.P1BtnClick(Sender: TObject);
 begin
   Main.HandleAction(faParamValuePlus1);
   FormMain.ShowTrimm;
-end;
-
-procedure TActionSpeedBarRG01.UpdateSpeedButtonDown;
-begin
-  SandboxedBtn.IsPressed := MainConst.MustBeSandboxed or MainVar.IsSandboxed;
-//  AllPropsBtn.IsPressed := MainVar.AllProps;
-//  AllTagsBtn.IsPressed := MainVar.AllTags;
-end;
-
-procedure TActionSpeedBarRG01.SpeedButtonClick(Sender: TObject);
-var
-  fa: Integer;
-begin
-  fa := (Sender as TComponent).Tag;
-//  Main.ActionHandler.Execute(fa);
-
-  case fa of
-    faUpdateTrimm0: MT0BtnClick(Sender);
-
-    faReadTrimmFile: ReadTrimmFileBtnClick(Sender);
-    faSaveTrimmFile: SaveTrimmFileBtnClick(Sender);
-    faCopyTrimmFile: CopyTrimmFileBtnClick(Sender);
-
-    faCopyTrimmItem: CopyTrimmItemBtnClick(Sender);
-    faPasteTrimmItem: PasteTrimmItemBtnClick(Sender);
-    faCopyAndPaste: CopyAndPasteBtnClick(Sender);
-
-    faParamValueMinus1: M1BtnClick(Sender);
-    faParamValueMinus10: M10BtnClick(Sender);
-    faParamValuePlus1: P1BtnClick(Sender);
-    faParamValuePlus10: P10BtnClick(Sender);
-
-    faToggleSandboxed: SandboxedBtnClick(Sender);
-    faToggleAllProps: MainVar.AllProps := not MainVar.AllProps;
-    faToggleAllTags: AllTagsBtnClick(Sender);
-
-    faTrimm1 .. faTrimm6: TrimmBtnClick(Sender);
-    fa420: TrimmBtnClick(Sender);
-    faLogo: TrimmBtnClick(Sender);
-  end;
-
 end;
 
 procedure TActionSpeedBarRG01.LogBtnClick(Sender: TObject);
@@ -533,16 +445,6 @@ begin
   fa := (Sender as TComponent).Tag;
   Main.HandleAction(fa);
   FormMain.ShowTrimm;
-end;
-
-procedure TActionSpeedBarRG01.ToggleColorModeBtnClick(Sender: TObject);
-begin
-  Main.ToggleDarkMode;
-end;
-
-procedure TActionSpeedBarRG01.ToggleFontSizeBtnClick(Sender: TObject);
-begin
-  Main.ToggleSpeedPanelFontSize;
 end;
 
 end.

@@ -6,7 +6,7 @@ uses
   FrmMain in 'App\FrmMain.pas' {FormMain},
   RiggVar.App.Main in 'App\RiggVar.App.Main.pas',
   RggStrings in 'Core\RggStrings.pas',
-  RggUnit4 in 'Core\RggUnit4.pas',
+  RiggVar.App.Model in 'App\RiggVar.App.Model.pas',
   RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
   RiggVar.FB.ActionLong in 'FB\RiggVar.FB.ActionLong.pas',
   RiggVar.FB.ActionShort in 'FB\RiggVar.FB.ActionShort.pas',

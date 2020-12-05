@@ -19,11 +19,11 @@
 interface
 
 uses
+  RiggVar.App.Model,
   RiggVar.RG.Def,
   RiggVar.RG.Report,
   RiggVar.FB.SpeedBar,
   RiggVar.FB.SpeedColor,
-  RggUnit4,
   System.SysUtils,
   System.Classes,
   System.Types,
@@ -95,9 +95,7 @@ type
     SpeedPanel: TActionSpeedBar;
     SpeedColorScheme: TSpeedColorScheme;
     procedure InitSpeedButtons;
-    procedure UpdateSpeedButtonDown;
-    procedure UpdateSpeedButtonEnabled;
-    procedure ToggleSpeedPanelFontSize;
+    procedure ToggleButtonSize;
   public
     procedure UpdateColorScheme;
     procedure LayoutComponents;
@@ -190,8 +188,6 @@ begin
 
   Application.OnHint := HandleShowHint;
   InitSpeedButtons;
-  UpdateSpeedButtonDown;
-  UpdateSpeedButtonEnabled;
   UpdateColorScheme;
 
   Main.InitDefaultData;
@@ -451,7 +447,7 @@ begin
   UpdateLog;
 end;
 
-procedure TFormMain.ToggleSpeedPanelFontSize;
+procedure TFormMain.ToggleButtonSize;
 begin
   SpeedPanel.ToggleBigMode;
   LayoutComponents;
@@ -535,18 +531,6 @@ procedure TFormMain.InitSpeedButtons;
 begin
   if SpeedPanel <> nil then
     SpeedPanel.InitSpeedButtons;
-end;
-
-procedure TFormMain.UpdateSpeedButtonDown;
-begin
-  if SpeedPanel <> nil then
-    SpeedPanel.UpdateSpeedButtonDown;
-end;
-
-procedure TFormMain.UpdateSpeedButtonEnabled;
-begin
-  if SpeedPanel <> nil then
-    SpeedPanel.UpdateSpeedButtonEnabled;
 end;
 
 procedure TFormMain.UpdateColorScheme;

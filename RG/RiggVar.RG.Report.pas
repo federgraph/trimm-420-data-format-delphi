@@ -19,6 +19,7 @@ type
     rgDataText,
     rgDiffText,
 
+    rgAusgabeDetail,
     rgAusgabeRL,
     rgAusgabeRP,
     rgAusgabeRLE,

@@ -52,9 +52,10 @@ type
     procedure InitSpeedButton(SB: TSpeedBtn);
     procedure UpdateSpeedButtonFontColor(SB: TSpeedButton);
     procedure UpdateSpeedButtonFontSize(SB: TSpeedButton);
-    procedure SpeedButtonClick(Sender: TObject); virtual;
     procedure UpdateCaptions;
     procedure UpdateHints;
+    procedure ToggleDarkModeBtnClick(Sender: TObject);
+    procedure ToggleButtonSizeBtnClick(Sender: TObject);
   public
     class var SpeedColorScheme: TSpeedColorScheme; // injected
 
@@ -65,8 +66,6 @@ type
     procedure ToggleBigMode;
 
     procedure InitSpeedButtons; virtual;
-    procedure UpdateSpeedButtonDown; virtual;
-    procedure UpdateSpeedButtonEnabled; virtual;
 
     property DarkMode: Boolean read FDarkMode write SetDarkMode;
     property BigMode: Boolean read FBigMode write SetBigMode;
@@ -84,6 +83,7 @@ type
 implementation
 
 uses
+  RiggVar.App.Main,
   RiggVar.FB.ActionConst,
   RiggVar.FB.ActionShort,
   RiggVar.FB.ActionLong;
@@ -92,7 +92,6 @@ constructor TActionSpeedBar.Create(AOwner: TComponent);
 begin
   inherited;
   InitLayoutProps;
-//  InitSpeedButtons; // Main is still nil (by design)
   DarkMode := True;
   BigMode := True;
 end;
@@ -134,12 +133,6 @@ begin
 {$endif}
   B.Width := BtnWidth;
   B.Height := BtnHeight;
-{$ifdef FMX}
-  { Does not work. }
-  { Because B not assigned yet to actual SpeedButton instance ? }
-//  InitSpeedButton(B);
-  { also maybe not wanted to do this here }
-{$endif}
 {$ifdef Vcl}
   B.Font.Name := 'Consolas';
   B.Font.Size := 12;
@@ -269,7 +262,7 @@ begin
   begin
     sb.Text := GetFederActionShort(SB.Tag);
     sb.Hint := GetFederActionLong(SB.Tag);
-    sb.OnClick := SpeedButtonClick;
+//  sb.Action := Main.ActionList.GetFederAction(sb.Tag, True);
   end;
 
   { Text must be set before changing Font.Size }
@@ -372,22 +365,17 @@ begin
     SpeedColorScheme.InitLight;
 end;
 
+procedure TActionSpeedBar.ToggleDarkModeBtnClick(Sender: TObject);
+begin
+  Main.ToggleDarkMode;
+end;
+
+procedure TActionSpeedBar.ToggleButtonSizeBtnClick(Sender: TObject);
+begin
+  Main.ToggleButtonSize;
+end;
+
 procedure TActionSpeedBar.InitSpeedButtons;
-begin
-  { virtual }
-end;
-
-procedure TActionSpeedBar.SpeedButtonClick(Sender: TObject);
-begin
-  { virtual }
-end;
-
-procedure TActionSpeedBar.UpdateSpeedButtonDown;
-begin
-  { virtual }
-end;
-
-procedure TActionSpeedBar.UpdateSpeedButtonEnabled;
 begin
   { virtual }
 end;

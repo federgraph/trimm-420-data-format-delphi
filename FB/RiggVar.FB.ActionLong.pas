@@ -18,6 +18,8 @@
 
 interface
 
+{.$define WantAll}
+
 uses
   System.SysUtils,
   RiggVar.FB.ActionConst;
@@ -207,7 +209,8 @@ begin
 
     faChartReset: result := 'Chart Reset';
 
-    faToggleFontColor: result := 'Toggle Font Color';
+    faToggleDarkMode: result := 'Toggle Dark Mode';
+    faToggleButtonSize: result := 'Toggle Button Size';
 
     faReportNone: result := 'Empty Report';
     faReportLog: result := 'Log Report';
@@ -363,6 +366,30 @@ begin
     faResetRotation: result := 'Reset Rotation';
     faResetZoom: result := 'Reset Zoom';
 
+    faShowHelpText: result := 'Show Help Text';
+    faShowInfoText: result := 'Show Info Text';
+    faShowNormalKeyInfo: result := 'Show normal key info';
+    faShowSpecialKeyInfo: result := 'Show special key info';
+    faShowDebugInfo: result := 'Show Debug Info';
+    faShowZOrderInfo: result := 'Show Z-Order';
+
+    faParamT1: result := 'Param T1';
+    faParamT2: result := 'Param T2';
+    faParamT3: result := 'Param T3';
+    faParamT4: result := 'Param T4';
+
+    faTouchBarTop: result := 'TouchBar Top: Rotation Z';
+    faTouchBarBottom: result := 'TouchBar Bottom: Zoom';
+    faTouchBarLeft: result := 'TouchBar Left: Big Step';
+    faTouchBarRight: result := 'TouchBar Right: Small Step ';
+
+    faToggleSortedRota: result := 'Toggle Sorted Rota';
+
+    faToggleViewType: result := 'Toggle view type';
+    faViewTypeOrtho: result := 'Set view type to orthographic';
+    faViewTypePerspective: result := 'Set view type to perspective';
+
+{$ifdef WantAll}
     faToggleLanguage: result := 'Toggle Language';
 
     faToggleDropTarget: result := 'Drop target';
@@ -374,10 +401,6 @@ begin
     faPaste: result := 'Paste';
     faShare: result := 'Share';
 
-    faToggleViewType: result := 'Toggle view type';
-    faViewTypeOrtho: result := 'Set view type to orthographic';
-    faViewTypePerspective: result := 'Set view type to perspective';
-
     faHullMesh :result := 'toggle hull mesh';
     faHullMeshOn :result := 'hull mesh on';
     faHullMeshOff :result := 'hull mesh off';
@@ -386,17 +409,16 @@ begin
     faLinearMove: result := 'Linear move';
     faExpoMove: result := 'Exponential move';
 
-    faShowHelpText: result := 'Show Help Text';
-    faShowInfoText: result := 'Show Info Text';
-    faShowNormalKeyInfo: result := 'Show normal key info';
-    faShowSpecialKeyInfo: result := 'Show special key info';
-    faShowDebugInfo: result := 'Show Debug Info';
-    faShowZOrderInfo: result := 'Show Z-Order';
+    faCycleBitmapP: result := 'cycle bitmap +';
+    faCycleBitmapM: result := 'cycle bitmap -';
 
-    faTouchBarTop: result := 'TouchBar Top: Rotation Z';
-    faTouchBarBottom: result := 'TouchBar Bottom: Zoom';
-    faTouchBarLeft: result := 'TouchBar Left: Big Step';
-    faTouchBarRight: result := 'TouchBar Right: Small Step ';
+    faRandom: result := 'Random Param Values';
+    faRandomWhite: result := 'random colors white rings';
+    faRandomBlack: result := 'random colors black rings';
+    faBitmapEscape: result := 'Enter outer cycle';
+
+    faToggleContour: result := 'Toggle contour rings';
+{$endif}
 
   end;
 end;

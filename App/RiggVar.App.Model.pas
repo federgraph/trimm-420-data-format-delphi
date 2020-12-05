@@ -1,4 +1,4 @@
-﻿unit RggUnit4;
+﻿unit RiggVar.App.Model;
 
 interface
 
@@ -6,7 +6,7 @@ uses
   RiggVar.RG.Data;
 
 type
-  TRigg = class // (TRiggFS)
+  TRigg = class
   public
     Data: TRggData;
     constructor Create;
