@@ -5,7 +5,6 @@ uses
   FMX.Forms,
   FrmMain in 'App\FrmMain.pas' {FormMain},
   RiggVar.App.Main in 'App\RiggVar.App.Main.pas',
-  RggStrings in 'Core\RggStrings.pas',
   RiggVar.App.Model in 'App\RiggVar.App.Model.pas',
   RiggVar.FB.ActionConst in 'FB\RiggVar.FB.ActionConst.pas',
   RiggVar.FB.ActionLong in 'FB\RiggVar.FB.ActionLong.pas',
@@ -20,6 +19,7 @@ uses
   RiggVar.RG.Def in 'RG\RiggVar.RG.Def.pas',
   RiggVar.RG.Report in 'RG\RiggVar.RG.Report.pas',
   RiggVar.RG.Main in 'RG\RiggVar.RG.Main.pas',
+  RiggVar.RG.Strings in 'RG\RiggVar.RG.Strings.pas',
   RiggVar.RG.Speed01 in 'RG\RiggVar.RG.Speed01.pas';
 
 {$R *.res}

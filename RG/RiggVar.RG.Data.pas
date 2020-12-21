@@ -21,11 +21,137 @@ interface
 uses
   System.SysUtils,
   System.Classes,
-  System.Math,
-  RiggVar.RG.Def;
+  System.Math;
 
 type
   TRggData = class
+  private type RggConst = record
+    const
+      cFaktor = 'Faktor';
+      cName = 'Name';
+
+      cA0X = 'A0X';
+      cA0Y = 'A0Y';
+      cA0Z = 'A0Z';
+
+      cC0X = 'C0X';
+      cC0Y = 'C0Y';
+      cC0Z = 'C0Z';
+
+      cD0X = 'D0X';
+      cD0Y = 'D0Y';
+      cD0Z = 'D0Z';
+
+      cE0X = 'E0X';
+      cE0Y = 'E0Y';
+      cE0Z = 'E0Z';
+
+      cF0X = 'F0X';
+      cF0Y = 'F0Y';
+      cF0Z = 'F0Z';
+
+      cMU = 'MU';
+      cMO = 'MO';
+      cML = 'ML';
+      cMV = 'MV';
+      cCA = 'CA';
+
+      cCPMin = 'CPMin';
+      cCPPos = 'CPPos';
+      cCPMax = 'CPMax';
+
+      cSHMin = 'SHMin';
+      cSHPos = 'SHPos';
+      cSHMax = 'SHMax';
+
+      cSAMin = 'SAMin';
+      cSAPos = 'SAPos';
+      cSAMax = 'SAMax';
+
+      cSLMin = 'SLMin';
+      cSLPos = 'SLPos';
+      cSLMax = 'SLMax';
+
+      cSWMin = 'SWMin';
+      cSWPos = 'SWPos';
+      cSWMax = 'SWMax';
+
+      cVOMin = 'VOMin';
+      cVOPos = 'VOPos';
+      cVOMax = 'VOMax';
+
+      cWIMin = 'WIMin';
+      cWIPos = 'WIPos';
+      cWIMax = 'WIMax';
+
+      cWLMin = 'WLMin';
+      cWLPos = 'WLPos';
+      cWLMax = 'WLMax';
+
+      cWOMin = 'WOMin';
+      cWOPos = 'WOPos';
+      cWOMax = 'WOMax';
+
+      cCP = 'cp';
+      cSH = 'sh';
+      cSA = 'sa';
+    //  cSL = 'sl';
+    //  cSW = 'sw';
+      cVO = 'vo';
+      cWI = 'wi';
+      cWL = 'wl';
+      cWO = 'wo';
+
+      { saved base values }
+      ch0 = 'h0';
+      cl2 = 'l2';
+      ch2 = 'h2';
+
+      { not persisted }
+      ch1 = 'h1';
+      ch3 = 'h3';
+      cl3 = 'l3';
+      cw3 = 'w3';
+
+      { Delphi code format strings }
+      dsg = '%s := %g;';
+      dsd = '%s := %d;';
+      dss = '%s := %s;';
+      dsf = '%s := %2.2f;';
+
+      dbg = '%d := %g;';
+      dbd = '%d := %d;';
+      dbs = '%d := %s;';
+      dbf = '%d := %2.2f;';
+
+      { Java code format strings }
+      jsg = '%s = %g;';
+      jsd = '%s = %d;';
+      jss = '%s = %s;';
+      jsf = '%s = %2.2f;';
+
+      jbg = '%d = %g;';
+      jbd = '%d = %d;';
+      jbs = '%d = %s;';
+      jbf = '%d = %2.2f;';
+
+      { normal 'properties file' format strings }
+      fsg = '%s=%g';
+      fsd = '%s=%d';
+      fss = '%s=%s';
+      fsf = '%s=%2.2f';
+
+      fbg = '%d=%g';
+      fbd = '%d=%d';
+      fbs = '%d=%s';
+      fbf = '%d=%2.2f';
+
+      cVersion = 'version';
+
+      cOffsetX = 'OffsetX';
+      cOffsetY = 'OffsetY';
+      cOffsetZ = 'OffsetZ';
+    end;
   private
     DoctypeRgg: string;
     DoctypeTrimm: string;
@@ -534,7 +660,7 @@ begin
     AML.Add(Format('Namespace := %s ;', [NamespaceTrimm]));
     AML.Add('Version := 1;');
     AML.Add('');
-    AML.Add(Format(dss, [cName, Name]));
+    AML.Add(Format(RggConst.dss, [RggConst.cName, Name]));
   end
   else if WantJava then
   begin
@@ -542,7 +668,7 @@ begin
     AML.Add(Format('Namespace = %s;', [NamespaceTrimm]));
     AML.Add('Version = 1;');
     AML.Add('');
-    AML.Add(Format(jss, [cName, Name]));
+    AML.Add(Format(RggConst.jss, [RggConst.cName, Name]));
   end
   else
   begin
@@ -551,7 +677,7 @@ begin
     AML.Add(Format('Namespace = %s', [NamespaceTrimm]));
     AML.Add('Version = 1');
     AML.Add('');
-    AML.Add(Format(fss, [cName, Name]));
+    AML.Add(Format(RggConst.fss, [RggConst.cName, Name]));
   end;
   AML.Add('');
   WantName := False;
@@ -571,22 +697,22 @@ end;
 procedure TRggData.SavePascal(AML: TStrings);
 begin
   if WantName then
-    AML.Add(Format(dss, [cName, Name]));
-  DoSave(dsd, AML);
+    AML.Add(Format(RggConst.dss, [RggConst.cName, Name]));
+  DoSave(RggConst.dsd, AML);
 end;
 
 procedure TRggData.SaveJava(AML: TStrings);
 begin
   if WantName then
-    AML.Add(Format(jss, [cName, Name]));
-  DoSave(jsd, AML);
+    AML.Add(Format(RggConst.jss, [RggConst.cName, Name]));
+  DoSave(RggConst.jsd, AML);
 end;
 
 procedure TRggData.SaveProps(AML: TStrings);
 begin
   if WantName then
-    AML.Add(Format(fss, [cName, Name]));
-  DoSave(fsd, AML);
+    AML.Add(Format(RggConst.fss, [RggConst.cName, Name]));
+  DoSave(RggConst.fsd, AML);
 end;
 
 procedure TRggData.DoSave(fs: string; AML: TStrings);
@@ -605,134 +731,134 @@ begin
   if WantSpace then
     AML.Add('');
   if WantAll or (A0X <> fd.A0X) then
-    AML.Add(Format(fs, [cA0X, A0X]));
+    AML.Add(Format(fs, [RggConst.cA0X, A0X]));
   if WantAll or (A0Y <> fd.A0Y) then
-    AML.Add(Format(fs, [cA0Y, A0Y]));
+    AML.Add(Format(fs, [RggConst.cA0Y, A0Y]));
   if WantAll or (A0Z <> fd.A0Z) then
-    AML.Add(Format(fs, [cA0Z, A0Z]));
+    AML.Add(Format(fs, [RggConst.cA0Z, A0Z]));
 
   if WantAll or (C0X <> fd.C0X) then
-    AML.Add(Format(fs, [cC0X, C0X]));
+    AML.Add(Format(fs, [RggConst.cC0X, C0X]));
   if WantAll or (C0Y <> fd.C0Y) then
-    AML.Add(Format(fs, [cC0Y, C0Y]));
+    AML.Add(Format(fs, [RggConst.cC0Y, C0Y]));
   if WantAll or (C0Z <> fd.C0Z) then
-    AML.Add(Format(fs, [cC0Z, C0Z]));
+    AML.Add(Format(fs, [RggConst.cC0Z, C0Z]));
 
   if WantAll or (D0X <> fd.D0X) then
-    AML.Add(Format(fs, [cD0X, D0X]));
+    AML.Add(Format(fs, [RggConst.cD0X, D0X]));
   if WantAll or (D0Y <> fd.D0Y) then
-    AML.Add(Format(fs, [cD0Y, D0Y]));
+    AML.Add(Format(fs, [RggConst.cD0Y, D0Y]));
   if WantAll or (D0Z <> fd.D0Z) then
-    AML.Add(Format(fs, [cD0Z, D0Z]));
+    AML.Add(Format(fs, [RggConst.cD0Z, D0Z]));
 
   if WantAll or (E0X <> fd.E0X) then
-    AML.Add(Format(fs, [cE0X, E0X]));
+    AML.Add(Format(fs, [RggConst.cE0X, E0X]));
   if WantAll or (E0Y <> fd.E0Y) then
-    AML.Add(Format(fs, [cE0Y, E0Y]));
+    AML.Add(Format(fs, [RggConst.cE0Y, E0Y]));
   if WantAll or (E0Z <> fd.E0Z) then
-    AML.Add(Format(fs, [cE0Z, E0Z]));
+    AML.Add(Format(fs, [RggConst.cE0Z, E0Z]));
 
   if WantAll or (F0X <> fd.F0X) then
-    AML.Add(Format(fs, [cF0X, F0X]));
+    AML.Add(Format(fs, [RggConst.cF0X, F0X]));
   if WantAll or (F0Y <> fd.F0Y) then
-    AML.Add(Format(fs, [cF0Y, F0Y]));
+    AML.Add(Format(fs, [RggConst.cF0Y, F0Y]));
   if WantAll or (F0Z <> fd.F0Z) then
-    AML.Add(Format(fs, [cF0Z, F0Z]));
+    AML.Add(Format(fs, [RggConst.cF0Z, F0Z]));
 
   if WantSpace then
     AML.Add('');
   if WantAll or (MU <> fd.MU) then
-    AML.Add(Format(fs, [cMU, MU]));
+    AML.Add(Format(fs, [RggConst.cMU, MU]));
   if WantAll or (MO <> fd.MO) then
-    AML.Add(Format(fs, [cMO, MO]));
+    AML.Add(Format(fs, [RggConst.cMO, MO]));
   if WantAll or (ML <> fd.ML) then
-    AML.Add(Format(fs, [cML, ML]));
+    AML.Add(Format(fs, [RggConst.cML, ML]));
   if WantAll or (MV <> fd.MV) then
-    AML.Add(Format(fs, [cMV, MV]));
+    AML.Add(Format(fs, [RggConst.cMV, MV]));
   if WantAll or (CA <> fd.CA) then
-    AML.Add(Format(fs, [cCA, CA]));
+    AML.Add(Format(fs, [RggConst.cCA, CA]));
 
   if WantSpace then
     AML.Add('');
   if WantAll or (h0 <> fd.h0) then
-    AML.Add(Format(fs, [ch0, h0]));
+    AML.Add(Format(fs, [RggConst.ch0, h0]));
   if WantAll or (h2 <> fd.h2) then
-    AML.Add(Format(fs, [ch2, h2]));
+    AML.Add(Format(fs, [RggConst.ch2, h2]));
   if WantAll or (l2 <> fd.l2) then
-    AML.Add(Format(fs, [cl2, l2]));
+    AML.Add(Format(fs, [RggConst.cl2, l2]));
 
   if WantSpace then
     AML.Add('');
   if WantAll or (CPMin <> fd.CPMin) then
-    AML.Add(Format(fs, [cCPMin, CPMin]));
+    AML.Add(Format(fs, [RggConst.cCPMin, CPMin]));
   if WantAll or (CPPos <> fd.CPPos) then
-    AML.Add(Format(fs, [cCPPos, CPPos]));
+    AML.Add(Format(fs, [RggConst.cCPPos, CPPos]));
   if WantAll or (CPMax <> fd.CPMax) then
-    AML.Add(Format(fs, [cCPMax, CPMax]));
+    AML.Add(Format(fs, [RggConst.cCPMax, CPMax]));
   if WantSpace then
     AML.Add('');
   if WantAll or (SHMin <> fd.SHMin) then
-    AML.Add(Format(fs, [cSHMin, SHMin]));
+    AML.Add(Format(fs, [RggConst.cSHMin, SHMin]));
   if WantAll or (SHPos <> fd.SHPos) then
-    AML.Add(Format(fs, [cSHPos, SHPos]));
+    AML.Add(Format(fs, [RggConst.cSHPos, SHPos]));
   if WantAll or (SHMax <> fd.SHMax) then
-    AML.Add(Format(fs, [cSHMax, SHMax]));
+    AML.Add(Format(fs, [RggConst.cSHMax, SHMax]));
   if WantSpace then
     AML.Add('');
   if WantAll or (SAMin <> fd.SAMin) then
-    AML.Add(Format(fs, [cSAMin, SAMin]));
+    AML.Add(Format(fs, [RggConst.cSAMin, SAMin]));
   if WantAll or (SAPos <> fd.SAPos) then
-    AML.Add(Format(fs, [cSAPos, SAPos]));
+    AML.Add(Format(fs, [RggConst.cSAPos, SAPos]));
   if WantAll or (SAMax <> fd.SAMax) then
-    AML.Add(Format(fs, [cSAMax, SAMax]));
+    AML.Add(Format(fs, [RggConst.cSAMax, SAMax]));
   if WantSpace then
     AML.Add('');
   if WantAll or (SLMin <> fd.SLMin) then
-    AML.Add(Format(fs, [cSLMin, SLMin]));
+    AML.Add(Format(fs, [RggConst.cSLMin, SLMin]));
   if WantAll or (SLPos <> fd.SLPos) then
-    AML.Add(Format(fs, [cSLPos, SLPos]));
+    AML.Add(Format(fs, [RggConst.cSLPos, SLPos]));
   if WantAll or (SLMax <> fd.SLMax) then
-    AML.Add(Format(fs, [cSLMax, SLMax]));
+    AML.Add(Format(fs, [RggConst.cSLMax, SLMax]));
   if WantSpace then
     AML.Add('');
   if WantAll or (SWMin <> fd.SWMin) then
-    AML.Add(Format(fs, [cSWMin, SWMin]));
+    AML.Add(Format(fs, [RggConst.cSWMin, SWMin]));
   if WantAll or (SWPos <> fd.SWPos) then
-    AML.Add(Format(fs, [cSWPos, SWPos]));
+    AML.Add(Format(fs, [RggConst.cSWPos, SWPos]));
   if WantAll or (SWMax <> fd.SWMax) then
-    AML.Add(Format(fs, [cSWMax, SWMax]));
+    AML.Add(Format(fs, [RggConst.cSWMax, SWMax]));
   if WantSpace then
     AML.Add('');
   if WantAll or (VOMin <> fd.VOMin) then
-    AML.Add(Format(fs, [cVOMin, VOMin]));
+    AML.Add(Format(fs, [RggConst.cVOMin, VOMin]));
   if WantAll or (VOPos <> fd.VOPos) then
-    AML.Add(Format(fs, [cVOPos, VOPos]));
+    AML.Add(Format(fs, [RggConst.cVOPos, VOPos]));
   if WantAll or (VOMax <> fd.VOMax) then
-    AML.Add(Format(fs, [cVOMax, VOMax]));
+    AML.Add(Format(fs, [RggConst.cVOMax, VOMax]));
   if WantSpace then
     AML.Add('');
   if WantAll or (WIMin <> fd.WIMin) then
-    AML.Add(Format(fs, [cWIMin, WIMin]));
+    AML.Add(Format(fs, [RggConst.cWIMin, WIMin]));
   if WantAll or (WIPos <> fd.WIPos) then
-    AML.Add(Format(fs, [cWIPos, WIPos]));
+    AML.Add(Format(fs, [RggConst.cWIPos, WIPos]));
   if WantAll or (WIMax <> fd.WIMax) then
-    AML.Add(Format(fs, [cWIMax, WIMax]));
+    AML.Add(Format(fs, [RggConst.cWIMax, WIMax]));
   if WantSpace then
     AML.Add('');
   if WantAll or (WLMin <> fd.WLMin) then
-    AML.Add(Format(fs, [cWLMin, WLMin]));
+    AML.Add(Format(fs, [RggConst.cWLMin, WLMin]));
   if WantAll or (WLPos <> fd.WLPos) then
-    AML.Add(Format(fs, [cWLPos, WLPos]));
+    AML.Add(Format(fs, [RggConst.cWLPos, WLPos]));
   if WantAll or (WLMax <> fd.WLMax) then
-    AML.Add(Format(fs, [cWLMax, WLMax]));
+    AML.Add(Format(fs, [RggConst.cWLMax, WLMax]));
   if WantSpace then
     AML.Add('');
   if WantAll or (WOMin <> fd.WOMin) then
-    AML.Add(Format(fs, [cWOMin, WOMin]));
+    AML.Add(Format(fs, [RggConst.cWOMin, WOMin]));
   if WantAll or (WOPos <> fd.WOPos) then
-    AML.Add(Format(fs, [cWOPos, WOPos]));
+    AML.Add(Format(fs, [RggConst.cWOPos, WOPos]));
   if WantAll or (WOMax <> fd.WOMax) then
-    AML.Add(Format(fs, [cWOMax, WOMax]));
+    AML.Add(Format(fs, [RggConst.cWOMax, WOMax]));
 end;
 
 procedure TRggData.Load(AML: TStrings);
@@ -741,138 +867,138 @@ var
 begin
 //  Reset;
 
-  s := AML.Values[cVersion];
+  s := AML.Values[RggConst.cVersion];
   Version := StrToIntDef(s, VersionTrimm);
 
-  s := AML.Values[cName];
+  s := AML.Values[RggConst.cName];
   Name := s;
 
-  s := AML.Values[cFaktor];
+  s := AML.Values[RggConst.cFaktor];
   Faktor := StrToIntDef(s, Faktor);
 
-  s := AML.Values[cOffsetX];
+  s := AML.Values[RggConst.cOffsetX];
   OffsetX := StrToIntDef(s, OffsetX);
 
-  s := AML.Values[cOffsetZ];
+  s := AML.Values[RggConst.cOffsetZ];
   OffsetZ := StrToIntDef(s, OffsetZ);
 
-  s := AML.Values[cA0X];
+  s := AML.Values[RggConst.cA0X];
   A0X := StrToIntDef(s, A0X);
-  s := AML.Values[cA0Y];
+  s := AML.Values[RggConst.cA0Y];
   A0Y := StrToIntDef(s, A0Y);
-  s := AML.Values[cA0Z];
+  s := AML.Values[RggConst.cA0Z];
   A0Z := StrToIntDef(s, A0Z);
 
-  s := AML.Values[cC0X];
+  s := AML.Values[RggConst.cC0X];
   C0X := StrToIntDef(s, C0X);
-  s := AML.Values[cC0Y];
+  s := AML.Values[RggConst.cC0Y];
   C0Y := StrToIntDef(s, C0Y);
-  s := AML.Values[cC0Z];
+  s := AML.Values[RggConst.cC0Z];
   C0Z := StrToIntDef(s, C0Z);
 
-  s := AML.Values[cD0X];
+  s := AML.Values[RggConst.cD0X];
   D0X := StrToIntDef(s, D0X);
-  s := AML.Values[cD0Y];
+  s := AML.Values[RggConst.cD0Y];
   D0Y := StrToIntDef(s, D0Y);
-  s := AML.Values[cD0Z];
+  s := AML.Values[RggConst.cD0Z];
   D0Z := StrToIntDef(s, D0Z);
 
-  s := AML.Values[cE0X];
+  s := AML.Values[RggConst.cE0X];
   E0X := StrToIntDef(s, E0X);
-  s := AML.Values[cE0Y];
+  s := AML.Values[RggConst.cE0Y];
   E0Y := StrToIntDef(s, E0Y);
-  s := AML.Values[cE0Z];
+  s := AML.Values[RggConst.cE0Z];
   E0Z := StrToIntDef(s, E0Z);
 
-  s := AML.Values[cF0X];
+  s := AML.Values[RggConst.cF0X];
   F0X := StrToIntDef(s, F0X);
-  s := AML.Values[cF0Y];
+  s := AML.Values[RggConst.cF0Y];
   F0Y := StrToIntDef(s, F0Y);
-  s := AML.Values[cF0Z];
+  s := AML.Values[RggConst.cF0Z];
   F0Z := StrToIntDef(s, F0Z);
 
-  s := AML.Values[cMU];
+  s := AML.Values[RggConst.cMU];
   MU := StrToIntDef(s, MU);
-  s := AML.Values[cMO];
+  s := AML.Values[RggConst.cMO];
   MO := StrToIntDef(s, MO);
-  s := AML.Values[cML];
+  s := AML.Values[RggConst.cML];
   ML := StrToIntDef(s, ML);
-  s := AML.Values[cCA];
+  s := AML.Values[RggConst.cCA];
   CA := StrToIntDef(s, CA);
 
-  s := AML.Values[cMV];
+  s := AML.Values[RggConst.cMV];
   MV := StrToIntDef(s, MV);
 
-  s := AML.Values[cCPMin];
+  s := AML.Values[RggConst.cCPMin];
   CPMin := StrToIntDef(s, CPMin);
-  s := AML.Values[cCPPos];
+  s := AML.Values[RggConst.cCPPos];
   CPPos := StrToIntDef(s, CPPos);
-  s := AML.Values[cCPMax];
+  s := AML.Values[RggConst.cCPMax];
   CPMax := StrToIntDef(s, CPMax);
 
-  s := AML.Values[cSHMin];
+  s := AML.Values[RggConst.cSHMin];
   SHMin := StrToIntDef(s, SHMin);
-  s := AML.Values[cSHPos];
+  s := AML.Values[RggConst.cSHPos];
   SHPos := StrToIntDef(s, SHPos);
-  s := AML.Values[cSHMax];
+  s := AML.Values[RggConst.cSHMax];
   SHMax := StrToIntDef(s, SHMax);
 
-  s := AML.Values[cSAMin];
+  s := AML.Values[RggConst.cSAMin];
   SAMin := StrToIntDef(s, SAMin);
-  s := AML.Values[cSAPos];
+  s := AML.Values[RggConst.cSAPos];
   SAPos := StrToIntDef(s, SAPos);
-  s := AML.Values[cSAMax];
+  s := AML.Values[RggConst.cSAMax];
   SAMax := StrToIntDef(s, SAMax);
 
-  s := AML.Values[cSLMin];
+  s := AML.Values[RggConst.cSLMin];
   SLMin := StrToIntDef(s, SLMin);
 //  s := AML.Values[cSLPos];
 //  SLPos := StrToIntDef(s, SLPos);
-  s := AML.Values[cSLMax];
+  s := AML.Values[RggConst.cSLMax];
   SLMax := StrToIntDef(s, SLMax);
 
-  s := AML.Values[cSWMin];
+  s := AML.Values[RggConst.cSWMin];
   SWMin := StrToIntDef(s, SWMin);
 //  s := AML.Values[cSWPos];
 //  SWPos := StrToIntDef(s, SWPos);
-  s := AML.Values[cSWMax];
+  s := AML.Values[RggConst.cSWMax];
   SWMax := StrToIntDef(s, SWMax);
 
-  s := AML.Values[cVOMin];
+  s := AML.Values[RggConst.cVOMin];
   VOMin := StrToIntDef(s, VOMin);
-  s := AML.Values[cVOPos];
+  s := AML.Values[RggConst.cVOPos];
   VOPos := StrToIntDef(s, VOPos);
-  s := AML.Values[cVOMax];
+  s := AML.Values[RggConst.cVOMax];
   VOMax := StrToIntDef(s, VOMax);
 
-  s := AML.Values[cWIMin];
+  s := AML.Values[RggConst.cWIMin];
   WIMin := StrToIntDef(s, WIMin);
-  s := AML.Values[cWIPos];
+  s := AML.Values[RggConst.cWIPos];
   WIPos := StrToIntDef(s, WIPos);
-  s := AML.Values[cWIMax];
+  s := AML.Values[RggConst.cWIMax];
   WIMax := StrToIntDef(s, WIMax);
 
-  s := AML.Values[cWLMin];
+  s := AML.Values[RggConst.cWLMin];
   WLMin := StrToIntDef(s, WLMin);
-  s := AML.Values[cWLPos];
+  s := AML.Values[RggConst.cWLPos];
   WLPos := StrToIntDef(s, WLPos);
-  s := AML.Values[cWLMax];
+  s := AML.Values[RggConst.cWLMax];
   WLMax := StrToIntDef(s, WLMax);
 
-  s := AML.Values[cWOMin];
+  s := AML.Values[RggConst.cWOMin];
   WOMin := StrToIntDef(s, WOMin);
-  s := AML.Values[cWOPos];
+  s := AML.Values[RggConst.cWOPos];
   WOPos := StrToIntDef(s, WOPos);
-  s := AML.Values[cWOMax];
+  s := AML.Values[RggConst.cWOMax];
   WOMax := StrToIntDef(s, WOMax);
 
-  s := AML.Values[cCP];
+  s := AML.Values[RggConst.cCP];
   CPPos := CPPos + StrToIntDef(s, 0);
 
-  s := AML.Values[cSH];
+  s := AML.Values[RggConst.cSH];
   SHPos := SHPos + StrToIntDef(s, 0);
 
-  s := AML.Values[cSA];
+  s := AML.Values[RggConst.cSA];
   SAPos := SAPos + StrToIntDef(s, 0);
 
 //  s := AML.Values[cSL];
@@ -881,34 +1007,34 @@ begin
 //  s := AML.Values[cSW];
 //  SWPos := SWPos + StrToIntDef(s, 0);
 
-  s := AML.Values[cVO];
+  s := AML.Values[RggConst.cVO];
   VOPos := VOPos + StrToIntDef(s, 0);
 
-  s := AML.Values[cWI];
+  s := AML.Values[RggConst.cWI];
   WIPos := WIPos + StrToIntDef(s, 0);
 
-  s := AML.Values[cWL];
+  s := AML.Values[RggConst.cWL];
   WLPos := WLPos + StrToIntDef(s, 0);
 
-  s := AML.Values[cWO];
+  s := AML.Values[RggConst.cWO];
   WOPos := WOPos + StrToIntDef(s, 0);
 
-  s := AML.Values[ch0];
+  s := AML.Values[RggConst.ch0];
   h0 := StrToIntDef(s, h0);
 
-  s := AML.Values[ch1];
+  s := AML.Values[RggConst.ch1];
   h1 := StrToIntDef(s, h1);
 
-  s := AML.Values[ch2];
+  s := AML.Values[RggConst.ch2];
   h2 := StrToIntDef(s, h2);
 
-  s := AML.Values[cl2];
+  s := AML.Values[RggConst.cl2];
   l2 := StrToIntDef(s, l2);
 
-  s := AML.Values[cl3];
+  s := AML.Values[RggConst.cl3];
   l3 := StrToIntDef(s, l3);
 
-  s := AML.Values[cw3];
+  s := AML.Values[RggConst.cw3];
   w3 := StrToIntDef(s, w3);
 
   ProcessH;

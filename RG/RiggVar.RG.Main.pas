@@ -19,7 +19,7 @@
 interface
 
 uses
-  RggStrings,
+  RiggVar.RG.Strings,
   RiggVar.App.Model,
   RiggVar.RG.Def,
   RiggVar.RG.Data,

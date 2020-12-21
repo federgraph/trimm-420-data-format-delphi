@@ -1,4 +1,4 @@
-﻿unit RggStrings;
+﻿unit RiggVar.RG.Strings;
 
 interface
 
